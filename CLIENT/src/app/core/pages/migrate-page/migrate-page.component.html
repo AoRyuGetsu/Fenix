@@ -1,0 +1,40 @@
+<div class="d-flex flex-column align-items-center justify-content-center py-5" style="min-height: 80vh;">
+  <div class="col-11 col-sm-10 col-md-8 col-lg-6">
+
+    <div class="text-center mb-4">
+      <h4 class="fw-bold text-gray-900 mb-2">Migraciones de base de datos</h4>
+      <p class="text-gray-600 small">Ejecuta las migraciones pendientes del sistema.</p>
+    </div>
+
+    @if (error(); as err) {
+      <div class="alert alert-danger text-center small py-2" role="alert">
+        {{ err }}
+      </div>
+    }
+
+    <div class="text-center mb-4">
+      <button
+        type="button"
+        class="btn btn-primary btn-lg px-5"
+        (click)="run()"
+        [disabled]="loading()"
+      >
+        @if (loading()) {
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Ejecutando…
+        } @else {
+          Ejecutar migraciones
+        }
+      </button>
+    </div>
+
+    @if (output(); as html) {
+      <div class="card">
+        <div class="card-body p-4 overflow-auto" style="max-height: 70vh;">
+          <div [innerHTML]="html"></div>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

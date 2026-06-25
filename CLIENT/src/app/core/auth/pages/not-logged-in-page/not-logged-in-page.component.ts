@@ -1,0 +1,20 @@
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+
+@Component({
+  selector: 'app-not-logged-in-page',
+  imports: [RouterModule],
+  template: `
+    <div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);">
+      <div class="text-center px-3">
+        <div class="icon-circle bg-white text-primary mx-auto mb-4" style="width: 4.5rem; height: 4.5rem; font-size: 2rem;">
+          <i class="bi bi-shield-lock"></i>
+        </div>
+        <h3 class="fw-bold text-white mb-2">Acceso restringido</h3>
+        <p class="text-white-50 mb-4" style="font-size: 1.05rem;">Debe iniciar sesión para acceder a esta sección</p>
+        <a routerLink="/login" class="btn btn-light btn-lg px-4 elevation-1">Ir a Iniciar Sesión</a>
+      </div>
+    </div>
+  `,
+})
+export class NotLoggedInPageComponent {}

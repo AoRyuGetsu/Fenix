@@ -1,0 +1,27 @@
+# ──────────────────────────────────────────────
+# API (PHP 8 + Composer)
+# ──────────────────────────────────────────────
+API/vendor/
+API/.env
+API/var/
+API/public/openapi.json
+
+# ──────────────────────────────────────────────
+# CLIENT (Angular 19)
+# ──────────────────────────────────────────────
+CLIENT/node_modules/
+CLIENT/dist/
+CLIENT/.angular/
+
+# ──────────────────────────────────────────────
+# IDE / Editor
+# ──────────────────────────────────────────────
+.vscode/
+
+# ──────────────────────────────────────────────
+# Documentos del proyecto (solo desarrollo)
+# ──────────────────────────────────────────────
+/AGENT_CONTEXT.md
+/AGENTS.md
+/PENDIENTES.md
+/ARCHITECTURE.md

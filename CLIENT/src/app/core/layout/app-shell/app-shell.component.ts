@@ -1,0 +1,11 @@
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import { TopbarComponent } from '../topbar/topbar.component';
+
+@Component({
+  selector: 'app-app-shell',
+  imports: [RouterOutlet, SidebarComponent, TopbarComponent],
+  templateUrl: './app-shell.component.html',
+})
+export class AppShellComponent {}

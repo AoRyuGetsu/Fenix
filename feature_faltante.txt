@@ -1,0 +1,6 @@
+actualizar core/auth se debe agregar una pagina para roles-permisos, que tendra una lista (horizontal con los permisos), luego un card con una tabla con los roles y los permisos de cada rol.
+esta es solo de lectura no se puede modificar ni agregar ni roles ni permisos
+
+actualizar migracion de menus, se debe quitar menu de permisos, al menu de roles se debe asignar la nueva ruta roles-permisos que se genere.
+
+al final actualizar la base de datos quitar el menu de permisos y actualizar menu roles con la nueva ruta que se cree
