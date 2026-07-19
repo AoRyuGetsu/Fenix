@@ -1,28 +1,29 @@
 :root {
-  --primary: #4B5563;
-  --primary-dark: #111827;
-  --primary-light: #AEB7C6;
-  --primary-bg: #F5F7FA;
-  --success: #43a047;
-  --info: #039be5;
-  --warning: #fb8c00;
-  --danger: #e53935;
-  --secondary: #AEB7C6;
-  --light: #F5F7FA;
-  --dark: #111827;
-  --surface: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #4B5563;
-  --text-hint: #AEB7C6;
-  --border-color: #D9DEE7;
-  --divider: #D9DEE7;
-  --sidebar-width: 16rem;
-  --topbar-height: 4rem;
-  --font-family: 'Roboto', sans-serif;
-  --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
-  --shadow-2: 0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1);
-  --shadow-3: 0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1);
-  --shadow-4: 0 15px 25px rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.1);
+  --primary:          #0D1B5E;
+  --primary-dark:     #091345;
+  --primary-light:    #1a2d7a;
+  --primary-bg:       #F4F6F8;
+  --accent:           #F3E12D;
+  --accent-dark:      #d4c828;
+  --success:          #43a047;
+  --info:             #039be5;
+  --warning:          #fb8c00;
+  --danger:           #e53935;
+  --secondary:        #AEB7C6;
+  --light:            #F4F6F8;
+  --dark:             #0D1B5E;
+  --surface:          #FFFFFF;
+  --text-primary:     #0D1B5E;
+  --text-secondary:   #4B5563;
+  --text-hint:        #AEB7C6;
+  --border-color:     #D9DEE7;
+  --divider:          #D9DEE7;
+  --sidebar-width:    16rem;
+  --font-family:      'Roboto', sans-serif;
+  --shadow-1:         0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
+  --shadow-2:         0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-3:         0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1);
+  --shadow-4:         0 15px 25px rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.1);
 }
 
 html {
@@ -34,7 +35,6 @@ body {
   font-family: var(--font-family);
   font-size: 0.875rem;
   color: var(--text-secondary);
-  background-color: #f5f5f5;
   height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -56,7 +56,7 @@ a:focus {
 
 .layout-body {
   display: flex;
-  min-height: calc(100vh - var(--topbar-height));
+  min-height: 100vh;
 }
 
 .content {
@@ -67,13 +67,13 @@ a:focus {
 }
 
 /* ===========================================
-   Sidebar — Material Style
+   Sidebar — Blanco
    =========================================== */
 .sidebar {
   width: var(--sidebar-width);
-  height: calc(100vh - var(--topbar-height));
+  height: 100vh;
   position: sticky;
-  top: var(--topbar-height);
+  top: 0;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -85,19 +85,24 @@ a:focus {
   padding-top: 0;
 }
 
+.sidebar .sidebar-logo-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar .sidebar-logo-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .sidebar hr.sidebar-divider {
   margin: 0 1rem 0.5rem;
   border-top: 1px solid var(--divider);
   opacity: 1;
-}
-
-.sidebar .sidebar-heading {
-  padding: 0.75rem 1.25rem 0.25rem;
-  font-weight: 500;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-hint);
 }
 
 .sidebar .nav-item {
@@ -151,13 +156,13 @@ a:focus {
 }
 
 .sidebar .nav-item.active > .nav-link {
-  background-color: var(--primary-bg);
-  color: var(--primary);
+  background-color: var(--primary);
+  color: var(--accent);
   font-weight: 500;
 }
 
 .sidebar .nav-item.active > .nav-link i {
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .sidebar .nav-item .collapse,
@@ -189,26 +194,32 @@ a:focus {
 }
 
 .sidebar .nav-item .collapse .collapse-inner .collapse-item.active {
-  color: var(--primary);
+  color: var(--accent);
   font-weight: 500;
-  background-color: var(--primary-bg);
+  background-color: var(--primary);
 }
 
 .sidebar .sidebar-footer {
   margin-top: auto;
-  padding: 0.75rem 1rem;
-  border-top: 1px solid var(--divider);
+  background: var(--primary);
+  border-top: 1px solid var(--primary-dark);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar .sidebar-footer .user-section {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  padding: 0.75rem 1rem;
 }
 
 .sidebar .sidebar-footer .avatar {
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 50%;
-  background: var(--primary-bg);
-  color: var(--primary);
+  background: rgba(255,255,255,0.15);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -224,144 +235,52 @@ a:focus {
 .sidebar .sidebar-footer .user-info .user-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--accent);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.sidebar .sidebar-footer .user-info .user-email {
+.sidebar .sidebar-footer .user-info .user-role {
   font-size: 0.75rem;
-  color: var(--text-hint);
+  color: rgba(243, 225, 45, 0.7);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sidebar .sidebar-footer .logout-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar .sidebar-footer .logout-link:hover {
+  background-color: var(--primary-dark);
+  color: var(--accent);
+}
+
+.sidebar .sidebar-footer .logout-link i {
+  font-size: 1rem;
 }
 
 /* sb-admin compat overrides */
-.bg-gradient-primary {
-  background: var(--primary);
-  background-image: none;
-}
-
 .sidebar-dark .nav-item .nav-link,
 .sidebar .nav-pills .nav-link {
   color: var(--text-secondary);
 }
 
 .sidebar .nav-pills .nav-link.active {
-  background-color: var(--primary-bg) !important;
-  color: var(--primary) !important;
+  background-color: var(--primary) !important;
+  color: var(--accent) !important;
   font-weight: 500;
-}
-
-/* ===========================================
-   Topbar — Material Style
-   =========================================== */
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 1031;
-  width: 100%;
-  height: var(--topbar-height);
-  background: var(--primary);
-  border-bottom: 1px solid var(--primary-dark);
-  padding: 0 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.topbar .topbar-title {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #fff;
-}
-
-.topbar .navbar-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.topbar .navbar-nav .nav-item .nav-link {
-  height: 2.5rem;
-  width: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255,255,255,0.75);
-  border-radius: 50%;
-  transition: background-color 0.15s ease;
-  position: relative;
-  padding: 0;
-}
-
-.topbar .navbar-nav .nav-item .nav-link:hover {
-  background-color: rgba(255,255,255,0.1);
-  color: #fff;
-}
-
-.topbar .navbar-nav .nav-item .nav-link .badge-dot {
-  position: absolute;
-  top: 0.35rem;
-  right: 0.35rem;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: var(--danger);
-  border: 2px solid var(--surface);
-}
-
-.topbar .navbar-nav .nav-item .nav-link i {
-  font-size: 1.15rem;
-}
-
-.topbar .navbar-nav .nav-item .user-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem 0.25rem 0.75rem;
-  border-radius: 2rem;
-  color: rgba(255,255,255,0.75);
-  text-decoration: none;
-  transition: background-color 0.15s ease;
-  height: auto;
-  width: auto;
-}
-
-.topbar .navbar-nav .nav-item .user-link:hover {
-  background-color: rgba(255,255,255,0.1);
-  color: #fff;
-}
-
-.topbar .navbar-nav .nav-item .user-link .user-avatar {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  flex-shrink: 0;
-}
-
-.topbar .navbar-nav .nav-item .user-link .user-name {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #fff;
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .topbar .navbar-nav .nav-item .user-link .user-name {
-    display: inline;
-  }
 }
 
 /* ===========================================
@@ -394,22 +313,6 @@ a:focus {
   border-left: 3px solid var(--primary) !important;
 }
 
-.border-left-success {
-  border-left: 3px solid var(--success) !important;
-}
-
-.border-left-info {
-  border-left: 3px solid var(--info) !important;
-}
-
-.border-left-warning {
-  border-left: 3px solid var(--warning) !important;
-}
-
-.border-left-danger {
-  border-left: 3px solid var(--danger) !important;
-}
-
 /* ===========================================
    Buttons — Material Style
    =========================================== */
@@ -428,23 +331,28 @@ a:focus {
 }
 
 .btn-primary {
-  background-color: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
+  --bs-btn-color: var(--primary);
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-hover-color: var(--primary);
+  --bs-btn-hover-bg: var(--accent-dark);
+  --bs-btn-hover-border-color: var(--accent-dark);
+  --bs-btn-active-color: var(--primary);
+  --bs-btn-active-bg: var(--accent-dark);
+  --bs-btn-active-border-color: var(--accent-dark);
+  --bs-btn-focus-shadow-rgb: 243, 225, 45;
+  font-weight: 600;
 }
 
-.btn-primary:hover {
-  background-color: var(--primary-dark);
-  border-color: var(--primary-dark);
-  box-shadow: var(--shadow-2);
-}
-
-.btn-primary:focus {
-  box-shadow: 0 0 0 0.2rem rgba(75, 85, 99, 0.3);
-}
-
-.btn-primary:active {
-  box-shadow: var(--shadow-1);
+.btn-outline-primary {
+  --bs-btn-color: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-hover-color: var(--primary);
+  --bs-btn-hover-bg: var(--accent);
+  --bs-btn-hover-border-color: var(--accent);
+  --bs-btn-active-color: var(--primary);
+  --bs-btn-active-bg: var(--accent);
+  --bs-btn-active-border-color: var(--accent);
 }
 
 .btn-light {
@@ -456,6 +364,42 @@ a:focus {
 .btn-light:hover {
   background-color: #f5f5f5;
   border-color: var(--border-color);
+}
+
+.btn-secondary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--secondary);
+  --bs-btn-border-color: var(--secondary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #9ca8b8;
+  --bs-btn-hover-border-color: #9ca8b8;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #8a97a8;
+  --bs-btn-active-border-color: #8a97a8;
+}
+
+.btn-info {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--primary);
+  --bs-btn-border-color: var(--primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--primary-dark);
+  --bs-btn-hover-border-color: var(--primary-dark);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--primary-dark);
+  --bs-btn-active-border-color: var(--primary-dark);
+  font-weight: 500;
+}
+
+.btn-outline-info {
+  --bs-btn-color: var(--primary);
+  --bs-btn-border-color: var(--primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--primary);
+  --bs-btn-hover-border-color: var(--primary);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--primary);
+  --bs-btn-active-border-color: var(--primary);
 }
 
 /* ===========================================
@@ -473,7 +417,7 @@ a:focus {
 
 .form-control:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(75, 85, 99, 0.15);
+  box-shadow: 0 0 0 2px rgba(13, 27, 94, 0.15);
 }
 
 .form-control-lg {
@@ -494,7 +438,7 @@ a:focus {
 .text-xs { font-size: 0.7rem; }
 .text-sm { font-size: 0.8rem; }
 .text-lg { font-size: 1.1rem; }
-.text-gray-100 { color: #f5f5f5 !important; }
+.text-gray-100 { color: var(--primary-bg) !important; }
 .text-gray-200 { color: var(--divider) !important; }
 .text-gray-300 { color: var(--border-color) !important; }
 .text-gray-400 { color: var(--text-hint) !important; }
@@ -507,9 +451,7 @@ a:focus {
 /* ===========================================
    Background Utilities
    =========================================== */
-.bg-gray-100 { background-color: #f5f5f5 !important; }
-.bg-gray-200 { background-color: var(--divider) !important; }
-.bg-gradient-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); }
+.bg-primary { background-color: var(--primary) !important; }
 
 /* ===========================================
    Icon Circle
@@ -526,50 +468,6 @@ a:focus {
 /* ===========================================
    Dropdown — Material Style
    =========================================== */
-.dropdown-menu {
-  border: none;
-  border-radius: 8px;
-  box-shadow: var(--shadow-3);
-  padding: 0.5rem;
-}
-
-.dropdown-menu .dropdown-item {
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  transition: background-color 0.15s ease;
-}
-
-.dropdown-menu .dropdown-item:hover {
-  background-color: var(--primary-bg);
-  color: var(--primary);
-}
-
-.dropdown-menu .dropdown-item i {
-  font-size: 1rem;
-  width: 1.25rem;
-  text-align: center;
-  color: var(--text-hint);
-}
-
-.dropdown-header {
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-hint);
-  padding: 0.5rem 0.75rem;
-}
-
-.dropdown-divider {
-  border-top: 1px solid var(--divider);
-  margin: 0.25rem 0;
-}
-
 /* ===========================================
    Alerts
    =========================================== */
@@ -606,14 +504,6 @@ a:focus {
 /* ===========================================
    Rotate Utilities
    =========================================== */
-.rotate-n-15 {
-  transform: rotate(-15deg);
-}
-
-.rotate-15 {
-  transform: rotate(15deg);
-}
-
 /* ===========================================
    Animations
    =========================================== */
@@ -628,20 +518,6 @@ a:focus {
   }
 }
 
-.animated--grow-in {
-  animation-name: growIn;
-  animation-duration: 200ms;
-  animation-timing-function: transform cubic-bezier(0.18, 1.25, 0.4, 1), opacity cubic-bezier(0, 1, 0.4, 1);
-}
-
-/* ===========================================
-   Ripple Utility (Material inspired)
-   =========================================== */
-.ripple {
-  position: relative;
-  overflow: hidden;
-}
-
 /* ===========================================
    Material Elevation Classes
    =========================================== */
@@ -649,14 +525,6 @@ a:focus {
   box-shadow: var(--shadow-1);
 }
 
-.elevation-2 {
-  box-shadow: var(--shadow-2);
-}
-
 .elevation-3 {
   box-shadow: var(--shadow-3);
-}
-
-.elevation-4 {
-  box-shadow: var(--shadow-4);
 }

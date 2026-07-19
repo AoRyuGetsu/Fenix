@@ -1,0 +1,8 @@
+{
+  "rp_hdr_roles_permisos":                  { "message": "Roles y Permisos", "desc": "Título página" },
+  "rp_lbl_desc":                            { "message": "Vista general de roles y sus permisos asignados (solo lectura).", "desc": "Descripción página" },
+  "rp_hdr_system_permissions":              { "message": "Permisos del Sistema", "desc": "Card header permisos" },
+  "rp_hdr_roles_and_permissions":           { "message": "Roles y sus Permisos", "desc": "Card header roles x permisos" },
+  "rp_lbl_role":                            { "message": "Rol", "desc": "Columna rol" },
+  "rp_err_load":                            { "message": "Error al cargar roles y permisos", "desc": "Error al cargar" }
+}

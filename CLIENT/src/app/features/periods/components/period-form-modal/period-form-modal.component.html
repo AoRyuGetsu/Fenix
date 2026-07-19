@@ -1,0 +1,39 @@
+<div class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        @if (editing()) {
+          <h5 class="modal-title fw-bold">Editar periodo</h5>
+        } @else {
+          <h5 class="modal-title fw-bold">Nuevo periodo</h5>
+        }
+        <button type="button" class="btn-close" (click)="onClose()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input #inputName type="text" class="form-control" [value]="name()" (input)="name.set(inputName.value)" placeholder="Ej: Ene-Mar 2026" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Fecha inicio <span class="text-danger">*</span></label>
+            <input #inputStart type="date" class="form-control" [value]="startDate()" (input)="startDate.set(inputStart.value)" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Fecha fin <span class="text-danger">*</span></label>
+            <input #inputEnd type="date" class="form-control" [value]="endDate()" (input)="endDate.set(inputEnd.value)" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="saving()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="saving() || !name() || !startDate() || !endDate()">
+          @if (saving()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<div class="mb-3">
+  <button class="btn btn-sm btn-primary" (click)="add.emit()">
+    <i class="bi-plus-lg me-1"></i>Agregar Pregunta
+  </button>
+</div>
+
+@if (questions().length === 0 && !loading()) {
+  <p class="text-muted text-sm">No hay preguntas aún.</p>
+}
+
+@if (loading()) {
+  <div class="text-center py-2">
+    <div class="spinner-border spinner-border-sm text-primary"></div>
+  </div>
+}
+
+<div class="list-group">
+  @for (question of questions(); track question.id) {
+    <div class="list-group-item list-group-item-action">
+      <div class="d-flex justify-content-between align-items-start">
+        <div class="flex-grow-1">
+          <span class="badge bg-secondary me-2">{{ question.question_order }}</span>
+          <strong>{{ question.text }}</strong>
+          <span class="badge bg-info ms-2 text-xs">{{ question.type }}</span>
+          @if (question.type === 'selection' && question.options?.length) {
+            <div class="mt-1 text-sm text-muted">
+              Opciones: {{ question.options!.map(o => o.option_text).join(', ') }}
+            </div>
+          }
+        </div>
+        <div class="btn-group btn-group-sm ms-2">
+          <button class="btn btn-outline-info btn-sm" (click)="edit.emit(question)">
+            <i class="bi-pencil"></i>
+          </button>
+          <button class="btn btn-outline-danger btn-sm" (click)="delete.emit(question.id)">
+            <i class="bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

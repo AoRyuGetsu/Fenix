@@ -1,0 +1,60 @@
+@let q = question();
+
+<div class="card mb-3">
+  <div class="card-body">
+    <label class="form-label fw-semibold mb-2">
+      {{ q.question_order }}. {{ q.text }}
+    </label>
+
+    @switch (q.type) {
+      @case ('textarea') {
+        <textarea
+          class="form-control"
+          [value]="value()"
+          (input)="onTextarea($event)"
+          rows="3"
+        ></textarea>
+      }
+      @case ('selection') {
+        <select
+          class="form-select"
+          [value]="value()"
+          (change)="onSelect($event)"
+        >
+          <option value="" disabled selected>{{ 'eval_plh_select_option' | message }}</option>
+          @for (opt of q.options; track trackByOptionId($index, opt)) {
+            <option [value]="opt.option_text">{{ opt.option_text }}</option>
+          }
+        </select>
+      }
+      @case ('radio') {
+        <div class="d-flex flex-column gap-2">
+          @for (opt of q.options; track trackByOptionId($index, opt)) {
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                [name]="'q_' + q.id"
+                [id]="'q_' + q.id + '_opt_' + opt.id"
+                [value]="opt.option_text"
+                [checked]="value() === opt.option_text"
+                (change)="onOptionSelect(opt.option_text)"
+              />
+              <label class="form-check-label" [for]="'q_' + q.id + '_opt_' + opt.id">
+                {{ opt.option_text }}
+              </label>
+            </div>
+          }
+        </div>
+      }
+      @default {
+        <input
+          type="text"
+          class="form-control"
+          [value]="value()"
+          (input)="onInput($event)"
+        />
+      }
+    }
+  </div>
+</div>

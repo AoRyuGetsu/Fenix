@@ -1,0 +1,164 @@
+@if (loading()) {
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+} @else {
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          @if (detail() !== null) {
+            <th style="width: 40px;"></th>
+          }
+          @for (col of columns(); track col.key) {
+            <th [style.width]="col.width ?? undefined">{{ col.label }}</th>
+          }
+          @if (actions().length > 0) {
+            <th style="width: 140px;">Acciones</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of data(); track item.id) {
+          <tr>
+            @if (detail() !== null) {
+              <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-secondary border-0"
+                  (click)="toggleExpand(item.id)" title="Detalles">
+                  <i class="bi"
+                    [class.bi-chevron-down]="!isExpanded(item.id)"
+                    [class.bi-chevron-up]="isExpanded(item.id)"></i>
+                </button>
+              </td>
+            }
+            @for (col of columns(); track col.key) {
+              <td [class]="col.class ?? ''">
+                @switch (col.format) {
+                  @case ('badge') {
+                    @let val = cellValue(item, col.key);
+                    @let cfg = col.badgeMap?.[val];
+                    @if (cfg) {
+                      <span class="badge" [class]="cfg.class">{{ cfg.label }}</span>
+                    } @else {
+                      <span class="badge bg-secondary">{{ val }}</span>
+                    }
+                  }
+                  @case ('boolean') {
+                    @if (cellValue(item, col.key)) {
+                      <span class="badge bg-success">Sí</span>
+                    } @else {
+                      <span class="badge bg-danger">No</span>
+                    }
+                  }
+                  @case ('date') {
+                    {{ cellValue(item, col.key) | date:'dd/MM/yyyy HH:mm' }}
+                  }
+                  @case ('template') {
+                    <ng-container
+                      [ngTemplateOutlet]="col.template!"
+                      [ngTemplateOutletContext]="{ $implicit: item, value: cellValue(item, col.key) }">
+                    </ng-container>
+                  }
+                  @default {
+                    {{ cellValue(item, col.key) }}
+                  }
+                }
+              </td>
+            }
+            @if (actions().length > 0) {
+              <td>
+                <div class="btn-group btn-group-sm">
+                  @for (act of actions(); track act.key) {
+                    @if (!act.visible || act.visible(item)) {
+                      <button type="button" class="btn {{ act.btnClass ?? 'btn-outline-info' }}"
+                        (click)="actionClick.emit({ key: act.key, item: item })"
+                        [attr.title]="act.label">
+                        <i class="bi {{ act.icon }}"></i>
+                      </button>
+                    }
+                  }
+                </div>
+              </td>
+            }
+          </tr>
+          @if (detail() !== null && isExpanded(item.id)) {
+            <tr>
+              <td [attr.colspan]="colspan()" class="p-0 border-0">
+                <div class="p-3 bg-light">
+                  <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                      @if (detail()!.template) {
+                        <ng-container [ngTemplateOutlet]="detail()!.template!"
+                          [ngTemplateOutletContext]="{ $implicit: item }">
+                        </ng-container>
+                      } @else {
+                        <h6 class="fw-bold mb-3">Detalles</h6>
+                        <div class="row g-3">
+                          @for (field of detail()!.fields!; track field.key) {
+                            <div class="{{ field.colspan ?? 'col-md-4' }}">
+                              <small class="text-muted d-block">{{ field.label }}</small>
+                              @switch (field.format) {
+                                @case ('badge') {
+                                  @let val = cellValue(item, field.key);
+                                  @let cfg = field.badgeMap?.[val];
+                                  @if (cfg) {
+                                    <span class="badge" [class]="cfg.class">{{ cfg.label }}</span>
+                                  } @else {
+                                    <span class="badge bg-secondary">{{ val }}</span>
+                                  }
+                                }
+                                @case ('boolean') {
+                                  @if (cellValue(item, field.key)) {
+                                    <span class="badge bg-success">Sí</span>
+                                  } @else {
+                                    <span class="badge bg-danger">No</span>
+                                  }
+                                }
+                                @case ('date') {
+                                  <span>{{ cellValue(item, field.key) | date:'dd/MM/yyyy HH:mm' }}</span>
+                                }
+                                @default {
+                                  <span>{{ cellValue(item, field.key) ?? '-' }}</span>
+                                }
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        } @empty {
+          <tr>
+            <td [attr.colspan]="colspan()" class="text-center text-muted py-4">
+              {{ emptyMsg() }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (pagination().total > 0) {
+    <nav class="mt-3">
+      <ul class="pagination pagination-sm justify-content-center mb-0">
+        <li class="page-item" [class.disabled]="pagination().page <= 1">
+          <button class="page-link" (click)="pageChange.emit(pagination().page - 1)"><i class="bi bi-chevron-left"></i></button>
+        </li>
+        @for (p of pages(); track p) {
+          <li class="page-item" [class.active]="p === pagination().page">
+            <button class="page-link" (click)="pageChange.emit(p)">{{ p }}</button>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="pagination().page >= totalPages()">
+          <button class="page-link" (click)="pageChange.emit(pagination().page + 1)"><i class="bi bi-chevron-right"></i></button>
+        </li>
+      </ul>
+    </nav>
+  }
+}

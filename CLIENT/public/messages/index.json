@@ -1,0 +1,10 @@
+{
+  "features": {
+    "core": "core.json",
+    "evaluations": "evaluations.json",
+    "periods": "periods.json",
+    "questionnaire": "questionnaire.json",
+    "users": "users.json",
+    "rolesPermisos": "roles-permisos.json"
+  }
+}

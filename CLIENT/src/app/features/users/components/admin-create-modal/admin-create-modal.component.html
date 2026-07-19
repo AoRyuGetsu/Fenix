@@ -1,0 +1,31 @@
+<div class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Nuevo administrador</h5>
+        <button type="button" class="btn-close" (click)="onClose()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+            <input #emailInput type="email" class="form-control" [value]="email()" (input)="email.set(emailInput.value)" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Contraseña <span class="text-danger">*</span></label>
+            <input #passwordInput type="password" class="form-control" [value]="password()" (input)="password.set(passwordInput.value)" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading() || !email() || !password()">
+          @if (loading()) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+          }
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

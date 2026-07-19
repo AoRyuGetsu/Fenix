@@ -1,12 +1,12 @@
 # Analítica API
 
-API de análisis de datos basada en una arquitectura **Modular Service-Oriented MVC** con PHP 8.3+.
+API de análisis de datos basada en una arquitectura **Modular Service-Oriented MVC** con PHP 8.2+.
 
 ## Estructura del proyecto
 
 ```
 analitica_api/
-├── API/             ← Backend (PHP 8.3+, sin framework)
+├── API/             ← Backend (PHP 8.2+, sin framework)
 │   ├── app/         ←   Código fuente (Core + Features)
 │   ├── config/      ←   Configuración (DI, base de datos)
 │   ├── DB/          ←   Scripts SQL y migraciones
@@ -16,7 +16,7 @@ analitica_api/
 │   ├── vendor/      ←   Dependencias Composer
 │   ├── composer.json
 │   └── .env
-├── CLIENT/          ← Frontend (Angular 19+, Bootstrap 5)
+├── CLIENT/          ← Frontend (Angular 22+, Bootstrap 5)
 │   ├── src/         ←   Código fuente (standalone components, signals)
 │   ├── dist/        ←   Build de producción
 │   ├── angular.json
@@ -47,23 +47,25 @@ Las **migraciones de datos** (roles, usuarios iniciales, etc.) se ejecutan con s
 | `symfony/error-handler` | Manejo de errores |
 | `symfony/http-foundation` | Request/Response |
 | `zircote/swagger-php` | Generación de spec OpenAPI |
+| `doctrine/orm` SQLFilter | Soft delete automático (`SoftDeleteFilter`) |
+| `middleware.php` + `AuthContext` | Autenticación JWT y autorización por roles en rutas |
 | `phpunit/phpunit` | Testing |
 
 ### Frontend
 
 | Tecnología | Propósito |
 |---|---|
-| Angular 19+ | SPA con standalone components y signals |
+| Angular 22+ | SPA con standalone components y signals |
 | Bootstrap 5 | Sistema de diseño base |
 | Bootstrap Icons | Iconografía |
-| TypeScript 5+ | Tipado estricto |
-| Shared form controls | Componentes genéricos para formularios (text, number, select, date, textarea) |
+| TypeScript 6+ | Tipado estricto |
+| `app-gtable` | Componente genérico de tabla con paginación, columnas configurables y detalle expandible |
 
 ## Inicio rápido
 
 ### Requisitos
 
-- PHP >= 8.3
+- PHP >= 8.2
 - Composer
 - MySQL 8.0+
 
@@ -118,18 +120,27 @@ curl http://localhost:8000/health
 Abrir en el navegador (o con curl):
 
 ```
-http://localhost:8000/migrate.php
+http://localhost:8000/migrate.php                → modo incremental
+http://localhost:8000/migrate.php?confirm=reset  → borra DB y regenera desde cero
 ```
 
 También disponible desde el frontend en `http://localhost:4200/migrate`.
 
 En desarrollo se accede sin restricciones. En producción requiere definir `MIGRATION_TOKEN` en `.env` y acceder como `/migrate.php?token=...`.
 
+El modo de ejecución se controla con la variable `RESET_DATABASE_ON_MIGRATE` en el `.env`:
+- `false` (default) → incremental: verifica existencias, no pierde datos
+- `true` → reset completo: borra todo y regenera estructura + datos
+
 ### Credenciales de ingreso
 
 | Usuario | Contraseña |
 |---------|-----------|
 | `administrador@mail.com` | `adminPass1234` |
+| `supervisor@mail.com` | `pass1234` |
+| `entrenador@mail.com` | `pass1234` |
+| `jugador@mail.com` | `pass1234` |
+| `representante@mail.com` | `pass1234` |
 
 ### Documentación interactiva
 
@@ -193,10 +204,52 @@ $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE,
 $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 ```
 
-Si frontend y backend sirven desde el **mismo dominio** (ej: backend sirve los archivos estáticos de Angular en `public/`), la URL base se resuelve automáticamente como `''` en producción y `http://localhost:8000` en desarrollo vía `isDevMode()`.
+La URL base del backend se obtiene de `CLIENT/public/config/config.json` (campo `apiUrl`) a través de `ConfigService`. En desarrollo típicamente `http://localhost:8000`, en producción puede ser el mismo origen o un dominio separado.
 
 Para producción, cambiar `Access-Control-Allow-Origin` de `*` al dominio específico del frontend. Si están en el mismo origen, no se requieren CORS.
 
 ### Configuración de la app
 
-Toda la configuración que el frontend necesita conocer (nombre de la app, URL de la API, etc.) se define en el `.env` del backend, se expone en `GET /config` y se consume via `ConfigFacade`. No existen archivos `environments/` en el frontend.
+Toda la configuración que el frontend necesita conocer (apiUrl, logoUrl, backgroundUrl) se define en `CLIENT/public/config/config.json` y se carga via `ConfigService` (`APP_INITIALIZER`). No existen archivos `environments/` en el frontend.
+
+---
+
+## Autenticación y Autorización
+
+El sistema usa **JWT (HS256)** con middleware centralizado:
+
+### Middleware de rutas
+
+Todas las rutas protegidas se envuelven con `middleware(Container, handler, roles?)`:
+
+| Tipo | Ejemplo |
+|---|---|
+| Pública (sin middleware) | `/health`, `/config`, `/auth/login`, `/people` (GET) |
+| Autenticada (cualquier rol) | `/auth/me`, GETs de listados, `/users` |
+| Solo administrador | POST/PUT/DELETE de cualquier recurso |
+
+**Flujo del middleware:**
+1. Extrae `Authorization: Bearer <token>` del header
+2. Valida el token JWT
+3. Crea `AuthContext` (userId, email, roles, permissions) y lo inyecta en el Container
+4. Si la ruta requiere roles específicos, verifica que el usuario tenga al menos uno (403 en caso contrario)
+5. Si el usuario es administrador, desactiva `SoftDeleteFilter` para que pueda ver registros soft-deleteados
+6. Ejecuta el controller
+
+### Soft Delete automático
+
+El `SoftDeleteFilter` (Doctrine SQLFilter) agrega automáticamente `deletedAt IS NULL` a todas las consultas. Los administradores lo ven desactivado (ven registros eliminados).
+
+### Endpoints públicos y protegidos
+
+Ver `ARCHITECTURE.md` §2.13 para la tabla completa de endpoints con sus requisitos de autenticación.
+
+### Features disponibles
+
+| Feature | Backend | Frontend |
+|---------|---------|----------|
+| Usuarios (CRUD + admin) | `app/Features/User/` | `CLIENT/src/app/features/users/` |
+| Roles y Permisos | `app/Features/RolesPermisos/` | `core/auth/` (RolesPermisosPage) |
+| Personas | `app/Features/People/` | (pendiente) |
+| Cuestionarios | `app/Features/Questionnaire/` | `features/questionnaire/` |
+| Evaluaciones | `app/Features/Questionnaire/` (Evaluation + Answer) | `features/evaluations/` |

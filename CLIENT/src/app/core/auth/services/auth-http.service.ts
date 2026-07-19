@@ -1,8 +1,7 @@
-import { Injectable, inject, isDevMode } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-const BASE_URL = isDevMode() ? 'http://localhost:8000' : '';
+import { ConfigService } from '../../services/config.service';
 
 export interface MenuItem {
   id: number;
@@ -13,6 +12,12 @@ export interface MenuItem {
   menu_order: number;
 }
 
+export interface RoleItem {
+  id: number;
+  code: string;
+  name: string;
+}
+
 export interface LoginResponse {
   access_token: string;
   refresh_token: string;
@@ -20,31 +25,29 @@ export interface LoginResponse {
   user: {
     id: number;
     email: string;
+    person: { full_name: string } | null;
   };
-  menus: MenuItem[];
-}
-
-export interface MeResponse {
-  id: number;
-  email: string;
   roles: string[];
-  permissions: string[];
   menus: MenuItem[];
+  catalogs?: {
+    roles: RoleItem[];
+    [key: string]: unknown[];
+  };
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthHttpService {
   private http = inject(HttpClient);
+  private config = inject(ConfigService);
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${BASE_URL}/auth/login`, { email, password });
+    return this.http.post<LoginResponse>(`${this.config.apiUrl}/auth/login`, { email, password });
   }
 
-  refresh(refreshToken: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${BASE_URL}/auth/refresh`, { refresh_token: refreshToken });
-  }
-
-  me(): Observable<MeResponse> {
-    return this.http.get<MeResponse>(`${BASE_URL}/auth/me`);
+  refresh(refreshToken: string): Observable<{ access_token: string; refresh_token: string }> {
+    return this.http.post<{ access_token: string; refresh_token: string }>(
+      `${this.config.apiUrl}/auth/refresh`,
+      { refresh_token: refreshToken },
+    );
   }
 }

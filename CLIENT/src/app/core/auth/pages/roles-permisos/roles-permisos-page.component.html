@@ -1,0 +1,69 @@
+<div class="container-fluid">
+  <h4 class="text-gray-800 fw-bold mb-1">Roles y Permisos</h4>
+  <p class="text-gray-600 mb-4" style="font-size: 0.9rem;">Vista general de roles y sus permisos asignados (solo lectura).</p>
+
+  @if (vm().loading) {
+    <div class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  }
+
+  @if (vm().error) {
+    <div class="alert alert-danger" role="alert">{{ vm().error }}</div>
+  }
+
+  @if (!vm().loading && !vm().error) {
+    <!-- Permisos horizontal -->
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-primary">Permisos del Sistema</h6>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+          @for (perm of vm().permissions; track perm.id) {
+            <span class="badge bg-secondary fs-6">{{ perm.name }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla Roles x Permisos -->
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-primary">Roles y sus Permisos</h6>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-light">
+              <tr>
+                <th style="min-width: 120px;">Rol</th>
+                @for (perm of vm().permissions; track perm.id) {
+                  <th class="text-center" style="min-width: 100px;">{{ perm.name }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (role of vm().roles; track role.id) {
+                <tr>
+                  <td class="fw-semibold">{{ role.name }}</td>
+                  @for (perm of vm().permissions; track perm.id) {
+                    <td class="text-center">
+                      @if (facade.roleHasPermission(role, perm.name)) {
+                        <i class="bi bi-check-lg text-success fs-5"></i>
+                      } @else {
+                        <i class="bi bi-dash text-muted fs-5"></i>
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+</div>

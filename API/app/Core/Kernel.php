@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core;
 
 use App\Core\OpenApi\OpenApiController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,6 +29,11 @@ class Kernel
             $this->container,
         );
 
+        $this->router->registerFromFeatures(
+            __DIR__ . '/../Infrastructure',
+            $this->container,
+        );
+
         $this->router->addRoute('GET', '/api-docs', function () {
             $controller = new OpenApiController();
             return $controller->spec();
@@ -45,7 +51,19 @@ class Kernel
             $response = new Response('', 204);
         } else {
             $this->container->set(Request::class, $request);
-            $response = $this->router->dispatch($request);
+            try {
+                $response = $this->router->dispatch($request);
+            } catch (\Throwable $e) {
+                $logger = $this->container->get(\Monolog\Logger::class);
+                $logger->error('Unhandled exception in request', [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                    'trace'   => $e->getTraceAsString(),
+                    'url'     => $request->getMethod() . ' ' . $request->getRequestUri(),
+                ]);
+                $response = new JsonResponse(['error' => 'Internal server error'], 500);
+            }
         }
 
         $response->headers->set('Access-Control-Allow-Origin', '*');

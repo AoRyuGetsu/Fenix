@@ -1,4 +1,7 @@
 <ul class="navbar-nav sidebar accordion" id="accordionSidebar">
+  <li class="sidebar-logo-item">
+    <img [src]="logoUrl" alt="Logo" class="sidebar-logo-img" />
+  </li>
   <hr class="sidebar-divider mt-0">
 
   @for (item of menuTree(); track item.id) {
@@ -50,13 +53,23 @@
 
   @if (authVm().user) {
     <div class="sidebar-footer">
-      <div class="avatar">
-        <i class="bi bi-person"></i>
+      <div class="user-section">
+        <div class="avatar">
+          <i class="bi bi-person"></i>
+        </div>
+        <div class="user-info">
+          @if (authVm().user?.person?.full_name) {
+            <div class="user-name">{{ authVm().user?.person?.full_name }}</div>
+          } @else {
+            <div class="user-name">{{ authVm().user?.email }}</div>
+          }
+          <div class="user-role">{{ userRoleName() }}</div>
+        </div>
       </div>
-      <div class="user-info">
-        <div class="user-name">{{ displayName() }}</div>
-        <div class="user-email">{{ authVm().user?.email }}</div>
-      </div>
+      <a class="logout-link" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+      </a>
     </div>
   }
 </ul>

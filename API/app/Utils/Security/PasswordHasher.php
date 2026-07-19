@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Utils\Security;
 
-use App\Core\Contracts\PasswordHasherInterface;
+use App\Core\Interfaces\PasswordHasherInterface;
 
 class PasswordHasher implements PasswordHasherInterface
 {

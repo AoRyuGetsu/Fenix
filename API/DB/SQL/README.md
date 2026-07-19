@@ -14,4 +14,4 @@ mysql -u analiticaDBUser -p analiticaDB < DB/SQL/002_*.sql
 | Script | Descripción |
 |--------|-------------|
 | `001_create_database.sql` | Crea la base de datos `analiticaDB` con charset utf8mb4. |
-| `002_create_structure.sql` | Crea tablas `users`, `roles`, `permissions`, `user_roles`, `role_permissions` con sus FK. |
+| `002_create_structure.sql` | Crea todas las tablas del sistema: `users`, `roles`, `permissions`, `user_roles`, `role_permissions`, `menus`, `menu_role`, `people_type`, `people`, `person_user`, `questionnaires`, `questionnaire_sections`, `questions`, `question_options`, `evaluations`, `answers`. Incluye FK, soft delete (`deleted_at`, `deleted_by`), y auto-referencias para auditoría. |

@@ -21,7 +21,7 @@ class Router
 
     public function registerFromFeatures(string $featuresDir, Container $container): void
     {
-        foreach (glob(rtrim($featuresDir, '/') . '/*/Routes/routes.php') as $file) {
+        foreach (glob(rtrim($featuresDir, '/') . '/*/Application/Routes/routes.php') as $file) {
             $routes = require $file;
             $routes($this, $container);
         }
@@ -54,6 +54,6 @@ class Router
 
     private function resolveHandler(callable|array $handler, array $params): Response
     {
-        return call_user_func_array($handler, $params);
+        return call_user_func_array($handler, array_values($params));
     }
 }

@@ -1,0 +1,19 @@
+<app-gtable
+  [columns]="cols()"
+  [data]="items()"
+  [pagination]="pagination()"
+  [loading]="loading()"
+  [actions]="actions"
+  [detail]="detailConfig()"
+  (pageChange)="pageChange.emit($event)"
+  (expandedChange)="expandedChange.emit($event)"
+  (actionClick)="onAction($event)">
+</app-gtable>
+
+<ng-template #countTpl let-item>
+  @if (item.questions_count === 0) {
+    <span class="badge bg-danger">0</span>
+  } @else {
+    {{ item.questions_count }}
+  }
+</ng-template>

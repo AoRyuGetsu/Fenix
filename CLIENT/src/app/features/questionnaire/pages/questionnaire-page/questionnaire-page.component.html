@@ -1,0 +1,199 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="text-gray-800 fw-bold mb-1">Cuestionarios</h4>
+      <p class="text-gray-800 mb-0 text-sm">Administración de cuestionarios y preguntas</p>
+    </div>
+    <button class="btn btn-primary" (click)="facade.openCreateModal()">
+      <i class="bi-plus-lg me-1"></i>Nuevo Cuestionario
+    </button>
+  </div>
+
+  @if (vm().success) {
+    <div class="alert alert-success alert-dismissible fade show py-2" role="alert">
+      {{ vm().success }}
+      <button type="button" class="btn-close py-2" (click)="facade.clearMessages()"></button>
+    </div>
+  }
+  @if (vm().error) {
+    <div class="alert alert-danger alert-dismissible fade show py-2" role="alert">
+      {{ vm().error }}
+      <button type="button" class="btn-close py-2" (click)="facade.clearMessages()"></button>
+    </div>
+  }
+
+  @if (vm().loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  }
+
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 fw-bold text-gray-800">Listado de Cuestionarios</h6>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <input
+            #filterInput
+            type="text"
+            class="form-control"
+            placeholder="Buscar por título..."
+            [value]="vm().searchTerm"
+            (input)="onFilter(filterInput.value)"
+          />
+        </div>
+      </div>
+      <app-questionnaire-table
+        [items]="vm().items"
+        [loading]="vm().loading"
+        [pagination]="pagination()"
+        [detailTemplate]="detailTpl"
+        (edit)="facade.openUpdateModal($event)"
+        (delete)="facade.deleteQuestionnaire($event.id)"
+        (expandedChange)="onExpandedChange($event)"
+        (pageChange)="facade.changePage($event)">
+      </app-questionnaire-table>
+    </div>
+  </div>
+
+  <ng-template #detailTpl let-item>
+    @if (item.description) {
+      <p class="text-muted mb-2">{{ item.description }}</p>
+    }
+    <div class="row mb-3">
+      <div class="col-md-4 col-sm-6">
+        <small class="text-muted d-block">Rol que responde</small>
+        <span class="fw-medium">{{ item.responder_role }}</span>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <small class="text-muted d-block">Rol evaluado</small>
+        <span class="fw-medium">{{ item.target_role }}</span>
+      </div>
+      <div class="col-md-4 col-sm-6">
+        <small class="text-muted d-block">Activo</small>
+        <span class="badge" [class.bg-success]="item.active" [class.bg-secondary]="!item.active">
+          {{ item.active ? 'Sí' : 'No' }}
+        </span>
+      </div>
+    </div>
+    <hr />
+
+    @if (vm().detailSectionsLoading) {
+      <div class="text-center py-2">
+        <div class="spinner-border spinner-border-sm text-primary"></div>
+      </div>
+    } @else {
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-bold mb-0">Secciones</h6>
+        <button class="btn btn-sm btn-primary" (click)="onAddSection()">
+          <i class="bi-plus-lg me-1"></i>Agregar Sección
+        </button>
+      </div>
+
+      @for (section of vm().detailSections; track section.id) {
+        <div class="card mb-3 border">
+          <div class="card-header d-flex justify-content-between align-items-center py-2">
+            <div>
+              <strong>{{ section.title }}</strong>
+              @if (section.description) {
+                <small class="text-muted ms-2">{{ section.description }}</small>
+              }
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-info btn-sm" (click)="onEditSection(section)">
+                <i class="bi-pencil"></i>
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="facade.deleteSection(section.id, item.id)">
+                <i class="bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-2">
+            <app-question-manager
+              [questions]="section.questions"
+              [loading]="false"
+              (add)="onAddQuestion(section.id)"
+              (edit)="onEditQuestion($event)"
+              (delete)="facade.deleteQuestion($event, item.id)">
+            </app-question-manager>
+          </div>
+        </div>
+      } @empty {
+        @if (!vm().detailSectionsLoading) {
+          <p class="text-muted text-sm">No hay secciones aún. Cree una sección para agregar preguntas.</p>
+        }
+      }
+    }
+  </ng-template>
+
+  <app-questionnaire-create-modal
+    [visible]="vm().showCreateModal"
+    [loading]="vm().loading"
+    [roles]="vm().roles"
+    (close)="facade.closeModals()"
+    (save)="facade.createQuestionnaire($event)">
+  </app-questionnaire-create-modal>
+
+  <app-questionnaire-update-modal
+    [visible]="vm().showUpdateModal"
+    [loading]="vm().loading"
+    [item]="vm().selectedItem"
+    [roles]="vm().roles"
+    (close)="facade.closeModals()"
+    (save)="facade.updateQuestionnaire(vm().selectedItem!.id, $event)">
+  </app-questionnaire-update-modal>
+
+  <app-questionnaire-edit-question-modal
+    [visible]="showQuestionModal()"
+    [loading]="vm().loading"
+    [question]="editingQuestion()"
+    (close)="showQuestionModal.set(false)"
+    (save)="onSaveQuestion($event)">
+  </app-questionnaire-edit-question-modal>
+
+  @if (showSectionModal()) {
+    <div class="modal d-block" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">{{ editingSection() ? 'Editar' : 'Nueva' }} Sección</h5>
+            <button type="button" class="btn-close" (click)="showSectionModal.set(false)"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Título <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                [value]="sectionTitle()"
+                (input)="sectionTitle.set($any($event.target).value)"
+                placeholder="Nombre de la sección"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Descripción</label>
+              <textarea
+                class="form-control"
+                [value]="sectionDescription()"
+                (input)="sectionDescription.set($any($event.target).value)"
+                rows="2"
+                placeholder="Descripción opcional"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-danger" (click)="showSectionModal.set(false)">Cancelar</button>
+            <button class="btn btn-primary" (click)="onSaveSection()" [disabled]="!sectionTitle().trim()">
+              {{ editingSection() ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+  }
+</div>

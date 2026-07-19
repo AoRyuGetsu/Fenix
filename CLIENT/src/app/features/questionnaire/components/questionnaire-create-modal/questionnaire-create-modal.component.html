@@ -1,0 +1,47 @@
+@if (visible()) {
+  <div class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Nuevo Cuestionario</h5>
+          <button type="button" class="btn-close" (click)="close.emit()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Título <span class="text-danger">*</span></label>
+            <input #titleInput type="text" class="form-control" [value]="title()" (input)="title.set(titleInput.value)" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea #descInput class="form-control" rows="3" [value]="description()" (input)="description.set(descInput.value)"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Rol que responde <span class="text-danger">*</span></label>
+            <select #responderSel class="form-select" [value]="responderRoleId()" (change)="responderRoleId.set(+responderSel.value)">
+              <option value="0">Seleccione...</option>
+              @for (role of roles(); track role.id) {
+                <option [value]="role.id">{{ role.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Rol evaluado <span class="text-danger">*</span></label>
+            <select #targetSel class="form-select" [value]="targetRoleId()" (change)="targetRoleId.set(+targetSel.value)">
+              <option value="0">Seleccione...</option>
+              @for (role of roles(); track role.id) {
+                <option [value]="role.id">{{ role.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" (click)="close.emit()" [disabled]="loading()">Cancelar</button>
+          <button class="btn btn-primary" (click)="onSave()" [disabled]="loading() || !title() || !responderRoleId() || !targetRoleId()">
+            @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

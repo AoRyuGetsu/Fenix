@@ -1,0 +1,8 @@
+<app-gtable
+  [columns]="columns()"
+  [data]="processedItems()"
+  [pagination]="{ page: page(), perPage: perPage(), total: total() }"
+  [detail]="detailConfig()"
+  [actions]="actions()"
+  (pageChange)="pageChange.emit($event)"
+  (actionClick)="onAction($event)" />

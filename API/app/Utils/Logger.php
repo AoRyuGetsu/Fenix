@@ -6,7 +6,6 @@ namespace App\Utils;
 
 use Monolog\Level;
 use Monolog\Logger as MonologLogger;
-use Monolog\Handler\StreamHandler;
 use Monolog\Handler\RotatingFileHandler;
 
 class Logger

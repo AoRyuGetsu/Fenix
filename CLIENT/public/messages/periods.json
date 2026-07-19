@@ -1,0 +1,19 @@
+{
+  "per_hdr_title":                          { "message": "Periodos", "desc": "Título de la página de periodos" },
+  "per_lbl_subtitle":                       { "message": "Gestión de periodos de evaluación", "desc": "Subtítulo de la página" },
+  "per_btn_new_period":                     { "message": "Nuevo periodo", "desc": "Botón crear periodo" },
+  "per_hdr_list":                           { "message": "Listado de periodos", "desc": "Card header listado" },
+  "per_plh_search_name":                    { "message": "Buscar por nombre...", "desc": "Placeholder búsqueda" },
+  "per_lbl_name":                           { "message": "Nombre", "desc": "Columna nombre" },
+  "per_lbl_start_date":                     { "message": "Fecha inicio", "desc": "Columna fecha inicio" },
+  "per_lbl_end_date":                       { "message": "Fecha fin", "desc": "Columna fecha fin" },
+  "per_plh_period_example":                 { "message": "Ej: Ene-Mar 2026", "desc": "Placeholder input nombre" },
+  "per_err_load":                           { "message": "Error al cargar periodos", "desc": "Error al listar" },
+  "per_suc_created":                        { "message": "Periodo creado correctamente", "desc": "Éxito al crear" },
+  "per_suc_updated":                        { "message": "Periodo actualizado correctamente", "desc": "Éxito al actualizar" },
+  "per_err_create":                         { "message": "Error al crear periodo", "desc": "Error al crear" },
+  "per_err_update":                         { "message": "Error al actualizar periodo", "desc": "Error al actualizar" },
+  "per_suc_deleted":                        { "message": "Periodo eliminado correctamente", "desc": "Éxito al eliminar" },
+  "per_err_delete":                         { "message": "Error al eliminar periodo", "desc": "Error al eliminar" },
+  "per_cnf_delete":                         { "message": "¿Está seguro de eliminar este periodo?", "desc": "Confirmación eliminar" }
+}

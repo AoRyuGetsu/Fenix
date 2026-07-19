@@ -37,10 +37,32 @@ export const routes: Routes = [
     children: [
       {
         path: 'welcome',
+        loadChildren: () => import('./features/welcome/routes'),
+      },
+      {
+        path: 'configuracion/roles-permisos',
         loadComponent: () =>
-          import('./core/pages/welcome/welcome-page').then(
-            (m) => m.WelcomePageComponent,
+          import('./core/auth/pages/roles-permisos/roles-permisos-page.component').then(
+            (m) => m.RolesPermisosPageComponent,
           ),
+      },
+      {
+        path: 'configuracion/usuarios',
+        loadChildren: () => import('./features/users/routes'),
+      },
+      {
+        path: 'configuracion/cuestionarios',
+        loadChildren: () => import('./features/questionnaire/routes'),
+      },
+      {
+        path: 'configuracion/periodos',
+        canActivate: [permissionGuard],
+        data: { roles: ['administrador'] },
+        loadChildren: () => import('./features/periods/routes'),
+      },
+      {
+        path: 'evaluaciones',
+        loadChildren: () => import('./features/evaluations/routes'),
       },
       {
         path: '**',

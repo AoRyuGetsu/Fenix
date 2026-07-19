@@ -1,0 +1,40 @@
+@let state = vm();
+
+<div class="container-fluid py-3">
+  <h4 class="mb-3">{{ 'eval_hdr_title' | message }}</h4>
+
+  @if (state.success) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ state.success }}
+      <button type="button" class="btn-close" (click)="facade.clearMessages()"></button>
+    </div>
+  }
+
+  @if (state.error) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ state.error }}
+      <button type="button" class="btn-close" (click)="facade.clearMessages()"></button>
+    </div>
+  }
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <input
+        #filterInput
+        type="text"
+        class="form-control"
+        [placeholder]="'eval_plh_search_title' | message"
+        [value]="vm().searchTerm"
+        (input)="onFilter(filterInput.value)"
+      />
+    </div>
+  </div>
+
+  <app-evaluations-table
+    [items]="state.items"
+    [loading]="state.loading"
+    [pagination]="pagination()"
+    (pageChange)="onChangePage($event)"
+    (fill)="onFill($event)"
+  />
+</div>

@@ -3,17 +3,20 @@
 declare(strict_types=1);
 
 use App\Core\Env;
+use App\Infrastructure\Doctrine\SoftDeleteFilter;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\UnderscoreNamingStrategy;
 use Doctrine\ORM\ORMSetup;
 
 $config = ORMSetup::createAttributeMetadataConfiguration(
-    paths: [__DIR__ . '/../app/Features'],
-    isDevMode: true,
+    paths: [__DIR__ . '/../app/Features', __DIR__ . '/../app/Infrastructure'],
+    isDevMode: Env::get('APP_ENV', 'production') === 'development',
 );
 
 $config->setNamingStrategy(new UnderscoreNamingStrategy(CASE_LOWER));
+
+$config->addFilter('soft-delete', SoftDeleteFilter::class);
 
 $connectionParams = [
     'driver'   => Env::get('DB_DRIVER', 'pdo_mysql'),
@@ -26,4 +29,7 @@ $connectionParams = [
 
 $connection = DriverManager::getConnection($connectionParams);
 
-return new EntityManager($connection, $config);
+$em = new EntityManager($connection, $config);
+$em->getFilters()->enable('soft-delete');
+
+return $em;

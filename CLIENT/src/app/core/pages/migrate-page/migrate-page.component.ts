@@ -1,9 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { isDevMode } from '@angular/core';
 import { tap } from 'rxjs';
-
-const BASE_URL = isDevMode() ? 'http://localhost:8000' : '';
+import { ConfigService } from '../../services/config.service';
 
 @Component({
   selector: 'app-migrate-page',
@@ -12,6 +10,7 @@ const BASE_URL = isDevMode() ? 'http://localhost:8000' : '';
 })
 export class MigratePageComponent {
   private http = inject(HttpClient);
+  private configService = inject(ConfigService);
 
   loading = signal(false);
   output = signal<string | null>(null);
@@ -22,7 +21,7 @@ export class MigratePageComponent {
     this.output.set(null);
     this.error.set(null);
 
-    this.http.get(`${BASE_URL}/migrate.php`, { responseType: 'text' }).pipe(
+    this.http.get(`${this.configService.apiUrl}/migrate.php`, { responseType: 'text' }).pipe(
       tap({
         next: (res) => {
           this.output.set(res);
