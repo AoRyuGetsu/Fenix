@@ -85,9 +85,11 @@
             [total]="currentTotal()"
             [page]="vm().activePage"
             [perPage]="20"
+            [playerSpecs]="playerSpecs()"
             (pageChange)="onPageChange($event)"
             (delete)="onDelete($event)"
             (update)="onUpdate($event)"
+            (spec)="onSpecAction($event)"
           />
         } @else {
           <app-users-table
@@ -112,6 +114,10 @@
     <app-person-create-modal
       [peopleTypes]="peopleTypes()"
       [loading]="vm().loading"
+      [teams]="vm().teams"
+      [representatives]="vm().representatives"
+      [loadingTeams]="vm().loadingTeams"
+      [loadingReps]="vm().loadingReps"
       (save)="onCreatePerson($event)"
       (close)="onCloseModals()"
     />
@@ -129,6 +135,10 @@
     [peopleTypes]="peopleTypes()"
     [item]="selectedPersonItem()"
     [loading]="vm().loading"
+    [teams]="vm().teams"
+    [representatives]="vm().representatives"
+    [loadingTeams]="vm().loadingTeams"
+    [loadingReps]="vm().loadingReps"
     (save)="onUpdatePerson($event)"
     (close)="onCloseModals()"
   />
@@ -140,5 +150,15 @@
     [loading]="vm().loading"
     (save)="onUpdateAdmin($event)"
     (close)="onCloseModals()"
+  />
+}
+
+@if (vm().showSpecModal && selectedSpecUserId()) {
+  <app-player-spec-modal
+    [userId]="selectedSpecUserId()!"
+    [existingData]="selectedSpecData()"
+    [loading]="specLoading()"
+    (save)="onSaveSpec($event)"
+    (close)="onCloseSpec()"
   />
 }

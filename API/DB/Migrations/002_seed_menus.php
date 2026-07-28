@@ -126,17 +126,21 @@ echo "✓ Menú 'Cuestionarios' creado/verificado (ID: {$cuestionariosId}).\n";
 $periodosId = ensureMenu($menuIds, $conn, 'Periodos', $configId, 'calendar-date', '/configuracion/periodos', 4, $adminUserId, $now);
 echo "✓ Menú 'Periodos' creado/verificado (ID: {$periodosId}).\n";
 
+$equiposId = ensureMenu($menuIds, $conn, 'Equipos', $configId, 'people', '/configuracion/equipos', 5, $adminUserId, $now);
+echo "✓ Menú 'Equipos' creado/verificado (ID: {$equiposId}).\n";
+
 // ── Asignaciones por rol ──
 
-// Evaluaciones: todos los roles
+// Evaluaciones: todos los roles excepto administrador
 foreach ($roleIds as $rid) {
+    if ($rid === $adminRoleId) continue;
     if (assignMenu($conn, $evaluacionesId, $rid, "role-{$rid}")) {
         echo "✓ Evaluaciones asignado a rol ID {$rid}.\n";
     }
 }
 
 // Configuración y sus hijos: solo administrador
-$adminMenus = [$configId, $rolesId, $usuariosId, $cuestionariosId, $periodosId];
+$adminMenus = [$configId, $rolesId, $usuariosId, $cuestionariosId, $periodosId, $equiposId];
 foreach ($adminMenus as $mid) {
     if (assignMenu($conn, $mid, $adminRoleId, 'ADM')) {
         $label = array_search($mid, $menuIds) ?: "Menu #{$mid}";

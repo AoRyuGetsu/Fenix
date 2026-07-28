@@ -5,6 +5,7 @@
     "periods": "periods.json",
     "questionnaire": "questionnaire.json",
     "users": "users.json",
-    "rolesPermisos": "roles-permisos.json"
+    "rolesPermisos": "roles-permisos.json",
+    "teams": "teams.json"
   }
 }

@@ -45,7 +45,7 @@ class Role
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTime $deletedAt = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'roles')]
     #[ORM\JoinTable(name: 'user_roles')]
     private Collection $users;
 

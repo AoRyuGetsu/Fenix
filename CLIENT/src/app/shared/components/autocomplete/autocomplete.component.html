@@ -1,0 +1,42 @@
+<div class="position-relative">
+  <div class="input-group">
+    <input
+      #inputRef
+      type="text"
+      class="form-control"
+      [class.is-invalid]="isInvalid()"
+      [readonly]="selectedItem() !== null"
+      [placeholder]="placeholder()"
+      [value]="filterText()"
+      (input)="onInput(inputRef.value)"
+      (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+      autocomplete="off"
+    />
+    @if (selectedItem()) {
+      <button class="btn btn-outline-secondary" type="button" (click)="clearSelection()" tabindex="-1">
+        &times;
+      </button>
+    }
+    @if (loading()) {
+      <span class="input-group-text">
+        <span class="spinner-border spinner-border-sm"></span>
+      </span>
+    }
+  </div>
+
+  @if (isOpen() && filteredItems().length > 0) {
+    <ul class="list-group position-absolute w-100 z-3 shadow" style="max-height: 200px; overflow-y: auto;">
+      @for (item of filteredItems(); track trackById($index, item); let i = $index) {
+        <li
+          class="list-group-item list-group-item-action"
+          [class.active]="i === activeIndex()"
+          (mousedown)="selectItem(item)"
+        >
+          {{ item[displayField()] }}
+        </li>
+      }
+    </ul>
+  }
+</div>

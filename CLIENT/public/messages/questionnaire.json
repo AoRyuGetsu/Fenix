@@ -48,5 +48,6 @@
   "qnr_err_delete_question":                { "message": "Error al eliminar pregunta", "desc": "Error eliminar pregunta" },
   "qnr_cnf_delete_question":                { "message": "¿Está seguro de eliminar esta pregunta?", "desc": "Confirmación eliminar pregunta" },
   "qnr_err_load":                           { "message": "Error al cargar cuestionarios", "desc": "Error listar" },
-  "qnr_plh_select_role":                    { "message": "Seleccione...", "desc": "Opción default select rol" }
+  "qnr_plh_select_role":                    { "message": "Seleccione...", "desc": "Opción default select rol" },
+  "qnr_info_topic_guidelines":              { "message": "Cada cuestionario debe tratar un tema específico e incluir preguntas evaluables cuantitativamente, requisito fundamental para el análisis estadístico.", "desc": "Informativo sobre lineamientos de cuestionarios" }
 }

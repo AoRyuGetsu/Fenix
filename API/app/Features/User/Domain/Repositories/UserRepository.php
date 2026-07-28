@@ -9,6 +9,7 @@ use App\Features\People\Domain\Entities\PersonUser;
 use App\Features\RolesPermisos\Domain\Entities\Role;
 use App\Features\User\Application\DTO\UserQuery;
 use App\Features\User\Domain\Entities\User;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 
 class UserRepository implements UserRepositoryInterface
@@ -59,6 +60,20 @@ class UserRepository implements UserRepositoryInterface
                    $idQb->expr()->like('p.documentNumber', ':name'),
                ))
                ->setParameter('name', '%' . $query->name . '%');
+        }
+
+        if ($query->teamIds !== null && $query->teamIds !== []) {
+            $idQb->andWhere($idQb->expr()->in('u.id', ':teamIds'))
+                ->setParameter('teamIds', $query->teamIds);
+        }
+
+        if ($query->unassigned === true) {
+            $conn = $this->entityManager->getConnection();
+            $assigned = $conn->executeQuery('SELECT DISTINCT player_user_id FROM team_players')->fetchFirstColumn();
+            if ($assigned !== []) {
+                $idQb->andWhere($idQb->expr()->notIn('u.id', ':assignedIds'))
+                    ->setParameter('assignedIds', $assigned);
+            }
         }
 
         if ($query->role !== null) {

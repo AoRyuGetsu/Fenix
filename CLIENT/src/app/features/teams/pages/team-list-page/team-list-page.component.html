@@ -1,0 +1,59 @@
+@let state = vm();
+
+<div class="container-fluid py-3">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h4 class="mb-0">{{ 'team_hdr_title' | message }}</h4>
+    <button class="btn btn-primary" (click)="onNew()">
+      <i class="bi bi-plus-lg"></i> {{ 'team_btn_new' | message }}
+    </button>
+  </div>
+
+  @if (state.success) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ state.success }}
+      <button type="button" class="btn-close" (click)="facade.clearMessages()"></button>
+    </div>
+  }
+
+  @if (state.error) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ state.error }}
+      <button type="button" class="btn-close" (click)="facade.clearMessages()"></button>
+    </div>
+  }
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <input
+        #filterInput
+        type="text"
+        class="form-control"
+        [placeholder]="'team_plh_search' | message"
+        [value]="state.searchTerm"
+        (input)="onFilter(filterInput.value)"
+      />
+    </div>
+  </div>
+
+  <app-team-table
+    [items]="state.items"
+    [loading]="state.loading"
+    [pagination]="pagination()"
+    (pageChange)="onPageChange($event)"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+  />
+</div>
+
+@if (state.showFormModal) {
+  <app-team-form-modal
+    [item]="state.editingItem"
+    [saving]="state.saving"
+    [trainers]="state.trainers"
+    [players]="state.players"
+    [loadingTrainers]="state.loadingTrainers"
+    [loadingPlayers]="state.loadingPlayers"
+    (save)="facade.saveTeam($event)"
+    (close)="facade.closeForm()"
+  />
+}

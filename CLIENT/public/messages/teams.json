@@ -1,0 +1,15 @@
+{
+  "team_hdr_title":                         { "message": "Equipos", "desc": "Título página equipos" },
+  "team_btn_new":                           { "message": "Nuevo equipo", "desc": "Botón nuevo equipo" },
+  "team_plh_search":                        { "message": "Buscar por nombre o código...", "desc": "Placeholder búsqueda" },
+  "team_lbl_name":                          { "message": "Nombre", "desc": "Columna nombre" },
+  "team_lbl_code":                          { "message": "Código", "desc": "Columna código" },
+  "team_lbl_description":                   { "message": "Descripción", "desc": "Label descripción" },
+  "team_lbl_trainer":                       { "message": "Entrenador", "desc": "Columna/label entrenador" },
+  "team_lbl_player_count":                  { "message": "Jugadores", "desc": "Columna cantidad jugadores" },
+  "team_lbl_created":                       { "message": "Creado", "desc": "Columna fecha creación" },
+  "team_lbl_players":                       { "message": "Jugadores", "desc": "Label select jugadores" },
+  "team_lbl_no_players_available":          { "message": "No hay jugadores disponibles", "desc": "Sin jugadores" },
+  "team_btn_edit":                          { "message": "Editar equipo", "desc": "Título editar equipo" },
+  "team_plh_select_trainer":                { "message": "Seleccionar entrenador", "desc": "Opción default select entrenador" }
+}

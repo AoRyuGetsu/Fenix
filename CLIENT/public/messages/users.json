@@ -42,5 +42,10 @@
   "usr_plh_password_optional":              { "message": "Opcional, si no se envía se usa la cédula", "desc": "Placeholder contraseña" },
   "usr_lbl_change_password":                { "message": "Cambiar contraseña", "desc": "Checkbox cambiar contraseña" },
   "usr_lbl_roles":                          { "message": "Roles", "desc": "Columna roles" },
-  "usr_plh_select_type":                    { "message": "Seleccione...", "desc": "Opción default select tipo" }
+  "usr_plh_select_type":                    { "message": "Seleccione...", "desc": "Opción default select tipo" },
+  "usr_lbl_team":                           { "message": "Equipo", "desc": "Label equipo" },
+  "usr_plh_search_team":                    { "message": "Buscar equipo...", "desc": "Placeholder buscar equipo" },
+  "usr_lbl_representative":                 { "message": "Representante", "desc": "Label representante" },
+  "usr_plh_search_representative":          { "message": "Buscar representante...", "desc": "Placeholder buscar representante" },
+  "usr_err_team_required":                  { "message": "El equipo es obligatorio para jugadores", "desc": "Error equipo requerido" }
 }

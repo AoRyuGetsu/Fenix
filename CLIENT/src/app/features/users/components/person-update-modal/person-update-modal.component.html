@@ -60,6 +60,30 @@
               <input #inputPassword type="password" class="form-control" [value]="password()" (input)="password.set(inputPassword.value)" />
             </div>
           }
+
+          @if (isJug()) {
+            <div class="col-12">
+              <label class="form-label">Equipo <span class="text-danger">*</span></label>
+              <app-autocomplete
+                [items]="teams()"
+                displayField="name"
+                placeholder="Buscar equipo..."
+                [loading]="loadingTeams()"
+                [required]="true"
+                (selectionChange)="onTeamSelect($event)"
+              />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Representante</label>
+              <app-autocomplete
+                [items]="representatives()"
+                displayField="display_name"
+                placeholder="Buscar representante..."
+                [loading]="loadingReps()"
+                (selectionChange)="onRepresentativeSelect($event)"
+              />
+            </div>
+          }
         </div>
       </div>
       <div class="modal-footer">

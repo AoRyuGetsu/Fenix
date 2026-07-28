@@ -57,8 +57,14 @@ export const routes: Routes = [
       {
         path: 'configuracion/periodos',
         canActivate: [permissionGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADM'] },
         loadChildren: () => import('./features/periods/routes'),
+      },
+      {
+        path: 'configuracion/equipos',
+        canActivate: [permissionGuard],
+        data: { roles: ['ADM'] },
+        loadChildren: () => import('./features/teams/routes'),
       },
       {
         path: 'evaluaciones',

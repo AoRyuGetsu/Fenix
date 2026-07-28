@@ -255,3 +255,74 @@ CREATE TABLE answers (
     CONSTRAINT fk_answers_evaluation FOREIGN KEY (evaluation_id) REFERENCES evaluations(id) ON DELETE CASCADE,
     CONSTRAINT fk_answers_question FOREIGN KEY (question_id) REFERENCES questions(id)
 ) ENGINE=InnoDB;
+
+-- Tabla Teams (equipos)
+CREATE TABLE teams (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT NULL,
+    trainer_user_id BIGINT UNSIGNED NOT NULL,
+    created_by BIGINT UNSIGNED DEFAULT NULL,
+    updated_by BIGINT UNSIGNED DEFAULT NULL,
+    deleted_by BIGINT UNSIGNED DEFAULT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME DEFAULT NULL,
+    CONSTRAINT fk_team_trainer FOREIGN KEY (trainer_user_id) REFERENCES users(id),
+    CONSTRAINT fk_team_created_by FOREIGN KEY (created_by) REFERENCES users(id),
+    CONSTRAINT fk_team_updated_by FOREIGN KEY (updated_by) REFERENCES users(id),
+    CONSTRAINT fk_team_deleted_by FOREIGN KEY (deleted_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla pivote team_players (N:N con UNIQUE en player_user_id)
+CREATE TABLE team_players (
+    team_id BIGINT UNSIGNED NOT NULL,
+    player_user_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (team_id, player_user_id),
+    UNIQUE KEY uq_player_team (player_user_id),
+    CONSTRAINT fk_tp_team FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE,
+    CONSTRAINT fk_tp_player FOREIGN KEY (player_user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla pivote rep_players (representante → jugador, N:1 con UNIQUE en player)
+CREATE TABLE rep_players (
+    rep_user_id BIGINT UNSIGNED NOT NULL,
+    player_user_id BIGINT UNSIGNED NOT NULL,
+    PRIMARY KEY (rep_user_id, player_user_id),
+    UNIQUE KEY uq_rep_player (player_user_id),
+    CONSTRAINT fk_rp_rep FOREIGN KEY (rep_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_rp_player FOREIGN KEY (player_user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla player_specification (especificación deportiva del jugador, 1:1 con users)
+CREATE TABLE player_specification (
+    user_id BIGINT UNSIGNED NOT NULL PRIMARY KEY,
+    birth_date DATE NOT NULL,
+    height_cm DECIMAL(5,2) NOT NULL,
+    weight_kg DECIMAL(5,2) NOT NULL,
+    gender VARCHAR(20) NOT NULL,
+    entry_date DATE NOT NULL,
+    medical_conditions TEXT NULL,
+    emergency_contact_name VARCHAR(150) NOT NULL,
+    emergency_contact_phone VARCHAR(20) NOT NULL,
+    emergency_contact_relationship VARCHAR(50) NOT NULL,
+    position VARCHAR(50) NULL,
+    jersey_number INT NULL,
+    dominant_foot VARCHAR(20) NULL,
+    nationality VARCHAR(100) NULL,
+    blood_type VARCHAR(5) NULL,
+    allergies TEXT NULL,
+    profile_photo_url VARCHAR(500) NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    created_by BIGINT UNSIGNED NULL,
+    updated_by BIGINT UNSIGNED NULL,
+    deleted_by BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME NULL,
+    CONSTRAINT fk_ps_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_ps_created_by FOREIGN KEY (created_by) REFERENCES users(id),
+    CONSTRAINT fk_ps_updated_by FOREIGN KEY (updated_by) REFERENCES users(id),
+    CONSTRAINT fk_ps_deleted_by FOREIGN KEY (deleted_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

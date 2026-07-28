@@ -1,21 +1,22 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EvaluationsFacade, EvaluatedStudent } from '../../facades/evaluations.facade';
+import { EvaluationsFacade } from '../../facades/evaluations.facade';
 import { QuestionCardComponent } from '../../components/question-card/question-card.component';
-import { UserItem, PeriodItem } from '../../services/evaluations-http.service';
+import { PlayerInfoModalComponent } from '../../components/player-info-modal/player-info-modal.component';
+import { UserItem } from '../../services/evaluations-http.service';
 import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 
 @Component({
   selector: 'app-evaluation-fill-page',
   standalone: true,
-  imports: [QuestionCardComponent, MessagePipe],
+  imports: [QuestionCardComponent, PlayerInfoModalComponent, MessagePipe],
   templateUrl: './evaluation-fill-page.component.html',
 })
 export class EvaluationFillPageComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   facade = inject(EvaluationsFacade);
-  fillVm = this.facade.fillVm;
+  vm = this.facade.fillVm;
 
   private questionnaireId = 0;
 
@@ -41,14 +42,10 @@ export class EvaluationFillPageComponent implements OnInit, OnDestroy {
   }
 
   onFillPageChange(page: number): void {
-    const periodId = this.fillVm().selectedPeriodId;
+    const periodId = this.vm().selectedPeriodId;
     if (periodId !== null) {
       this.facade.changeFillPage(page, this.questionnaireId, periodId);
     }
-  }
-
-  getUserDisplayName(user: UserItem): string {
-    return user.display_name || user.email;
   }
 
   onUserSelect(userId: number): void {
@@ -63,23 +60,23 @@ export class EvaluationFillPageComponent implements OnInit, OnDestroy {
     this.facade.save();
   }
 
-  getTotalPages(total: number, perPage: number): number {
-    return Math.max(1, Math.ceil(total / perPage));
-  }
-
   goBack(): void {
     this.router.navigate(['/evaluaciones']);
+  }
+
+  onShowFicha(user: UserItem): void {
+    this.facade.openPlayerInfoModal(user);
+  }
+
+  onCloseFicha(): void {
+    this.facade.closePlayerInfoModal();
   }
 
   trackByQuestionId(_index: number, q: { id: number }): number {
     return q.id;
   }
 
-  trackByUserId(_index: number, u: { id: number }): number {
-    return u.id;
-  }
-
-  trackByEvaluatedId(_index: number, e: EvaluatedStudent): number {
-    return e.evaluation_id;
+  trackByStudentId(_index: number, s: { user: { id: number } }): number {
+    return s.user.id;
   }
 }

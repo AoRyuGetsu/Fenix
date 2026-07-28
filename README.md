@@ -251,5 +251,6 @@ Ver `ARCHITECTURE.md` §2.13 para la tabla completa de endpoints con sus requisi
 | Usuarios (CRUD + admin) | `app/Features/User/` | `CLIENT/src/app/features/users/` |
 | Roles y Permisos | `app/Features/RolesPermisos/` | `core/auth/` (RolesPermisosPage) |
 | Personas | `app/Features/People/` | (pendiente) |
+| Ficha de Jugador | `app/Features/PlayerSpecification/` | `features/users/` (PlayerSpecModal) + `features/evaluations/` (PlayerInfoModal) |
 | Cuestionarios | `app/Features/Questionnaire/` | `features/questionnaire/` |
 | Evaluaciones | `app/Features/Questionnaire/` (Evaluation + Answer) | `features/evaluations/` |

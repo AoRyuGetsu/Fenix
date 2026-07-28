@@ -11,12 +11,6 @@
           <p class="text-gray-600 small">Panel de administración</p>
         </div>
 
-        @if (vm().success) {
-          <div class="alert alert-success text-center small py-2" role="alert">
-            {{ vm().success }}
-          </div>
-        }
-
         @if (vm().error) {
           <div class="alert alert-danger text-center small py-2" role="alert">
             {{ vm().error }}
@@ -48,15 +42,25 @@
 
           <div class="mb-3">
             <label class="form-label" for="password">Contraseña <span class="text-danger">*</span></label>
-            <input
-              id="password"
-              type="password"
-              class="form-control"
-              [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
-              formControlName="password"
-              placeholder="Ingrese su contraseña"
-              autocomplete="current-password"
-            />
+            <div class="input-group">
+              <input
+                id="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                class="form-control"
+                [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
+                formControlName="password"
+                placeholder="Ingrese su contraseña"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="togglePassword()"
+                tabindex="-1"
+              >
+                <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+              </button>
+            </div>
             @if (form.controls.password.invalid && form.controls.password.touched) {
               <div class="text-danger small mt-1">
                 @if (form.controls.password.errors?.['required']) {
@@ -72,8 +76,7 @@
             [disabled]="vm().loading || form.invalid"
           >
             @if (vm().loading) {
-              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-              Ingresando…
+              <span class="spinner-border spinner-border-sm" role="status"></span>
             } @else {
               Ingresar
             }

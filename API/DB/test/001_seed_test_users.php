@@ -113,6 +113,30 @@ $testUsers = [
             'email'          => 'representante@mail.com',
         ],
     ],
+    [
+        'email'    => 'entrenador2@mail.com',
+        'password' => 'pass1234',
+        'role'     => 'ENT',
+        'person'   => [
+            'type'           => 'ENT',
+            'first_name'     => 'Roberto',
+            'first_surname'  => 'Silva',
+            'document_number'      => 'ENT-002',
+            'email'          => 'entrenador2@mail.com',
+        ],
+    ],
+    [
+        'email'    => 'representante2@mail.com',
+        'password' => 'pass1234',
+        'role'     => 'REP',
+        'person'   => [
+            'type'           => 'REP',
+            'first_name'     => 'Laura',
+            'first_surname'  => 'Díaz',
+            'document_number'      => 'REP-002',
+            'email'          => 'representante2@mail.com',
+        ],
+    ],
 ];
 
 foreach ($testUsers as $data) {
@@ -148,6 +172,45 @@ foreach ($testUsers as $data) {
     } catch (\RuntimeException $e) {
         echo "✗ Error al asignar rol '{$data['role']}' a '{$data['email']}': {$e->getMessage()}\n";
     }
+}
+
+// ── Crear equipos ──
+$entityManager = $container->get(\Doctrine\ORM\EntityManager::class);
+$conn = $entityManager->getConnection();
+$now = (new \DateTime())->format('Y-m-d H:i:s');
+
+$teams = [
+    ['name' => 'Sub 12', 'code' => 'SUB12', 'trainer_email' => 'entrenador@mail.com'],
+    ['name' => 'Sub 18', 'code' => 'SUB18', 'trainer_email' => 'entrenador2@mail.com'],
+];
+
+foreach ($teams as $team) {
+    $existing = $conn->executeQuery(
+        "SELECT id FROM teams WHERE code = ? AND deleted_at IS NULL",
+        [$team['code']]
+    )->fetchOne();
+
+    if ($existing !== false) {
+        echo "• Equipo '{$team['name']}' ya existe (ID: {$existing}).\n";
+        continue;
+    }
+
+    $trainerId = $conn->executeQuery(
+        "SELECT id FROM users WHERE email = ? AND deleted_at IS NULL",
+        [$team['trainer_email']]
+    )->fetchOne();
+
+    if ($trainerId === false) {
+        echo "✗ Entrenador '{$team['trainer_email']}' no encontrado. No se creó el equipo '{$team['name']}'.\n";
+        continue;
+    }
+
+    $conn->executeStatement(
+        "INSERT INTO teams (name, code, description, trainer_user_id, created_by, updated_by, created_at, updated_at)
+         VALUES (?, ?, NULL, ?, ?, ?, ?, ?)",
+        [$team['name'], $team['code'], $trainerId, $trainerId, $trainerId, $now, $now]
+    );
+    echo "✓ Equipo '{$team['name']}' ({$team['code']}) creado.\n";
 }
 
 echo "\nMigración de test 001 completada.\n";

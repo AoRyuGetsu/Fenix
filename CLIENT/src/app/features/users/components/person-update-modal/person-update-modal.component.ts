@@ -1,15 +1,21 @@
-import { Component, input, output, signal, effect } from '@angular/core';
+import { Component, input, output, signal, effect, computed } from '@angular/core';
 import { PeopleType, PersonData, UpdatePersonPayload } from '../../services/users-http.service';
+import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
+import { TeamItem } from '../../../teams/services/teams-http.service';
 
 @Component({
   selector: 'app-person-update-modal',
-  imports: [],
+  imports: [AutocompleteComponent],
   templateUrl: './person-update-modal.component.html',
 })
 export class PersonUpdateModalComponent {
   peopleTypes = input<PeopleType[]>([]);
   item = input<PersonData | null>(null);
   loading = input(false);
+  teams = input<TeamItem[]>([]);
+  representatives = input<any[]>([]);
+  loadingTeams = input(false);
+  loadingReps = input(false);
 
   save = output<UpdatePersonPayload>();
   close = output<void>();
@@ -25,6 +31,10 @@ export class PersonUpdateModalComponent {
   address = signal('');
   changePassword = signal(false);
   password = signal('');
+  teamId = signal<number | null>(null);
+  representativeId = signal<number | null>(null);
+
+  isJug = computed(() => this.type() === 'JUG');
 
   constructor() {
     effect(() => {
@@ -45,6 +55,24 @@ export class PersonUpdateModalComponent {
     });
   }
 
+  onTeamSelect(item: any): void {
+    this.teamId.set(item?.id ?? null);
+  }
+
+  onRepresentativeSelect(item: any): void {
+    this.representativeId.set(item?.id ?? null);
+  }
+
+  getInitialTeam(): any {
+    const i = this.item();
+    return i && 'team' in i ? (i as any).team : null;
+  }
+
+  getInitialRepresentative(): any {
+    const i = this.item();
+    return i && 'representative' in i ? (i as any).representative : null;
+  }
+
   onSubmit(): void {
     const payload: UpdatePersonPayload = {
       person: {
@@ -62,6 +90,11 @@ export class PersonUpdateModalComponent {
 
     if (this.changePassword() && this.password()) {
       payload.password = this.password();
+    }
+
+    if (this.isJug()) {
+      payload.team_id = this.teamId();
+      payload.representative_id = this.representativeId() || null;
     }
 
     this.save.emit(payload);

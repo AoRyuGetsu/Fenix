@@ -33,5 +33,10 @@
   "eval_err_update_evaluation":             { "message": "Error al actualizar evaluación", "desc": "Error al actualizar" },
   "eval_err_save_evaluation":               { "message": "Error al guardar evaluación", "desc": "Error al crear" },
   "eval_plh_select_option":                 { "message": "-- Seleccione --", "desc": "Opción default select pregunta" },
-  "eval_lbl_responds":                      { "message": "Responde", "desc": "Columna rol que responde" }
+  "eval_lbl_responds":                      { "message": "Responde", "desc": "Columna rol que responde" },
+  "eval_lbl_student_name":                  { "message": "Nombre", "desc": "Columna nombre estudiante" },
+  "eval_lbl_status":                        { "message": "Estado", "desc": "Columna estado evaluación" },
+  "eval_badge_evaluated":                   { "message": "Evaluado", "desc": "Badge estudiante evaluado" },
+  "eval_badge_unevaluated":                 { "message": "No evaluado", "desc": "Badge estudiante no evaluado" },
+  "eval_btn_answer":                        { "message": "Contestar", "desc": "Botón contestar evaluación" }
 }

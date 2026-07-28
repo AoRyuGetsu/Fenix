@@ -11,6 +11,8 @@ use App\Features\Questionnaire\Application\DTO\QuestionnaireQuery;
 use App\Features\Questionnaire\Domain\Interfaces\EvaluationServiceInterface;
 use App\Features\Periods\Domain\Interfaces\PeriodRepositoryInterface;
 use App\Features\Questionnaire\Domain\Interfaces\QuestionnaireServiceInterface;
+use App\Features\Representatives\Application\Services\RepresentativeService;
+use App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface;
 use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
 use App\Infrastructure\Auth\AuthContext;
 use OpenApi\Attributes as OA;
@@ -25,6 +27,8 @@ class EvaluationController implements ControllerInterface
         private QuestionnaireServiceInterface $questionnaireService,
         private PeriodRepositoryInterface $periodRepository,
         private UserRepositoryInterface $userRepository,
+        private TeamRepositoryInterface $teamRepository,
+        private RepresentativeService $representativeService,
         private AuthContext $authContext,
         private Request $request,
     ) {}
@@ -278,8 +282,21 @@ class EvaluationController implements ControllerInterface
         }
 
         $targetRoleCode = $questionnaire->getTargetRole()->getCode();
+
+        $teamIds = null;
+        $responderRoles = $this->authContext->getRoles();
+        if ($targetRoleCode === 'JUG' && in_array('ENT', $responderRoles, true)) {
+            $playerIds = $this->teamRepository->findPlayerIdsByTrainerId($this->authContext->getUserId());
+            $teamIds = $playerIds !== [] ? $playerIds : null;
+        }
+
         $usersResult = $this->userRepository->findPaginated(
-            new \App\Features\User\Application\DTO\UserQuery(role: $targetRoleCode, page: $page, perPage: $perPage)
+            new \App\Features\User\Application\DTO\UserQuery(
+                role: $targetRoleCode,
+                teamIds: $teamIds,
+                page: $page,
+                perPage: $perPage,
+            )
         );
         [$allTargetUsers, $total] = $usersResult;
 
@@ -346,14 +363,23 @@ class EvaluationController implements ControllerInterface
             ];
         }
 
+        $roles = $user->getRoles()->map(fn($r) => $r->getCode())->toArray();
+        $rep = $this->representativeService->getRepresentative((int) $user->getId());
+
         return [
-            'id'         => $user->getId(),
-            'email'      => $user->getEmail(),
-            'active'     => $user->isActive(),
-            'person'     => $person,
-            'created_at' => $user->getCreatedAt()->format('c'),
-            'updated_at' => $user->getUpdatedAt()->format('c'),
-            'display_name' => $this->getUserName($user),
+            'id'            => $user->getId(),
+            'email'         => $user->getEmail(),
+            'active'        => $user->isActive(),
+            'roles'         => $roles,
+            'person'        => $person,
+            'representative' => $rep !== null ? [
+                'id'           => $rep->getId(),
+                'display_name' => $this->getUserName($rep),
+                'email'        => $rep->getEmail(),
+            ] : null,
+            'created_at'    => $user->getCreatedAt()->format('c'),
+            'updated_at'    => $user->getUpdatedAt()->format('c'),
+            'display_name'  => $this->getUserName($user),
         ];
     }
 

@@ -22,7 +22,9 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'People', description: 'People management')]
 #[OA\Tag(name: 'Evaluation', description: 'Evaluaciones y respuestas')]
 #[OA\Tag(name: 'Periods', description: 'Periodos de evaluación')]
+#[OA\Tag(name: 'Teams', description: 'Gestión de equipos')]
 #[OA\Tag(name: 'Dashboard', description: 'Dashboard y estadísticas')]
+#[OA\Tag(name: 'PlayerSpecification', description: 'Especificaciones deportivas de jugadores')]
 
 #[OA\Schema(
     schema: 'User',
@@ -31,6 +33,14 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'email', type: 'string'),
         new OA\Property(property: 'active', type: 'boolean'),
         new OA\Property(property: 'roles', type: 'array', items: new OA\Items(type: 'string')),
+        new OA\Property(property: 'team', properties: [
+            new OA\Property(property: 'id', type: 'integer'),
+            new OA\Property(property: 'name', type: 'string'),
+        ], type: 'object', nullable: true),
+        new OA\Property(property: 'representative', properties: [
+            new OA\Property(property: 'id', type: 'integer'),
+            new OA\Property(property: 'display_name', type: 'string'),
+        ], type: 'object', nullable: true),
         new OA\Property(property: 'deleted_at', type: 'string', format: 'date-time', nullable: true),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
@@ -42,6 +52,8 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'email', type: 'string'),
         new OA\Property(property: 'password', type: 'string'),
         new OA\Property(property: 'person', ref: '#/components/schemas/PersonCreate'),
+        new OA\Property(property: 'team_id', type: 'integer', nullable: true),
+        new OA\Property(property: 'representative_id', type: 'integer', nullable: true),
     ]
 )]
 #[OA\Schema(
@@ -380,6 +392,114 @@ use OpenApi\Attributes as OA;
                 type: 'object'
             ),
         ),
+    ]
+)]
+#[OA\Schema(
+    schema: 'Team',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'code', type: 'string'),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
+        new OA\Property(property: 'trainer', properties: [
+            new OA\Property(property: 'id', type: 'integer'),
+            new OA\Property(property: 'email', type: 'string'),
+            new OA\Property(property: 'display_name', type: 'string'),
+        ], type: 'object'),
+        new OA\Property(property: 'players', type: 'array', items: new OA\Items(
+            properties: [
+                new OA\Property(property: 'id', type: 'integer'),
+                new OA\Property(property: 'email', type: 'string'),
+                new OA\Property(property: 'display_name', type: 'string'),
+            ],
+            type: 'object'
+        )),
+        new OA\Property(property: 'player_count', type: 'integer'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'TeamCreate',
+    required: ['name', 'code', 'trainer_user_id'],
+    properties: [
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'code', type: 'string'),
+        new OA\Property(property: 'description', type: 'string', nullable: true),
+        new OA\Property(property: 'trainer_user_id', type: 'integer'),
+        new OA\Property(property: 'player_ids', type: 'array', items: new OA\Items(type: 'integer')),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PlayerSpecification',
+    properties: [
+        new OA\Property(property: 'user_id', type: 'integer'),
+        new OA\Property(property: 'user_email', type: 'string'),
+        new OA\Property(property: 'birth_date', type: 'string', format: 'date'),
+        new OA\Property(property: 'height_cm', type: 'number', format: 'float'),
+        new OA\Property(property: 'weight_kg', type: 'number', format: 'float'),
+        new OA\Property(property: 'gender', type: 'string'),
+        new OA\Property(property: 'entry_date', type: 'string', format: 'date'),
+        new OA\Property(property: 'medical_conditions', type: 'string', nullable: true),
+        new OA\Property(property: 'emergency_contact_name', type: 'string'),
+        new OA\Property(property: 'emergency_contact_phone', type: 'string'),
+        new OA\Property(property: 'emergency_contact_relationship', type: 'string'),
+        new OA\Property(property: 'position', type: 'string', nullable: true),
+        new OA\Property(property: 'jersey_number', type: 'integer', nullable: true),
+        new OA\Property(property: 'dominant_foot', type: 'string', nullable: true),
+        new OA\Property(property: 'nationality', type: 'string', nullable: true),
+        new OA\Property(property: 'blood_type', type: 'string', nullable: true),
+        new OA\Property(property: 'allergies', type: 'string', nullable: true),
+        new OA\Property(property: 'profile_photo_url', type: 'string', nullable: true),
+        new OA\Property(property: 'status', type: 'string'),
+        new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PlayerSpecificationCreate',
+    required: ['user_id', 'birth_date', 'height_cm', 'weight_kg', 'gender', 'entry_date', 'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship'],
+    properties: [
+        new OA\Property(property: 'user_id', type: 'integer'),
+        new OA\Property(property: 'birth_date', type: 'string', format: 'date'),
+        new OA\Property(property: 'height_cm', type: 'number', format: 'float'),
+        new OA\Property(property: 'weight_kg', type: 'number', format: 'float'),
+        new OA\Property(property: 'gender', type: 'string'),
+        new OA\Property(property: 'entry_date', type: 'string', format: 'date'),
+        new OA\Property(property: 'medical_conditions', type: 'string', nullable: true),
+        new OA\Property(property: 'emergency_contact_name', type: 'string'),
+        new OA\Property(property: 'emergency_contact_phone', type: 'string'),
+        new OA\Property(property: 'emergency_contact_relationship', type: 'string'),
+        new OA\Property(property: 'position', type: 'string', nullable: true),
+        new OA\Property(property: 'jersey_number', type: 'integer', nullable: true),
+        new OA\Property(property: 'dominant_foot', type: 'string', nullable: true),
+        new OA\Property(property: 'nationality', type: 'string', nullable: true),
+        new OA\Property(property: 'blood_type', type: 'string', nullable: true),
+        new OA\Property(property: 'allergies', type: 'string', nullable: true),
+        new OA\Property(property: 'profile_photo_url', type: 'string', nullable: true),
+        new OA\Property(property: 'status', type: 'string'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PlayerSpecificationUpdate',
+    properties: [
+        new OA\Property(property: 'birth_date', type: 'string', format: 'date'),
+        new OA\Property(property: 'height_cm', type: 'number', format: 'float'),
+        new OA\Property(property: 'weight_kg', type: 'number', format: 'float'),
+        new OA\Property(property: 'gender', type: 'string'),
+        new OA\Property(property: 'entry_date', type: 'string', format: 'date'),
+        new OA\Property(property: 'medical_conditions', type: 'string', nullable: true),
+        new OA\Property(property: 'emergency_contact_name', type: 'string'),
+        new OA\Property(property: 'emergency_contact_phone', type: 'string'),
+        new OA\Property(property: 'emergency_contact_relationship', type: 'string'),
+        new OA\Property(property: 'position', type: 'string', nullable: true),
+        new OA\Property(property: 'jersey_number', type: 'integer', nullable: true),
+        new OA\Property(property: 'dominant_foot', type: 'string', nullable: true),
+        new OA\Property(property: 'nationality', type: 'string', nullable: true),
+        new OA\Property(property: 'blood_type', type: 'string', nullable: true),
+        new OA\Property(property: 'allergies', type: 'string', nullable: true),
+        new OA\Property(property: 'profile_photo_url', type: 'string', nullable: true),
+        new OA\Property(property: 'status', type: 'string'),
     ]
 )]
 class OpenApiSpec

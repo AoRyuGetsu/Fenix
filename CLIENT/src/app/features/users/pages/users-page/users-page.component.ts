@@ -5,7 +5,8 @@ import { PersonCreateModalComponent } from '../../components/person-create-modal
 import { PersonUpdateModalComponent } from '../../components/person-update-modal/person-update-modal.component';
 import { AdminCreateModalComponent } from '../../components/admin-create-modal/admin-create-modal.component';
 import { AdminUpdateModalComponent } from '../../components/admin-update-modal/admin-update-modal.component';
-import { PeopleType, PersonData, UserData, CreatePersonPayload, UpdatePersonPayload, CreateAdminPayload, UpdateAdminPayload } from '../../services/users-http.service';
+import { PlayerSpecModalComponent } from '../../components/player-spec-modal/player-spec-modal.component';
+import { PeopleType, PersonData, UserData, CreatePersonPayload, UpdatePersonPayload, CreateAdminPayload, UpdateAdminPayload, CreatePlayerSpecPayload } from '../../services/users-http.service';
 
 @Component({
   selector: 'app-users-page',
@@ -15,6 +16,7 @@ import { PeopleType, PersonData, UserData, CreatePersonPayload, UpdatePersonPayl
     PersonUpdateModalComponent,
     AdminCreateModalComponent,
     AdminUpdateModalComponent,
+    PlayerSpecModalComponent,
   ],
   templateUrl: './users-page.component.html',
 })
@@ -67,6 +69,11 @@ export class UsersPageComponent implements OnInit {
     return null;
   });
 
+  selectedSpecUserId = computed<number | null>(() => this.vm().specUserId);
+  selectedSpecData = computed(() => this.vm().specData);
+  specLoading = computed(() => this.vm().specLoading);
+  playerSpecs = computed(() => this.vm().playerSpecs);
+
   peopleTypes = computed<PeopleType[]>(() =>
     this.vm().tabs
       .filter(t => t.code !== 'admin')
@@ -117,6 +124,18 @@ export class UsersPageComponent implements OnInit {
     if (item) {
       this.facade.updateAdmin(item.id, data);
     }
+  }
+
+  onSpecAction(personId: number): void {
+    this.facade.openSpecModal(personId);
+  }
+
+  onSaveSpec(data: CreatePlayerSpecPayload): void {
+    this.facade.saveSpec(data);
+  }
+
+  onCloseSpec(): void {
+    this.facade.closeSpecModal();
   }
 
   onCloseModals(): void {

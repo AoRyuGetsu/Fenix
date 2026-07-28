@@ -73,7 +73,36 @@ export interface UserItem {
     phone: string | null;
     address: string | null;
   } | null;
+  representative: {
+    id: number;
+    display_name: string;
+    email: string;
+  } | null;
   display_name?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlayerSpecData {
+  user_id: number;
+  user_email: string;
+  birth_date: string;
+  height_cm: number;
+  weight_kg: number;
+  gender: string;
+  entry_date: string;
+  medical_conditions: string | null;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  emergency_contact_relationship: string;
+  position: string | null;
+  jersey_number: number | null;
+  dominant_foot: string | null;
+  nationality: string | null;
+  blood_type: string | null;
+  allergies: string | null;
+  profile_photo_url: string | null;
+  status: string;
   created_at: string;
   updated_at: string;
 }
@@ -153,6 +182,10 @@ export class EvaluationsHttpService {
   getPeriods(): Observable<PeriodItem[]> {
     return this.http.get<{ data: PeriodItem[] }>(`${this.configService.apiUrl}/periods`)
       .pipe(map(res => res.data));
+  }
+
+  getPlayerSpec(userId: number): Observable<PlayerSpecData> {
+    return this.http.get<PlayerSpecData>(`${this.configService.apiUrl}/player-specifications/${userId}`);
   }
 
   getPeriodTargets(periodId: number, questionnaireId: number, page = 1, perPage = 20): Observable<PeriodTargetsResponse> {

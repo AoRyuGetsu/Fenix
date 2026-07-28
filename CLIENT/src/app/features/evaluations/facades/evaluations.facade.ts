@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
 import { MessageService } from '../../../core/services/message.service';
 import {
@@ -7,6 +7,7 @@ import {
   QuestionnaireDetail,
   UserItem,
   PeriodItem,
+  PlayerSpecData,
 } from '../services/evaluations-http.service';
 
 export interface EvaluatedStudent {
@@ -32,6 +33,16 @@ export interface EvaluationFillState {
   page: number;
   perPage: number;
   total: number;
+  showPlayerInfoModal: boolean;
+  playerInfoUser: UserItem | null;
+  playerInfoSpec: PlayerSpecData | null;
+  playerInfoLoading: boolean;
+}
+
+export interface EvaluationsStudentItem {
+  user: UserItem;
+  isEvaluated: boolean;
+  evaluationId: number | null;
 }
 
 export interface EvaluationsState {
@@ -78,10 +89,41 @@ export class EvaluationsFacade {
     page: 1,
     perPage: 20,
     total: 0,
+    showPlayerInfoModal: false,
+    playerInfoUser: null,
+    playerInfoSpec: null,
+    playerInfoLoading: false,
   });
 
   vm = this.listState.asReadonly();
-  fillVm = this.fillState.asReadonly();
+
+  private studentsList = computed<EvaluationsStudentItem[]>(() => {
+    const s = this.fillState();
+    const mapped: EvaluationsStudentItem[] = [
+      ...s.unevaluated.map(u => ({ user: u, isEvaluated: false, evaluationId: null })),
+      ...s.evaluated.map(e => ({ user: e.user, isEvaluated: true, evaluationId: e.evaluation_id })),
+    ];
+    return mapped.sort((a, b) =>
+      (a.user.display_name || a.user.email || '').localeCompare(b.user.display_name || b.user.email || '')
+    );
+  });
+
+  private selectedUserDisplayName = computed(() => {
+    const s = this.fillState();
+    if (s.selectedUserId === null) return '';
+    const student = this.studentsList().find(st => st.user.id === s.selectedUserId);
+    return student ? (student.user.display_name || student.user.email || '') : '';
+  });
+
+  fillVm = computed(() => {
+    const s = this.fillState();
+    return {
+      ...s,
+      studentsList: this.studentsList(),
+      selectedUserDisplayName: this.selectedUserDisplayName(),
+      totalPages: Math.max(1, Math.ceil(s.total / s.perPage)),
+    };
+  });
 
   load(page = 1): void {
     this.listState.update(s => ({ ...s, loading: true, error: null }));
@@ -318,6 +360,39 @@ export class EvaluationsFacade {
     this.fillState.update(s => ({ ...s, error: null, success: null }));
   }
 
+  openPlayerInfoModal(user: UserItem): void {
+    this.fillState.update(s => ({ ...s, playerInfoLoading: true, playerInfoUser: user, playerInfoSpec: null }));
+
+    this.api.getPlayerSpec(user.id).subscribe({
+      next: spec => {
+        this.fillState.update(s => ({
+          ...s,
+          playerInfoLoading: false,
+          showPlayerInfoModal: true,
+          playerInfoSpec: spec,
+        }));
+      },
+      error: () => {
+        this.fillState.update(s => ({
+          ...s,
+          playerInfoLoading: false,
+          showPlayerInfoModal: true,
+          playerInfoSpec: null,
+        }));
+      },
+    });
+  }
+
+  closePlayerInfoModal(): void {
+    this.fillState.update(s => ({
+      ...s,
+      showPlayerInfoModal: false,
+      playerInfoUser: null,
+      playerInfoSpec: null,
+      playerInfoLoading: false,
+    }));
+  }
+
   resetFill(): void {
     this.fillState.update(s => ({
       ...s,
@@ -337,6 +412,10 @@ export class EvaluationsFacade {
       page: 1,
       perPage: 20,
       total: 0,
+      showPlayerInfoModal: false,
+      playerInfoUser: null,
+      playerInfoSpec: null,
+      playerInfoLoading: false,
     }));
   }
 

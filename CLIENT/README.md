@@ -30,24 +30,24 @@ src/app/
 │   ├── components/gtable/  ← Tabla genérica reutilizable (app-gtable)
 │   └── utils/              ← error-messages.ts
 ├── features/
-│   ├── users/              ← CRUD de personas y administradores
+│   ├── users/              ← CRUD de personas, administradores y fichas de jugador
 │   │   ├── routes.ts
 │   │   ├── pages/
-│   │   ├── components/     ← Tablas, modales
+│   │   ├── components/     ← Tablas, modales, PlayerSpecModalComponent
+│   │   ├── services/       ← HTTP (incluye CRUD de player specs)
+│   │   └── facades/        ← Estado (signals + vm, player specs)
+│   ├── questionnaire/      ← Cuestionarios y preguntas
+│   │   ├── routes.ts
+│   │   ├── pages/
+│   │   ├── components/     ← Tablas, modales, question manager
 │   │   ├── services/       ← HTTP
 │   │   └── facades/        ← Estado (signals + vm)
-  │   ├── questionnaire/      ← Cuestionarios y preguntas
-  │   │   ├── routes.ts
-  │   │   ├── pages/
-  │   │   ├── components/     ← Tablas, modales, question manager
-  │   │   ├── services/       ← HTTP
-  │   │   └── facades/        ← Estado (signals + vm)
-  │   └── evaluations/        ← Evaluaciones (llenar cuestionarios asignados por rol)
-  │       ├── routes.ts
-  │       ├── pages/          ← EvaluationsPage, EvaluationFillPage
-  │       ├── components/     ← EvaluationsTable, QuestionCard
-  │       ├── services/       ← HTTP
-  │       └── facades/        ← Estado (signals + vm)
+│   └── evaluations/        ← Evaluaciones (llenar cuestionarios + ficha del jugador)
+│       ├── routes.ts
+│       ├── pages/          ← EvaluationsPage, EvaluationFillPage
+│       ├── components/     ← EvaluationsTable, QuestionCard, PlayerInfoModalComponent
+│       ├── services/       ← HTTP (incluye getPlayerSpec)
+│       └── facades/        ← Estado (signals + vm)
   ├── app.routes.ts   ← Rutas raíz con lazy loading
 └── main.ts         ← Entrypoint (bootstrapApplication)
 ```

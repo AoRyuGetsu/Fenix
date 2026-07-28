@@ -6,6 +6,9 @@ namespace App\Features\User\Domain\Entities;
 
 use App\Features\People\Domain\Entities\Person;
 use App\Features\People\Domain\Entities\PersonUser;
+use App\Features\RolesPermisos\Domain\Entities\Role;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -49,6 +52,14 @@ class User
 
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: PersonUser::class)]
     private ?PersonUser $personUser = null;
+
+    #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'users')]
+    private Collection $roles;
+
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -153,5 +164,10 @@ class User
     public function getPerson(): ?Person
     {
         return $this->personUser?->getPerson();
+    }
+
+    public function getRoles(): Collection
+    {
+        return $this->roles;
     }
 }

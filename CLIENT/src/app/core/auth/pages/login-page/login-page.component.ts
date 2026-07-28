@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthFacade } from '../../facades/auth.facade';
 
@@ -10,6 +10,12 @@ import { AuthFacade } from '../../facades/auth.facade';
 export class LoginPageComponent {
   private facade = inject(AuthFacade);
   vm = this.facade.vm;
+
+  showPassword = signal(false);
+
+  togglePassword(): void {
+    this.showPassword.update(v => !v);
+  }
 
   form = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),

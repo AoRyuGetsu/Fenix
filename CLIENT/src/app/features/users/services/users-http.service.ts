@@ -45,6 +45,8 @@ export interface UserData {
   active: boolean;
   roles: string[];
   person: UserPerson | null;
+  team: { id: number; name: string } | null;
+  representative: { id: number; display_name: string } | null;
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
@@ -59,6 +61,8 @@ export interface PaginatedResponse<T> {
 
 export interface CreatePersonPayload {
   password?: string;
+  team_id?: number | null;
+  representative_id?: number | null;
   person: {
     type: string;
     first_name: string;
@@ -76,6 +80,8 @@ export interface UpdatePersonPayload {
   email?: string;
   password?: string;
   active?: boolean;
+  team_id?: number | null;
+  representative_id?: number | null;
   person?: {
     type?: string;
     first_name?: string;
@@ -100,6 +106,53 @@ export interface UpdateAdminPayload {
   active?: boolean;
 }
 
+export interface PlayerSpecData {
+  user_id: number;
+  user_email: string;
+  birth_date: string;
+  height_cm: number;
+  weight_kg: number;
+  gender: string;
+  entry_date: string;
+  medical_conditions: string | null;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  emergency_contact_relationship: string;
+  position: string | null;
+  jersey_number: number | null;
+  dominant_foot: string | null;
+  nationality: string | null;
+  blood_type: string | null;
+  allergies: string | null;
+  profile_photo_url: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreatePlayerSpecPayload {
+  user_id: number;
+  birth_date: string;
+  height_cm: number;
+  weight_kg: number;
+  gender: string;
+  entry_date: string;
+  medical_conditions?: string | null;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  emergency_contact_relationship: string;
+  position?: string | null;
+  jersey_number?: number | null;
+  dominant_foot?: string | null;
+  nationality?: string | null;
+  blood_type?: string | null;
+  allergies?: string | null;
+  profile_photo_url?: string | null;
+  status?: string;
+}
+
+export type UpdatePlayerSpecPayload = Partial<CreatePlayerSpecPayload>;
+
 @Injectable({ providedIn: 'root' })
 export class UsersHttpService {
   private http = inject(HttpClient);
@@ -118,10 +171,11 @@ export class UsersHttpService {
     );
   }
 
-  getUsers(role: string, page: number, perPage: number, name?: string, includeDeleted?: boolean): Observable<PaginatedResponse<UserData>> {
+  getUsers(role: string, page: number, perPage: number, name?: string, includeDeleted?: boolean, unassigned?: boolean): Observable<PaginatedResponse<UserData>> {
     let params: Record<string, string> = { role, page: String(page), perPage: String(perPage) };
     if (name) params['name'] = name;
     if (includeDeleted) params['includeDeleted'] = '1';
+    if (unassigned) params['unassigned'] = '1';
     return this.http.get<PaginatedResponse<UserData>>(
       `${this.configService.apiUrl}/users`,
       { params },
@@ -150,5 +204,17 @@ export class UsersHttpService {
 
   restoreUser(id: number): Observable<UserData> {
     return this.http.put<UserData>(`${this.configService.apiUrl}/users/${id}/restore`, {});
+  }
+
+  getPlayerSpec(userId: number): Observable<PlayerSpecData> {
+    return this.http.get<PlayerSpecData>(`${this.configService.apiUrl}/player-specifications/${userId}`);
+  }
+
+  createPlayerSpec(data: CreatePlayerSpecPayload): Observable<PlayerSpecData> {
+    return this.http.post<PlayerSpecData>(`${this.configService.apiUrl}/player-specifications`, data);
+  }
+
+  updatePlayerSpec(userId: number, data: UpdatePlayerSpecPayload): Observable<PlayerSpecData> {
+    return this.http.put<PlayerSpecData>(`${this.configService.apiUrl}/player-specifications/${userId}`, data);
   }
 }

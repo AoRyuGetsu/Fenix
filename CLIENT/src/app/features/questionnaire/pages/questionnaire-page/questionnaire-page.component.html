@@ -22,6 +22,10 @@
     </div>
   }
 
+  <div class="alert alert-info py-2" role="alert">
+    <i class="bi-info-circle me-1"></i> {{ 'qnr_info_topic_guidelines' | message }}
+  </div>
+
   @if (vm().loading) {
     <div class="text-center py-5">
       <div class="spinner-border text-primary" role="status">

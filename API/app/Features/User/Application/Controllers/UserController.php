@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Features\User\Application\Controllers;
 
+use App\Core\AppException;
 use App\Core\Env;
 use App\Core\Interfaces\ControllerInterface;
+use App\Features\Representatives\Application\Services\RepresentativeService;
 use App\Features\RolesPermisos\Domain\Interfaces\RoleAccessControlServiceInterface;
+use App\Features\Teams\Application\Services\TeamService;
+use App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface;
 use App\Features\User\Application\DTO\UserQuery;
 use App\Features\User\Domain\Interfaces\UserServiceInterface;
 use App\Features\User\Domain\Entities\User;
@@ -21,6 +25,9 @@ class UserController implements ControllerInterface
         private UserServiceInterface $userService,
         private RoleAccessControlServiceInterface $roleAccessControl,
         private Request $request,
+        private TeamService $teamService,
+        private TeamRepositoryInterface $teamRepository,
+        private RepresentativeService $representativeService,
     ) {}
 
     public function execute(): Response
@@ -37,6 +44,8 @@ class UserController implements ControllerInterface
         new OA\Property(property: 'email', type: 'string'),
         new OA\Property(property: 'password', type: 'string'),
         new OA\Property(property: 'person', ref: '#/components/schemas/PersonCreate'),
+        new OA\Property(property: 'team_id', type: 'integer', nullable: true),
+        new OA\Property(property: 'representative_id', type: 'integer', nullable: true),
     ]))]
     #[OA\Response(response: 201, description: 'Usuario creado', content: new OA\JsonContent(ref: '#/components/schemas/User'))]
     #[OA\Response(response: 422, description: 'Datos inválidos', content: new OA\JsonContent(ref: '#/components/schemas/Error'))]
@@ -61,6 +70,14 @@ class UserController implements ControllerInterface
                     return new JsonResponse(['error' => "person.$field is required"], 422);
                 }
             }
+
+            $type = $personData['type'];
+            if ($type === 'JUG' && !isset($data['team_id'])) {
+                return new JsonResponse([
+                    'error' => 'El equipo es obligatorio para usuarios de tipo Jugador',
+                    'code'  => 'TEAM_REQUIRED_FOR_JUG',
+                ], 422);
+            }
         }
 
         try {
@@ -75,6 +92,22 @@ class UserController implements ControllerInterface
             $this->roleAccessControl->assignRoleToUser((int) $user->getId(), $roleCode);
         } catch (\App\Core\AppException $e) {
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
+        }
+
+        if (isset($data['team_id'])) {
+            try {
+                $this->teamService->addPlayer((int) $data['team_id'], $user);
+            } catch (\App\Core\AppException $e) {
+                return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], 422);
+            }
+        }
+
+        if (isset($data['representative_id'])) {
+            try {
+                $this->representativeService->assignPlayerToRep((int) $user->getId(), (int) $data['representative_id']);
+            } catch (\App\Core\AppException $e) {
+                return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], 422);
+            }
         }
 
         return new JsonResponse($this->serialize($user), 201);
@@ -98,6 +131,7 @@ class UserController implements ControllerInterface
             active: $this->request->query->get('active') !== null ? (bool) $this->request->query->get('active') : null,
             role: $this->request->query->get('role'),
             includeDeleted: $this->request->query->get('includeDeleted') !== null ? (bool) $this->request->query->get('includeDeleted') : null,
+            unassigned: $this->request->query->get('unassigned') !== null ? (bool) $this->request->query->get('unassigned') : null,
             page: max(1, $page),
             perPage: max(1, min(100, $perPage)),
         );
@@ -138,11 +172,9 @@ class UserController implements ControllerInterface
         new OA\Property(property: 'email', type: 'string'),
         new OA\Property(property: 'password', type: 'string', description: 'Contraseña'),
         new OA\Property(property: 'active', type: 'boolean'),
-        new OA\Property(property: 'person', properties: [
-            new OA\Property(property: 'first_name', type: 'string'),
-            new OA\Property(property: 'first_surname', type: 'string'),
-            new OA\Property(property: 'document_number', type: 'string'),
-        ], type: 'object'),
+        new OA\Property(property: 'person', ref: '#/components/schemas/PersonUpdate'),
+        new OA\Property(property: 'team_id', type: 'integer', nullable: true),
+        new OA\Property(property: 'representative_id', type: 'integer', nullable: true),
     ]))]
     #[OA\Response(response: 200, description: 'Usuario actualizado', content: new OA\JsonContent(ref: '#/components/schemas/User'))]
     #[OA\Response(response: 404, description: 'Usuario no encontrado', content: new OA\JsonContent(ref: '#/components/schemas/Error'))]
@@ -158,6 +190,26 @@ class UserController implements ControllerInterface
             $user = $this->userService->update($id, $data);
         } catch (\App\Core\AppException $e) {
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
+        }
+
+        if (array_key_exists('team_id', $data)) {
+            $currentTeam = $this->teamRepository->findByPlayerId($id);
+            if ($currentTeam !== null) {
+                $this->teamService->removePlayer($currentTeam->getId(), $id);
+            }
+            if ($data['team_id'] !== null) {
+                $this->teamService->addPlayer((int) $data['team_id'], $user);
+            }
+        }
+
+        if (array_key_exists('representative_id', $data)) {
+            $currentRep = $this->representativeService->getRepresentative($id);
+            if ($currentRep !== null) {
+                $this->representativeService->removePlayer((int) $currentRep->getId(), $id);
+            }
+            if ($data['representative_id'] !== null) {
+                $this->representativeService->assignPlayerToRep($id, (int) $data['representative_id']);
+            }
         }
 
         return new JsonResponse($this->serialize($user));
@@ -212,21 +264,43 @@ class UserController implements ControllerInterface
             'updated_at' => $user->getUpdatedAt()->format('c'),
         ];
 
+        $team = $this->teamRepository->findByPlayerId((int) $user->getId());
+        $result['team'] = $team !== null ? [
+            'id'   => $team->getId(),
+            'name' => $team->getName(),
+        ] : null;
+
+        $rep = $this->representativeService->getRepresentative((int) $user->getId());
+        $result['representative'] = $rep !== null ? [
+            'id'           => $rep->getId(),
+            'display_name' => $this->getUserDisplayName($rep),
+        ] : null;
+
         if ($person !== null) {
             $result['person'] = [
-                'id'             => $person->getId(),
-                'type'           => $person->getPeopleType()->getCode(),
-                'first_name'     => $person->getFirstName(),
-                'middle_name'    => $person->getMiddleName(),
-                'first_surname'  => $person->getFirstSurname(),
-                'second_surname' => $person->getSecondSurname(),
+                'id'              => $person->getId(),
+                'type'            => $person->getPeopleType()->getCode(),
+                'first_name'      => $person->getFirstName(),
+                'middle_name'     => $person->getMiddleName(),
+                'first_surname'   => $person->getFirstSurname(),
+                'second_surname'  => $person->getSecondSurname(),
                 'document_number' => $person->getDocumentNumber(),
-                'email'          => $person->getEmail(),
-                'phone'          => $person->getPhone(),
-                'address'        => $person->getAddress(),
+                'email'           => $person->getEmail(),
+                'phone'           => $person->getPhone(),
+                'address'         => $person->getAddress(),
             ];
         }
 
         return $result;
+    }
+
+    private function getUserDisplayName(User $user): string
+    {
+        $personUser = $user->getPersonUser();
+        if ($personUser !== null) {
+            $person = $personUser->getPerson();
+            return trim($person->getFirstName() . ' ' . $person->getFirstSurname());
+        }
+        return $user->getEmail();
     }
 }

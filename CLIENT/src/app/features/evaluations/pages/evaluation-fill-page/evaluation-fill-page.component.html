@@ -1,4 +1,4 @@
-@let state = fillVm();
+@let state = vm();
 
 <div class="container-fluid py-3">
   <div class="d-flex align-items-center gap-2 mb-3">
@@ -53,122 +53,151 @@
         </div>
       </div>
 
-      <!-- Lista de estudiantes -->
-      @if (!state.usersLoading) {
-        <!-- No evaluados -->
-        @if (state.unevaluated.length > 0) {
-          <div class="card mb-4">
-            <div class="card-header fw-semibold">{{ 'eval_hdr_students_unevaluated' | message }}</div>
-            <div class="card-body">
-              <div class="d-flex gap-2 flex-wrap">
-                @for (user of state.unevaluated; track trackByUserId($index, user)) {
-                  <button
-                    class="btn rounded-pill"
-                    [class.btn-primary]="state.selectedUserId === user.id && state.editingEvaluationId === null"
-                    [class.btn-outline-secondary]="state.selectedUserId !== user.id || state.editingEvaluationId !== null"
-                    (click)="onUserSelect(user.id)"
-                  >
-                    {{ getUserDisplayName(user) }}
-                  </button>
-                }
+      <div class="row">
+        <!-- Tabla de estudiantes -->
+        <div class="col-12" [class.col-lg-4]="state.selectedUserId !== null">
+          @if (!state.usersLoading) {
+            @if (state.studentsList.length > 0) {
+              <div class="card mb-4">
+                <div class="card-header fw-semibold">{{ 'eval_hdr_students_unevaluated' | message }}</div>
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle mb-0">
+                      <thead class="table-light">
+                        <tr>
+                          <th>{{ 'eval_lbl_student_name' | message }}</th>
+                          <th>{{ 'eval_lbl_status' | message }}</th>
+                          <th style="width: 200px;">{{ 'cr_lbl_actions' | message }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (student of state.studentsList; track trackByStudentId($index, student)) {
+                          <tr
+                            class="cursor-pointer"
+                            [class.table-primary]="state.selectedUserId === student.user.id"
+                            (click)="onUserSelect(student.user.id)"
+                          >
+                            <td>{{ student.user.display_name || student.user.email }}</td>
+                            <td>
+                              @if (student.isEvaluated) {
+                                <span class="badge bg-success">{{ 'eval_badge_evaluated' | message }}</span>
+                              } @else {
+                                <span class="badge bg-secondary">{{ 'eval_badge_unevaluated' | message }}</span>
+                              }
+                            </td>
+                            <td>
+                              <div class="d-flex gap-1">
+                                <button class="btn btn-sm btn-outline-info" (click)="onShowFicha(student.user); $event.stopPropagation()" title="Ver ficha">
+                                  <i class="bi bi-person-badge"></i>
+                                </button>
+                                @if (student.isEvaluated) {
+                                  <button class="btn btn-sm btn-outline-success" (click)="onUserSelect(student.user.id); $event.stopPropagation()" title="{{ 'cr_btn_edit' | message }}">
+                                    <i class="bi-pencil"></i>
+                                  </button>
+                                } @else {
+                                  <button class="btn btn-sm btn-primary flex-grow-1" (click)="onUserSelect(student.user.id); $event.stopPropagation()">
+                                    <i class="bi bi-check-lg"></i> {{ 'eval_btn_answer' | message }}
+                                  </button>
+                                }
+                              </div>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        }
 
-        <!-- Evaluados -->
-        @if (state.evaluated.length > 0) {
-          <div class="card mb-4">
-            <div class="card-header fw-semibold">{{ 'eval_hdr_students_evaluated' | message }}</div>
-            <div class="card-body">
-              <div class="d-flex gap-2 flex-wrap">
-                @for (e of state.evaluated; track trackByEvaluatedId($index, e)) {
+              @if (state.total > state.perPage) {
+                <div class="d-flex justify-content-center align-items-center gap-3 mb-4">
                   <button
-                    class="btn rounded-pill"
-                    [class.btn-success]="state.selectedUserId === e.user.id"
-                    [class.btn-outline-success]="state.selectedUserId !== e.user.id"
-                    (click)="onUserSelect(e.user.id)"
+                    class="btn btn-outline-secondary btn-sm"
+                    [disabled]="state.page <= 1"
+                    (click)="onFillPageChange(state.page - 1)"
                   >
-                    {{ getUserDisplayName(e.user) }} <i class="bi bi-pencil ms-1"></i>
+                    <i class="bi bi-chevron-left"></i> {{ 'eval_btn_previous' | message }}
                   </button>
-                }
-              </div>
-            </div>
-          </div>
-        }
-
-        @if (state.unevaluated.length === 0 && state.evaluated.length === 0) {
-          <div class="text-muted text-center py-3">{{ 'eval_lbl_no_students' | message }}</div>
-        }
-
-        @if (state.total > state.perPage) {
-          <div class="d-flex justify-content-center align-items-center gap-3 mt-3">
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              [disabled]="state.page <= 1"
-              (click)="onFillPageChange(state.page - 1)"
-            >
-              <i class="bi bi-chevron-left"></i> {{ 'eval_btn_previous' | message }}
-            </button>
-            <span class="text-muted small">
-              {{ 'eval_lbl_page_x_of_y' | message : { page: state.page, total: getTotalPages(state.total, state.perPage) } }}
-            </span>
-            <button
-              class="btn btn-outline-secondary btn-sm"
-              [disabled]="state.page >= getTotalPages(state.total, state.perPage)"
-              (click)="onFillPageChange(state.page + 1)"
-            >
-              {{ 'eval_btn_next' | message }} <i class="bi bi-chevron-right"></i>
-            </button>
-          </div>
-        }
-      } @else {
-        <div class="text-center py-3">
-          <div class="spinner-border spinner-border-sm text-primary" role="status">
-            <span class="visually-hidden">{{ 'eval_alr_loading_students' | message }}</span>
-          </div>
-        </div>
-      }
-
-      <!-- Preguntas del cuestionario -->
-      @if (state.selectedUserId !== null) {
-        <div class="mb-4">
-          @if (state.editingEvaluationId !== null) {
-            <div class="alert alert-info">{{ 'eval_alr_editing_evaluation' | message }}</div>
-          }
-
-          @for (section of state.questionnaire!.sections; track section.id) {
-            <div class="mb-4">
-              <h5 class="mb-1">{{ section.title }}</h5>
-              @if (section.description) {
-                <p class="text-muted small mb-3">{{ section.description }}</p>
+                  <span class="text-muted small">
+                    {{ 'eval_lbl_page_x_of_y' | message : { page: state.page, total: state.totalPages } }}
+                  </span>
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                    [disabled]="state.page >= state.totalPages"
+                    (click)="onFillPageChange(state.page + 1)"
+                  >
+                    {{ 'eval_btn_next' | message }} <i class="bi bi-chevron-right"></i>
+                  </button>
+                </div>
               }
-
-              @for (q of section.questions; track trackByQuestionId($index, q)) {
-                <app-question-card
-                  [question]="q"
-                  [value]="state.answers[q.id] || ''"
-                  (valueChange)="onAnswerChange(q.id, $event)"
-                />
-              }
-            </div>
-          }
-        </div>
-
-        <!-- Botón guardar -->
-        <div class="d-flex justify-content-end mb-4">
-          <button
-            class="btn btn-success btn-lg px-4"
-            (click)="onSave()"
-            [disabled]="state.saving"
-          >
-            @if (state.saving) {
-              <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+            } @else {
+              <div class="text-muted text-center py-3">{{ 'eval_lbl_no_students' | message }}</div>
             }
-            {{ state.editingEvaluationId !== null ? ('eval_btn_update_evaluation' | message) : ('eval_btn_save_evaluation' | message) }}
-          </button>
+          } @else {
+            <div class="text-center py-3">
+              <div class="spinner-border spinner-border-sm text-primary" role="status">
+                <span class="visually-hidden">{{ 'eval_alr_loading_students' | message }}</span>
+              </div>
+            </div>
+          }
         </div>
-      }
+
+        <!-- Card de evaluación -->
+        @if (state.selectedUserId !== null) {
+          <div class="col-12 col-lg-8">
+            <div class="card mb-4">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <span class="fw-semibold">
+                  {{ state.selectedUserDisplayName }}
+                </span>
+                @if (state.editingEvaluationId !== null) {
+                  <span class="badge bg-info">{{ 'eval_alr_editing_evaluation' | message }}</span>
+                }
+              </div>
+              <div class="card-body">
+                @for (section of state.questionnaire!.sections; track section.id) {
+                  <div class="mb-4">
+                    <h5 class="mb-1">{{ section.title }}</h5>
+                    @if (section.description) {
+                      <p class="text-muted small mb-3">{{ section.description }}</p>
+                    }
+
+                    @for (q of section.questions; track trackByQuestionId($index, q)) {
+                      <app-question-card
+                        [question]="q"
+                        [value]="state.answers[q.id] || ''"
+                        (valueChange)="onAnswerChange(q.id, $event)"
+                      />
+                    }
+                  </div>
+                }
+
+                <div class="d-flex justify-content-end">
+                  <button
+                    class="btn btn-success btn-lg px-4"
+                    (click)="onSave()"
+                    [disabled]="state.saving"
+                  >
+                    @if (state.saving) {
+                      <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                    }
+                    {{ state.editingEvaluationId !== null ? ('eval_btn_update_evaluation' | message) : ('eval_btn_save_evaluation' | message) }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     }
   }
 </div>
+
+@if (state.showPlayerInfoModal && state.playerInfoUser) {
+  <app-player-info-modal
+    [user]="state.playerInfoUser"
+    [spec]="state.playerInfoSpec"
+    [loading]="state.playerInfoLoading"
+    (close)="onCloseFicha()"
+  />
+}

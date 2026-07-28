@@ -12,7 +12,6 @@ export interface AuthState {
   permissions: string[];
   loading: boolean;
   error: string | null;
-  success: string | null;
 }
 
 const STORAGE_TOKEN = 'access_token';
@@ -55,7 +54,6 @@ export class AuthFacade {
     permissions: [],
     loading: false,
     error: null,
-    success: null,
     ...loadFromStorage(),
   });
 
@@ -68,7 +66,7 @@ export class AuthFacade {
   }
 
   login(email: string, password: string): void {
-    this.state.update(s => ({ ...s, loading: true, error: null, success: null }));
+    this.state.update(s => ({ ...s, loading: true, error: null }));
 
     this.api.login(email, password).subscribe({
       next: res => {
@@ -93,13 +91,12 @@ export class AuthFacade {
           permissions: [],
           loading: false,
           error: null,
-          success: 'Sesión iniciada correctamente',
         }));
 
-        setTimeout(() => this.router.navigateByUrl('/'), 1500);
+        this.router.navigateByUrl('/');
       },
       error: err => {
-        this.state.update(s => ({ ...s, loading: false, error: getErrorMessage(err, 'Error al iniciar sesión'), success: null }));
+        this.state.update(s => ({ ...s, loading: false, error: getErrorMessage(err, 'Error al iniciar sesión') }));
       },
     });
   }
@@ -120,13 +117,8 @@ export class AuthFacade {
       permissions: [],
       loading: false,
       error: null,
-      success: null,
     }));
     this.router.navigateByUrl('/login');
-  }
-
-  clearMessages(): void {
-    this.state.update(s => ({ ...s, error: null, success: null }));
   }
 
   isAuthenticated(): boolean {

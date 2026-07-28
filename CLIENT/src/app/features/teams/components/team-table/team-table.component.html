@@ -1,0 +1,68 @@
+@if (loading()) {
+  <div class="text-center py-3">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
+    </div>
+  </div>
+} @else {
+  <app-gtable
+    [columns]="cols()"
+    [data]="displayItems()"
+    [pagination]="pagination()"
+    [loading]="loading()"
+    [detail]="detailConfig()"
+    [actions]="actions"
+    (pageChange)="pageChange.emit($event)"
+    (actionClick)="onAction($event)"
+    (expandedChange)="onExpand($event)"
+  />
+}
+
+<ng-template #detailTpl let-item>
+  @let detail = teamDetailMap()[item.id];
+  <h6 class="fw-bold mb-3">{{ item.name }}</h6>
+  @if (detail) {
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <small class="text-muted d-block">{{ 'team_lbl_code' | message }}</small>
+        <span>{{ detail.code }}</span>
+      </div>
+      <div class="col-md-4">
+        <small class="text-muted d-block">{{ 'team_lbl_description' | message }}</small>
+        <span>{{ detail.description ?? '-' }}</span>
+      </div>
+      <div class="col-md-4">
+        <small class="text-muted d-block">{{ 'team_lbl_trainer' | message }}</small>
+        <span>{{ detail.trainer.display_name }}</span>
+      </div>
+      <div class="col-md-4">
+        <small class="text-muted d-block">{{ 'team_lbl_created' | message }}</small>
+        <span>{{ detail.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <div class="col-md-4">
+        <small class="text-muted d-block">Actualizado</small>
+        <span>{{ detail.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    </div>
+
+    <h6 class="fw-bold mb-2">{{ 'team_lbl_players' | message }} ({{ detail.players.length }})</h6>
+    @if (detail.players.length > 0) {
+      <ul class="list-group list-group-flush">
+        @for (p of detail.players; track p.id) {
+          <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+            <span>{{ p.display_name }}</span>
+            <small class="text-muted">{{ p.email }}</small>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="text-muted small mb-0">{{ 'team_lbl_no_players_available' | message }}</p>
+    }
+  } @else {
+    <div class="text-center py-3">
+      <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
+      </div>
+    </div>
+  }
+</ng-template>
