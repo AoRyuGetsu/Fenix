@@ -62,7 +62,7 @@ class Kernel
                     'trace'   => $e->getTraceAsString(),
                     'url'     => $request->getMethod() . ' ' . $request->getRequestUri(),
                 ]);
-                $response = new JsonResponse(['error' => 'Internal server error'], 500);
+                $response = new JsonResponse(['error' => getError('INTERNAL_ERROR'), 'code' => 'INTERNAL_ERROR'], 500);
             }
         }
 

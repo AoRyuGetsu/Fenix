@@ -1,9 +1,10 @@
 import { Component, input, output, signal, effect } from '@angular/core';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { UserData, UpdateAdminPayload } from '../../services/users-http.service';
 
 @Component({
   selector: 'app-admin-update-modal',
-  imports: [],
+  imports: [MessagePipe],
   templateUrl: './admin-update-modal.component.html',
 })
 export class AdminUpdateModalComponent {

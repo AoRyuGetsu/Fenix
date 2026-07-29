@@ -1,11 +1,11 @@
 <div class="container-fluid">
-  <h4 class="text-gray-800 fw-bold mb-1">Roles y Permisos</h4>
-  <p class="text-gray-600 mb-4" style="font-size: 0.9rem;">Vista general de roles y sus permisos asignados (solo lectura).</p>
+  <h4 class="text-gray-800 fw-bold mb-1">{{ 'rp_hdr_roles_permisos' | message }}</h4>
+  <p class="text-gray-600 mb-4" style="font-size: 0.9rem;">{{ 'rp_lbl_desc' | message }}</p>
 
   @if (vm().loading) {
     <div class="text-center py-4">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Cargando...</span>
+        <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
       </div>
     </div>
   }
@@ -18,7 +18,7 @@
     <!-- Permisos horizontal -->
     <div class="card shadow mb-4">
       <div class="card-header py-3">
-        <h6 class="m-0 fw-bold text-primary">Permisos del Sistema</h6>
+        <h6 class="m-0 fw-bold text-primary">{{ 'rp_hdr_system_permissions' | message }}</h6>
       </div>
       <div class="card-body">
         <div class="d-flex flex-wrap gap-2">
@@ -32,14 +32,14 @@
     <!-- Tabla Roles x Permisos -->
     <div class="card shadow mb-4">
       <div class="card-header py-3">
-        <h6 class="m-0 fw-bold text-primary">Roles y sus Permisos</h6>
+        <h6 class="m-0 fw-bold text-primary">{{ 'rp_hdr_roles_and_permissions' | message }}</h6>
       </div>
       <div class="card-body">
         <div class="table-responsive">
           <table class="table table-bordered table-hover">
             <thead class="table-light">
               <tr>
-                <th style="min-width: 120px;">Rol</th>
+                <th style="min-width: 120px;">{{ 'rp_lbl_role' | message }}</th>
                 @for (perm of vm().permissions; track perm.id) {
                   <th class="text-center" style="min-width: 100px;">{{ perm.name }}</th>
                 }

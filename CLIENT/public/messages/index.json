@@ -6,6 +6,7 @@
     "questionnaire": "questionnaire.json",
     "users": "users.json",
     "rolesPermisos": "roles-permisos.json",
-    "teams": "teams.json"
+    "teams": "teams.json",
+    "evaluationStats": "evaluation-stats.json"
   }
 }

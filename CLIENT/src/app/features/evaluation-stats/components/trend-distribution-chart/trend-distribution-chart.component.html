@@ -1,0 +1,18 @@
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 fw-bold text-gray-800">{{ title() }}</h6>
+  </div>
+  <div class="card-body text-center">
+    <canvas baseChart
+      [data]="chartData()"
+      [options]="chartOptions"
+      type="doughnut"
+      style="max-height: 220px;">
+    </canvas>
+    <div class="d-flex justify-content-center gap-4 mt-2 small">
+      <div><span class="badge bg-success me-1">&nbsp;</span> {{ 'es_lbl_upward' | message }}: {{ data().upward }}</div>
+      <div><span class="badge bg-danger me-1">&nbsp;</span> {{ 'es_lbl_downward' | message }}: {{ data().downward }}</div>
+      <div><span class="badge bg-info me-1">&nbsp;</span> {{ 'es_lbl_stable' | message }}: {{ data().stable }}</div>
+    </div>
+  </div>
+</div>

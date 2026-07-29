@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\Representatives\Domain\Repositories;
 
+use App\Features\Representatives\Application\DTO\RepPlayerQuery;
 use App\Features\Representatives\Domain\Entities\RepPlayer;
 use App\Features\Representatives\Domain\Interfaces\RepPlayerRepositoryInterface;
 use Doctrine\ORM\EntityManager;
@@ -26,6 +27,29 @@ class RepPlayerRepository implements RepPlayerRepositoryInterface
             ->setParameter('repUserId', $repUserId)
             ->getQuery()
             ->getResult();
+    }
+
+    public function findPaginatedByRepUserId(RepPlayerQuery $query): array
+    {
+        $qb = $this->entityManager
+            ->getRepository(RepPlayer::class)
+            ->createQueryBuilder('rp')
+            ->select('rp', 'rep', 'player')
+            ->leftJoin('rp.rep', 'rep')
+            ->leftJoin('rp.player', 'player')
+            ->where('IDENTITY(rp.rep) = :repUserId')
+            ->setParameter('repUserId', $query->repUserId);
+
+        $total = (int) (clone $qb)->select('COUNT(rp.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $items = $qb->setFirstResult(($query->page - 1) * $query->perPage)
+            ->setMaxResults($query->perPage)
+            ->getQuery()
+            ->getResult();
+
+        return [$items, $total];
     }
 
     public function findByPlayerUserId(int $playerUserId): ?RepPlayer

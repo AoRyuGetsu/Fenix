@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Features\Questionnaire\Application\Controllers;
 
+use App\Core\Env;
 use App\Core\Interfaces\ControllerInterface;
+use App\Features\Questionnaire\Application\DTO\SectionQuery;
 use App\Features\Questionnaire\Domain\Interfaces\SectionServiceInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,19 +22,35 @@ class SectionController implements ControllerInterface
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Get(path: '/questionnaires/{id}/sections', tags: ['Questionnaire'], summary: 'Listar secciones de un cuestionario')]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 200, description: 'Lista de secciones')]
+    #[OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer'))]
+    #[OA\Parameter(name: 'perPage', in: 'query', schema: new OA\Schema(type: 'integer'))]
+    #[OA\Response(response: 200, description: 'Lista paginada de secciones', content: new OA\JsonContent(ref: '#/components/schemas/PaginatedResponse'))]
     public function list(int $questionnaireId): Response
     {
-        $sections = $this->sectionService->findByQuestionnaire($questionnaireId);
+        $page = max(1, (int) ($this->request->query->get('page', '1')));
+        $perPage = max(1, min(100, (int) ($this->request->query->get('perPage', Env::get('PAGINATION_PER_PAGE', '20')))));
 
-        $data = array_map(fn ($s) => $this->serialize($s), $sections);
+        $query = new SectionQuery(
+            questionnaireId: $questionnaireId,
+            page: $page,
+            perPage: $perPage,
+        );
 
-        return new JsonResponse($data);
+        [$items, $total] = $this->sectionService->findPaginated($query);
+
+        $data = array_map(fn ($s) => $this->serialize($s), $items);
+
+        return new JsonResponse([
+            'data' => $data,
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+        ]);
     }
 
     #[OA\Post(path: '/questionnaires/{id}/sections', tags: ['Questionnaire'], summary: 'Crear sección en un cuestionario')]
@@ -48,11 +66,11 @@ class SectionController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         if (!isset($data['title'])) {
-            return new JsonResponse(['error' => 'title is required'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_TITLE_REQUIRED'), 'code' => 'VALIDATION_TITLE_REQUIRED'], 422);
         }
 
         try {
@@ -77,7 +95,7 @@ class SectionController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         try {

@@ -98,7 +98,7 @@ El directorio `DB/test/` contiene migraciones que crean datos de prueba (usuario
 |--------|-------------|
 | `000_reset_structure.php` | Reset total de la base de datos (drop + recreate estructura desde 002 SQL). Se activa automáticamente con `RESET_DATABASE_ON_MIGRATE=true` o manualmente con `?confirm=reset`. |
 | `001_seed_roles_and_admin_user.php` | Crea roles (administrador, entrenador, jugador, supervisor), permisos (read, write, delete), usuario administrador y asigna permisos según rol |
-| `002_seed_menus.php` | Crea todos los ítems del menú lateral (Configuración, Roles, Usuarios, Cuestionarios, Evaluaciones) con sus asignaciones por rol |
+| `002_seed_menus.php` | Crea todos los ítems del menú lateral (Configuración, Roles, Usuarios, Cuestionarios, Evaluaciones, Estadísticas) con sus asignaciones por rol |
 | `003_seed_basketball_questionnaire.php` | Crea el cuestionario "Evaluación Técnica de Jugador" con 4 secciones y 19 preguntas tipo selección (1-5). Responder: entrenador, evaluado: jugador |
 
 ### Credenciales del usuario administrador

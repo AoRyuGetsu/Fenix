@@ -2,41 +2,41 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title fw-bold">{{ isUpdate() ? 'Editar' : 'Nueva' }} Ficha de Jugador</h5>
+        <h5 class="modal-title fw-bold">{{ isUpdate() ? ('play_spec_hdr_edit' | message) : ('play_spec_hdr_new' | message) }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
-          <h6 class="text-primary border-bottom pb-2 mb-0">Datos físicos</h6>
+          <h6 class="text-primary border-bottom pb-2 mb-0">{{ 'play_spec_lbl_physical_data' | message }}</h6>
           <div class="col-md-4">
-            <label class="form-label">Fecha de nacimiento <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'play_spec_lbl_birth_date' | message }} <span class="text-danger">*</span></label>
             <input #inputBirth type="date" class="form-control" [value]="birthDate()" (input)="birthDate.set(inputBirth.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">Estatura (cm) <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'play_spec_lbl_height_cm' | message }} <span class="text-danger">*</span></label>
             <input #inputHeight type="number" step="0.01" class="form-control" [value]="heightCm()" (input)="heightCm.set(+inputHeight.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">Peso (kg) <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'play_spec_lbl_weight_kg' | message }} <span class="text-danger">*</span></label>
             <input #inputWeight type="number" step="0.01" class="form-control" [value]="weightKg()" (input)="weightKg.set(+inputWeight.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">Género <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'play_spec_lbl_gender' | message }} <span class="text-danger">*</span></label>
             <select #selGender class="form-select" [value]="gender()" (change)="gender.set(selGender.value)">
-              <option value="">Seleccione...</option>
-              <option value="male">Masculino</option>
-              <option value="female">Femenino</option>
-              <option value="other">Otro</option>
+              <option value="">{{ 'play_spec_plh_select' | message }}</option>
+              <option value="male">{{ 'play_spec_lbl_male' | message }}</option>
+              <option value="female">{{ 'play_spec_lbl_female' | message }}</option>
+              <option value="other">{{ 'play_spec_lbl_other' | message }}</option>
             </select>
           </div>
           <div class="col-md-4">
-            <label class="form-label">Nacionalidad</label>
+            <label class="form-label">{{ 'play_spec_lbl_nationality' | message }}</label>
             <input #inputNationality type="text" class="form-control" [value]="nationality()" (input)="nationality.set(inputNationality.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">Tipo de sangre</label>
+            <label class="form-label">{{ 'play_spec_lbl_blood_type' | message }}</label>
             <select #selBlood class="form-select" [value]="bloodType()" (change)="bloodType.set(selBlood.value)">
-              <option value="">Seleccione...</option>
+              <option value="">{{ 'play_spec_plh_select' | message }}</option>
               <option value="A+">A+</option>
               <option value="A-">A-</option>
               <option value="B+">B+</option>
@@ -48,70 +48,70 @@
             </select>
           </div>
 
-          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">Datos deportivos</h6>
+          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ 'play_spec_lbl_sports_data' | message }}</h6>
           <div class="col-md-4">
-            <label class="form-label">Posición</label>
-            <input #inputPosition type="text" class="form-control" [value]="position()" (input)="position.set(inputPosition.value)" placeholder="Ej: Delantero, Defensa..." />
+            <label class="form-label">{{ 'play_spec_lbl_position' | message }}</label>
+            <input #inputPosition type="text" class="form-control" [value]="position()" (input)="position.set(inputPosition.value)" [placeholder]="'play_spec_plh_position' | message" />
           </div>
           <div class="col-md-2">
-            <label class="form-label">Dorsal</label>
+            <label class="form-label">{{ 'play_spec_lbl_jersey_number' | message }}</label>
             <input #inputJersey type="number" class="form-control" [value]="jerseyNumber()" (input)="jerseyNumber.set(+inputJersey.value || null)" />
           </div>
           <div class="col-md-3">
-            <label class="form-label">Pie dominante</label>
+            <label class="form-label">{{ 'play_spec_lbl_dominant_foot' | message }}</label>
             <select #selFoot class="form-select" [value]="dominantFoot()" (change)="dominantFoot.set(selFoot.value)">
-              <option value="">Seleccione...</option>
-              <option value="left">Izquierdo</option>
-              <option value="right">Derecho</option>
-              <option value="ambidextrous">Ambidiestro</option>
+              <option value="">{{ 'play_spec_plh_select' | message }}</option>
+              <option value="left">{{ 'play_spec_lbl_foot_left' | message }}</option>
+              <option value="right">{{ 'play_spec_lbl_foot_right' | message }}</option>
+              <option value="ambidextrous">{{ 'play_spec_lbl_foot_ambidextrous' | message }}</option>
             </select>
           </div>
           <div class="col-md-3">
-            <label class="form-label">Estado</label>
+            <label class="form-label">{{ 'play_spec_lbl_player_status' | message }}</label>
             <select #selStatus class="form-select" [value]="status()" (change)="status.set(selStatus.value)">
-              <option value="active">Activo</option>
-              <option value="injured">Lesionado</option>
-              <option value="suspended">Suspendido</option>
-              <option value="inactive">Inactivo</option>
+              <option value="active">{{ 'play_spec_lbl_status_active' | message }}</option>
+              <option value="injured">{{ 'play_spec_lbl_status_injured' | message }}</option>
+              <option value="suspended">{{ 'play_spec_lbl_status_suspended' | message }}</option>
+              <option value="inactive">{{ 'play_spec_lbl_status_inactive' | message }}</option>
             </select>
           </div>
           <div class="col-md-4">
-            <label class="form-label">Fecha de ingreso <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'play_spec_lbl_entry_date' | message }} <span class="text-danger">*</span></label>
             <input #inputEntry type="date" class="form-control" [value]="entryDate()" (input)="entryDate.set(inputEntry.value)" />
           </div>
 
-          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">Contacto de emergencia</h6>
+          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ 'play_spec_lbl_emergency_contact' | message }}</h6>
           <div class="col-md-4">
-            <label class="form-label">Nombre <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'play_spec_lbl_contact_name' | message }} <span class="text-danger">*</span></label>
             <input #inputEmerName type="text" class="form-control" [value]="emergencyContactName()" (input)="emergencyContactName.set(inputEmerName.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">Teléfono <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'play_spec_lbl_contact_phone' | message }} <span class="text-danger">*</span></label>
             <input #inputEmerPhone type="text" class="form-control" [value]="emergencyContactPhone()" (input)="emergencyContactPhone.set(inputEmerPhone.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">Parentesco <span class="text-danger">*</span></label>
-            <input #inputEmerRel type="text" class="form-control" [value]="emergencyContactRelationship()" (input)="emergencyContactRelationship.set(inputEmerRel.value)" placeholder="Ej: Madre, Padre, Hermano..." />
+            <label class="form-label">{{ 'play_spec_lbl_relationship' | message }} <span class="text-danger">*</span></label>
+            <input #inputEmerRel type="text" class="form-control" [value]="emergencyContactRelationship()" (input)="emergencyContactRelationship.set(inputEmerRel.value)" [placeholder]="'play_spec_plh_relationship' | message" />
           </div>
 
-          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">Información médica</h6>
+          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ 'play_spec_lbl_medical_info' | message }}</h6>
           <div class="col-6">
-            <label class="form-label">Condiciones médicas</label>
-            <textarea #inputMedCond class="form-control" rows="2" [value]="medicalConditions()" (input)="medicalConditions.set(inputMedCond.value)" placeholder="Asma, diabetes, etc."></textarea>
+            <label class="form-label">{{ 'play_spec_lbl_medical_conditions' | message }}</label>
+            <textarea #inputMedCond class="form-control" rows="2" [value]="medicalConditions()" (input)="medicalConditions.set(inputMedCond.value)" [placeholder]="'play_spec_plh_medical' | message"></textarea>
           </div>
           <div class="col-6">
-            <label class="form-label">Alergias</label>
-            <textarea #inputAllergies class="form-control" rows="2" [value]="allergies()" (input)="allergies.set(inputAllergies.value)" placeholder="Polen, mariscos, etc."></textarea>
+            <label class="form-label">{{ 'play_spec_lbl_allergies' | message }}</label>
+            <textarea #inputAllergies class="form-control" rows="2" [value]="allergies()" (input)="allergies.set(inputAllergies.value)" [placeholder]="'play_spec_plh_allergies' | message"></textarea>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">{{ 'cr_btn_cancel' | message }}</button>
         <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading() || !birthDate() || !heightCm() || !weightKg() || !gender() || !entryDate() || !emergencyContactName() || !emergencyContactPhone() || !emergencyContactRelationship()">
           @if (loading()) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          {{ isUpdate() ? 'Actualizar' : 'Guardar' }}
+          {{ isUpdate() ? ('cr_btn_update' | message) : ('cr_btn_save' | message) }}
         </button>
       </div>
     </div>

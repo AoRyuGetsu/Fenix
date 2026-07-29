@@ -37,7 +37,7 @@
         </div>
       </li>
     } @else {
-      <li class="nav-item" routerLinkActive="active">
+      <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
         <a
           class="nav-link"
           [routerLink]="item.route"
@@ -68,7 +68,7 @@
       </div>
       <a class="logout-link" (click)="logout()">
         <i class="bi bi-box-arrow-right"></i>
-        <span>Salir</span>
+        <span>{{ 'cr_btn_logout' | message }}</span>
       </a>
     </div>
   }

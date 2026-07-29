@@ -1,11 +1,11 @@
 <div class="container-fluid">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h4 class="text-gray-800 fw-bold mb-1">Cuestionarios</h4>
-      <p class="text-gray-800 mb-0 text-sm">Administración de cuestionarios y preguntas</p>
+      <h4 class="text-gray-800 fw-bold mb-1">{{ 'qnr_hdr_title' | message }}</h4>
+      <p class="text-gray-800 mb-0 text-sm">{{ 'qnr_lbl_subtitle' | message }}</p>
     </div>
     <button class="btn btn-primary" (click)="facade.openCreateModal()">
-      <i class="bi-plus-lg me-1"></i>Nuevo Cuestionario
+      <i class="bi-plus-lg me-1"></i>{{ 'qnr_btn_new_questionnaire' | message }}
     </button>
   </div>
 
@@ -29,14 +29,14 @@
   @if (vm().loading) {
     <div class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Cargando...</span>
+        <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
       </div>
     </div>
   }
 
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 fw-bold text-gray-800">Listado de Cuestionarios</h6>
+      <h6 class="m-0 fw-bold text-gray-800">{{ 'qnr_hdr_list' | message }}</h6>
     </div>
     <div class="card-body">
       <div class="row mb-3">
@@ -45,7 +45,7 @@
             #filterInput
             type="text"
             class="form-control"
-            placeholder="Buscar por título..."
+            [placeholder]="'qnr_plh_search_title' | message"
             [value]="vm().searchTerm"
             (input)="onFilter(filterInput.value)"
           />
@@ -70,17 +70,17 @@
     }
     <div class="row mb-3">
       <div class="col-md-4 col-sm-6">
-        <small class="text-muted d-block">Rol que responde</small>
+        <small class="text-muted d-block">{{ 'qnr_lbl_responder_role' | message }}</small>
         <span class="fw-medium">{{ item.responder_role }}</span>
       </div>
       <div class="col-md-4 col-sm-6">
-        <small class="text-muted d-block">Rol evaluado</small>
+        <small class="text-muted d-block">{{ 'qnr_lbl_target_role' | message }}</small>
         <span class="fw-medium">{{ item.target_role }}</span>
       </div>
       <div class="col-md-4 col-sm-6">
-        <small class="text-muted d-block">Activo</small>
+        <small class="text-muted d-block">{{ 'qnr_lbl_active' | message }}</small>
         <span class="badge" [class.bg-success]="item.active" [class.bg-secondary]="!item.active">
-          {{ item.active ? 'Sí' : 'No' }}
+          {{ item.active ? ('cr_lbl_yes' | message) : ('cr_lbl_no' | message) }}
         </span>
       </div>
     </div>
@@ -92,9 +92,9 @@
       </div>
     } @else {
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h6 class="fw-bold mb-0">Secciones</h6>
+        <h6 class="fw-bold mb-0">{{ 'qnr_hdr_sections' | message }}</h6>
         <button class="btn btn-sm btn-primary" (click)="onAddSection()">
-          <i class="bi-plus-lg me-1"></i>Agregar Sección
+          <i class="bi-plus-lg me-1"></i>{{ 'qnr_btn_add_section' | message }}
         </button>
       </div>
 
@@ -128,7 +128,7 @@
         </div>
       } @empty {
         @if (!vm().detailSectionsLoading) {
-          <p class="text-muted text-sm">No hay secciones aún. Cree una sección para agregar preguntas.</p>
+          <p class="text-muted text-sm">{{ 'qnr_lbl_no_sections' | message }}</p>
         }
       }
     }
@@ -164,35 +164,35 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title fw-bold">{{ editingSection() ? 'Editar' : 'Nueva' }} Sección</h5>
+            <h5 class="modal-title fw-bold">{{ editingSection() ? ('qnr_hdr_edit_section' | message) : ('qnr_hdr_new_section' | message) }}</h5>
             <button type="button" class="btn-close" (click)="showSectionModal.set(false)"></button>
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label class="form-label">Título <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'qnr_lbl_title' | message }} <span class="text-danger">*</span></label>
               <input
                 type="text"
                 class="form-control"
                 [value]="sectionTitle()"
                 (input)="sectionTitle.set($any($event.target).value)"
-                placeholder="Nombre de la sección"
+                [placeholder]="'qnr_lbl_section_name' | message"
               />
             </div>
             <div class="mb-3">
-              <label class="form-label">Descripción</label>
+              <label class="form-label">{{ 'qnr_lbl_description' | message }}</label>
               <textarea
                 class="form-control"
                 [value]="sectionDescription()"
                 (input)="sectionDescription.set($any($event.target).value)"
                 rows="2"
-                placeholder="Descripción opcional"
+                [placeholder]="'qnr_plh_description_optional' | message"
               ></textarea>
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-danger" (click)="showSectionModal.set(false)">Cancelar</button>
+            <button class="btn btn-danger" (click)="showSectionModal.set(false)">{{ 'cr_btn_cancel' | message }}</button>
             <button class="btn btn-primary" (click)="onSaveSection()" [disabled]="!sectionTitle().trim()">
-              {{ editingSection() ? 'Actualizar' : 'Crear' }}
+              {{ editingSection() ? ('cr_btn_update' | message) : ('cr_btn_create' | message) }}
             </button>
           </div>
         </div>

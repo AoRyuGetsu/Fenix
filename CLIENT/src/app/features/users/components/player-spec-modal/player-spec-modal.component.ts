@@ -1,8 +1,10 @@
 import { Component, input, output, signal, computed, OnInit, effect } from '@angular/core';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { PlayerSpecData, CreatePlayerSpecPayload } from '../../services/users-http.service';
 
 @Component({
   selector: 'app-player-spec-modal',
+  imports: [MessagePipe],
   templateUrl: './player-spec-modal.component.html',
 })
 export class PlayerSpecModalComponent implements OnInit {

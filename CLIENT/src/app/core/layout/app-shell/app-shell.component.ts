@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { AuthFacade } from '../../auth/facades/auth.facade';
 import { ConfigService } from '../../services/config.service';
 
 @Component({
@@ -9,7 +10,8 @@ import { ConfigService } from '../../services/config.service';
   imports: [RouterOutlet, SidebarComponent],
   templateUrl: './app-shell.component.html',
 })
-export class AppShellComponent {
+export class AppShellComponent implements OnInit {
+  private authFacade = inject(AuthFacade);
   private configService = inject(ConfigService);
   private sanitizer = inject(DomSanitizer);
 
@@ -22,5 +24,9 @@ export class AppShellComponent {
           `linear-gradient(180deg, rgba(244,246,248,0.85) 0%, rgba(244,246,248,1) 100%), url(${url}) top center / 100% auto no-repeat`,
         )
       : '';
+  }
+
+  ngOnInit(): void {
+    this.authFacade.init();
   }
 }

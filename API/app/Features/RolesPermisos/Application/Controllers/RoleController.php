@@ -25,7 +25,7 @@ class RoleController implements ControllerInterface
         return match ($this->request->getMethod()) {
             'POST' => $this->create(),
             'GET'  => $this->list(),
-            default => new JsonResponse(['error' => 'Method not allowed'], 405),
+            default => new JsonResponse(['error' => getError('METHOD_NOT_ALLOWED'), 'code' => 'METHOD_NOT_ALLOWED'], 405),
         };
     }
 
@@ -38,14 +38,14 @@ class RoleController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $code = $data['code'] ?? null;
         $name = $data['name'] ?? null;
 
         if ($code === null || !is_string($code) || $name === null || !is_string($name)) {
-            return new JsonResponse(['error' => 'code and name are required'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_CODE_NAME_REQ'), 'code' => 'VALIDATION_CODE_NAME_REQ'], 422);
         }
 
         try {
@@ -149,13 +149,13 @@ class RoleController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $permissions = $data['permissions'] ?? [];
 
         if (!is_array($permissions)) {
-            return new JsonResponse(['error' => 'permissions must be an array'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_PERM_ARRAY'), 'code' => 'VALIDATION_PERM_ARRAY'], 422);
         }
 
         try {

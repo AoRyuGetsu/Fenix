@@ -2,83 +2,83 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title fw-bold">Actualizar usuario</h5>
+        <h5 class="modal-title fw-bold">{{ 'usr_hdr_update_user' | message }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">Tipo de persona <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'usr_lbl_person_type' | message }} <span class="text-danger">*</span></label>
             <select #selType class="form-select" [value]="type()" (change)="type.set(selType.value)">
-              <option value="">Seleccione...</option>
+              <option value="">{{ 'usr_plh_select_type' | message }}</option>
               @for (pt of peopleTypes(); track pt.code) {
                 <option [value]="pt.code">{{ pt.description }}</option>
               }
             </select>
           </div>
           <div class="col-md-6">
-            <label class="form-label">Cédula <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'usr_lbl_document_number' | message }} <span class="text-danger">*</span></label>
             <input #inputId type="text" class="form-control" [value]="documentNumber()" (input)="documentNumber.set(inputId.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Primer nombre <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'usr_lbl_first_name' | message }} <span class="text-danger">*</span></label>
             <input #inputFirstName type="text" class="form-control" [value]="firstName()" (input)="firstName.set(inputFirstName.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Segundo nombre</label>
+            <label class="form-label">{{ 'usr_lbl_middle_name' | message }}</label>
             <input #inputMiddleName type="text" class="form-control" [value]="middleName()" (input)="middleName.set(inputMiddleName.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Primer apellido <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'usr_lbl_first_surname' | message }} <span class="text-danger">*</span></label>
             <input #inputFirstSurname type="text" class="form-control" [value]="firstSurname()" (input)="firstSurname.set(inputFirstSurname.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Segundo apellido</label>
+            <label class="form-label">{{ 'usr_lbl_second_surname' | message }}</label>
             <input #inputSecondSurname type="text" class="form-control" [value]="secondSurname()" (input)="secondSurname.set(inputSecondSurname.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'usr_lbl_email' | message }} <span class="text-danger">*</span></label>
             <input #inputEmail type="email" class="form-control" [value]="email()" (input)="email.set(inputEmail.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Teléfono</label>
+            <label class="form-label">{{ 'usr_lbl_phone' | message }}</label>
             <input #inputPhone type="text" class="form-control" [value]="phone()" (input)="phone.set(inputPhone.value)" />
           </div>
           <div class="col-12">
-            <label class="form-label">Dirección</label>
+            <label class="form-label">{{ 'usr_lbl_address' | message }}</label>
             <textarea #inputAddress class="form-control" rows="2" [value]="address()" (input)="address.set(inputAddress.value)"></textarea>
           </div>
           <div class="col-12">
             <div class="form-check">
               <input #chgPwd type="checkbox" class="form-check-input" id="changePassword" [checked]="changePassword()" (change)="changePassword.set(chgPwd.checked)" />
-              <label class="form-check-label" for="changePassword">Cambiar contraseña</label>
+              <label class="form-check-label" for="changePassword">{{ 'usr_lbl_change_password' | message }}</label>
             </div>
           </div>
           @if (changePassword()) {
             <div class="col-md-6">
-              <label class="form-label">Nueva contraseña</label>
+              <label class="form-label">{{ 'usr_lbl_new_password' | message }}</label>
               <input #inputPassword type="password" class="form-control" [value]="password()" (input)="password.set(inputPassword.value)" />
             </div>
           }
 
           @if (isJug()) {
             <div class="col-12">
-              <label class="form-label">Equipo <span class="text-danger">*</span></label>
+              <label class="form-label">{{ 'usr_lbl_team' | message }} <span class="text-danger">*</span></label>
               <app-autocomplete
                 [items]="teams()"
                 displayField="name"
-                placeholder="Buscar equipo..."
+                [placeholder]="'usr_plh_search_team' | message"
                 [loading]="loadingTeams()"
                 [required]="true"
                 (selectionChange)="onTeamSelect($event)"
               />
             </div>
             <div class="col-12">
-              <label class="form-label">Representante</label>
+              <label class="form-label">{{ 'usr_lbl_representative' | message }}</label>
               <app-autocomplete
                 [items]="representatives()"
                 displayField="display_name"
-                placeholder="Buscar representante..."
+                [placeholder]="'usr_plh_search_representative' | message"
                 [loading]="loadingReps()"
                 (selectionChange)="onRepresentativeSelect($event)"
               />
@@ -87,12 +87,12 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">{{ 'cr_btn_cancel' | message }}</button>
         <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading()">
           @if (loading()) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          Actualizar
+          {{ 'cr_btn_update' | message }}
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
 import { Router } from '@angular/router';
 import { AuthHttpService } from '../services/auth-http.service';
@@ -59,11 +59,10 @@ export class AuthFacade {
 
   vm = this.state.asReadonly();
 
-  constructor() {
-    if (this.state().token) {
-      this.menuFacade.loadFromStorage();
-    }
-  }
+  isAuthenticated = computed(() => this.state().token !== null);
+
+  authRoles = computed(() => this.state().roles);
+  roles = this.authRoles;
 
   login(email: string, password: string): void {
     this.state.update(s => ({ ...s, loading: true, error: null }));
@@ -121,9 +120,9 @@ export class AuthFacade {
     this.router.navigateByUrl('/login');
   }
 
-  isAuthenticated(): boolean {
-    return this.state().token !== null;
+  init(): void {
+    if (this.state().token) {
+      this.menuFacade.loadFromStorage();
+    }
   }
-
-  roles = (): string[] => this.state().roles;
 }

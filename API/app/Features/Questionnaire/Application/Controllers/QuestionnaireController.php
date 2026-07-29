@@ -22,7 +22,7 @@ class QuestionnaireController implements ControllerInterface
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Get(path: '/questionnaires', tags: ['Questionnaire'], summary: 'Listar cuestionarios paginados')]
@@ -76,13 +76,13 @@ class QuestionnaireController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $required = ['title', 'responder_role_id', 'target_role_id'];
         foreach ($required as $field) {
             if (!isset($data[$field])) {
-                return new JsonResponse(['error' => "$field is required"], 422);
+                return new JsonResponse(['error' => getError('VALIDATION_REQUIRED'), 'code' => 'VALIDATION_REQUIRED'], 422);
             }
         }
 
@@ -104,7 +104,7 @@ class QuestionnaireController implements ControllerInterface
         $questionnaire = $this->questionnaireService->findById($id);
 
         if ($questionnaire === null) {
-            return new JsonResponse(['error' => 'Questionnaire not found'], 404);
+            return new JsonResponse(['error' => getError('QUESTIONNAIRE_NOT_FOUND'), 'code' => 'QUESTIONNAIRE_NOT_FOUND'], 404);
         }
 
         return new JsonResponse($this->serialize($questionnaire));
@@ -126,7 +126,7 @@ class QuestionnaireController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         try {

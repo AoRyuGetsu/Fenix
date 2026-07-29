@@ -1,11 +1,12 @@
 import { Component, input, output, signal, computed } from '@angular/core';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { PeopleType, CreatePersonPayload } from '../../services/users-http.service';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 import { TeamItem } from '../../../teams/services/teams-http.service';
 
 @Component({
   selector: 'app-person-create-modal',
-  imports: [AutocompleteComponent],
+  imports: [AutocompleteComponent, MessagePipe],
   templateUrl: './person-create-modal.component.html',
 })
 export class PersonCreateModalComponent {

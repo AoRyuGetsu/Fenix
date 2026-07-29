@@ -25,6 +25,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'Teams', description: 'Gestión de equipos')]
 #[OA\Tag(name: 'Dashboard', description: 'Dashboard y estadísticas')]
 #[OA\Tag(name: 'PlayerSpecification', description: 'Especificaciones deportivas de jugadores')]
+#[OA\Tag(name: 'EvaluationStats', description: 'Análisis estadístico de evaluaciones de jugadores')]
 
 #[OA\Schema(
     schema: 'User',
@@ -500,6 +501,115 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'allergies', type: 'string', nullable: true),
         new OA\Property(property: 'profile_photo_url', type: 'string', nullable: true),
         new OA\Property(property: 'status', type: 'string'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'EvaluationStatsResponse',
+    properties: [
+        new OA\Property(property: 'target_user', properties: [
+            new OA\Property(property: 'id', type: 'integer'),
+            new OA\Property(property: 'display_name', type: 'string'),
+        ], type: 'object'),
+        new OA\Property(property: 'periods', type: 'array', items: new OA\Items(ref: '#/components/schemas/StatsPeriod')),
+        new OA\Property(property: 'questionnaires', type: 'array', items: new OA\Items(ref: '#/components/schemas/QuestionnaireStats')),
+    ]
+)]
+#[OA\Schema(
+    schema: 'StatsPeriod',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer'),
+        new OA\Property(property: 'name', type: 'string'),
+        new OA\Property(property: 'index', type: 'integer'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'QuestionnaireStats',
+    properties: [
+        new OA\Property(property: 'questionnaire', properties: [
+            new OA\Property(property: 'id', type: 'integer'),
+            new OA\Property(property: 'title', type: 'string'),
+        ], type: 'object'),
+        new OA\Property(property: 'per_question', type: 'array', items: new OA\Items(ref: '#/components/schemas/PerQuestionStats')),
+        new OA\Property(property: 'overall', ref: '#/components/schemas/OverallStats'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PerQuestionStats',
+    properties: [
+        new OA\Property(property: 'question_id', type: 'integer'),
+        new OA\Property(property: 'question_text', type: 'string'),
+        new OA\Property(property: 'question_type', type: 'string'),
+        new OA\Property(property: 'averages', type: 'array', items: new OA\Items(ref: '#/components/schemas/PerPeriodAverage')),
+        new OA\Property(property: 'regression', ref: '#/components/schemas/RegressionResult', nullable: true),
+    ]
+)]
+#[OA\Schema(
+    schema: 'PerPeriodAverage',
+    properties: [
+        new OA\Property(property: 'period_id', type: 'integer'),
+        new OA\Property(property: 'period_name', type: 'string'),
+        new OA\Property(property: 'average', type: 'number', format: 'float'),
+        new OA\Property(property: 'count', type: 'integer'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'OverallStats',
+    properties: [
+        new OA\Property(property: 'averages', type: 'array', items: new OA\Items(ref: '#/components/schemas/PerPeriodAverage')),
+        new OA\Property(property: 'regression', ref: '#/components/schemas/RegressionResult', nullable: true),
+    ]
+)]
+#[OA\Schema(
+    schema: 'RegressionResult',
+    properties: [
+        new OA\Property(property: 'slope', type: 'number', format: 'float'),
+        new OA\Property(property: 'intercept', type: 'number', format: 'float'),
+        new OA\Property(property: 'r_squared', type: 'number', format: 'float'),
+        new OA\Property(property: 'trend', type: 'string', enum: ['upward', 'downward', 'stable']),
+    ]
+)]
+#[OA\Schema(
+    schema: 'TeamStatsResponse',
+    properties: [
+        new OA\Property(property: 'team', properties: [
+            new OA\Property(property: 'id', type: 'integer'),
+            new OA\Property(property: 'name', type: 'string'),
+        ], type: 'object'),
+        new OA\Property(property: 'periods', type: 'array', items: new OA\Items(ref: '#/components/schemas/StatsPeriod')),
+        new OA\Property(property: 'trend_summary', properties: [
+            new OA\Property(property: 'upward', type: 'integer'),
+            new OA\Property(property: 'downward', type: 'integer'),
+            new OA\Property(property: 'stable', type: 'integer'),
+        ], type: 'object'),
+        new OA\Property(property: 'questionnaires', type: 'array', items: new OA\Items(
+            properties: [
+                new OA\Property(property: 'questionnaire', properties: [
+                    new OA\Property(property: 'id', type: 'integer'),
+                    new OA\Property(property: 'title', type: 'string'),
+                ], type: 'object'),
+                new OA\Property(property: 'team_averages', type: 'array', items: new OA\Items(
+                    properties: [
+                        new OA\Property(property: 'period_id', type: 'integer'),
+                        new OA\Property(property: 'period_name', type: 'string'),
+                        new OA\Property(property: 'average', type: 'number', format: 'float'),
+                    ],
+                    type: 'object'
+                )),
+                new OA\Property(property: 'team_regression', ref: '#/components/schemas/RegressionResult', nullable: true),
+                new OA\Property(property: 'players', type: 'array', items: new OA\Items(
+                    properties: [
+                        new OA\Property(property: 'user', properties: [
+                            new OA\Property(property: 'id', type: 'integer'),
+                            new OA\Property(property: 'display_name', type: 'string'),
+                        ], type: 'object'),
+                        new OA\Property(property: 'overall_averages', type: 'array', items: new OA\Items(ref: '#/components/schemas/PerPeriodAverage')),
+                        new OA\Property(property: 'regression', ref: '#/components/schemas/RegressionResult', nullable: true),
+                    ],
+                    type: 'object'
+                )),
+            ],
+            type: 'object'
+        )),
     ]
 )]
 class OpenApiSpec

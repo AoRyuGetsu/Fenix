@@ -59,4 +59,7 @@ return [
     'PLAYER_SPEC_NOT_FOUND'      => 'Especificación de jugador no encontrada',
     'PLAYER_SPEC_ALREADY_EXISTS' => 'El jugador ya tiene una especificación',
     'PLAYER_SPEC_USER_NOT_JUG'   => 'El usuario no tiene el rol de Jugador',
+    'EVALUATION_STATS_INSUFFICIENT_PERIODS' => 'Se requieren al menos 2 periodos con evaluaciones',
+    'EVALUATION_STATS_TARGET_REQUIRED'      => 'target_user_id es requerido',
+    'EVALUATION_STATS_NO_DATA'             => 'No hay datos de evaluación para los filtros especificados',
 ];

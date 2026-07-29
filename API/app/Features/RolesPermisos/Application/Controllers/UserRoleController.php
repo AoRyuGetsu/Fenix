@@ -20,7 +20,7 @@ class UserRoleController implements ControllerInterface
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Post(path: '/users/{id}/roles', tags: ['User Roles'], summary: 'Asignar rol a usuario')]
@@ -33,13 +33,13 @@ class UserRoleController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $roleCode = $data['role'] ?? null;
 
         if ($roleCode === null || !is_string($roleCode)) {
-            return new JsonResponse(['error' => 'role is required'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_ROLE_REQUIRED'), 'code' => 'VALIDATION_ROLE_REQUIRED'], 422);
         }
 
         try {
@@ -69,7 +69,7 @@ class UserRoleController implements ControllerInterface
         }
 
         if ($roleCode === null) {
-            return new JsonResponse(['error' => 'Role not found'], 404);
+            return new JsonResponse(['error' => getError('ROLE_NOT_FOUND'), 'code' => 'ROLE_NOT_FOUND'], 404);
         }
 
         try {

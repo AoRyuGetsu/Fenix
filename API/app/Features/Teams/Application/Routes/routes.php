@@ -9,6 +9,11 @@ use App\Features\Teams\Application\Controllers\TeamController;
 require_once __DIR__ . '/../../../../Infrastructure/Auth/middleware.php';
 
 return function (Router $router, Container $container): void {
+    $router->addRoute('GET', '/teams/my', middleware($container, function () use ($container) {
+        $controller = $container->make(TeamController::class);
+        return $controller->listMyTeams();
+    }, ['ENT']));
+
     $router->addRoute('GET', '/teams', middleware($container, function () use ($container) {
         $controller = $container->make(TeamController::class);
         return $controller->list();

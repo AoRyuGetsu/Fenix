@@ -1,11 +1,12 @@
 import { Component, input, output, signal, effect, computed } from '@angular/core';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { PeopleType, PersonData, UpdatePersonPayload } from '../../services/users-http.service';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 import { TeamItem } from '../../../teams/services/teams-http.service';
 
 @Component({
   selector: 'app-person-update-modal',
-  imports: [AutocompleteComponent],
+  imports: [AutocompleteComponent, MessagePipe],
   templateUrl: './person-update-modal.component.html',
 })
 export class PersonUpdateModalComponent {

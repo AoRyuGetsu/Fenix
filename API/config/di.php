@@ -87,9 +87,13 @@ return [
     SectionServiceInterface::class => DI\autowire(SectionService::class),
     SectionRepositoryInterface::class => DI\autowire(SectionRepository::class),
     DashboardServiceInterface::class => DI\autowire(DashboardService::class),
+    App\Features\Teams\Domain\Interfaces\TeamServiceInterface::class => DI\autowire(App\Features\Teams\Application\Services\TeamService::class),
     App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface::class => DI\autowire(App\Features\Teams\Domain\Repositories\TeamRepository::class),
+    App\Features\Representatives\Domain\Interfaces\RepPlayerServiceInterface::class => DI\autowire(App\Features\Representatives\Application\Services\RepresentativeService::class),
     App\Features\Representatives\Domain\Interfaces\RepPlayerRepositoryInterface::class => DI\autowire(App\Features\Representatives\Domain\Repositories\RepPlayerRepository::class),
 
     App\Features\PlayerSpecification\Domain\Interfaces\PlayerSpecificationServiceInterface::class => DI\autowire(App\Features\PlayerSpecification\Application\Services\PlayerSpecificationService::class),
     App\Features\PlayerSpecification\Domain\Interfaces\PlayerSpecificationRepositoryInterface::class => DI\autowire(App\Features\PlayerSpecification\Domain\Repositories\PlayerSpecificationRepository::class),
+
+    App\Features\EvaluationStats\Domain\Interfaces\EvaluationStatsServiceInterface::class => DI\autowire(App\Features\EvaluationStats\Application\Services\EvaluationStatsService::class),
 ];

@@ -109,6 +109,10 @@ $menuIds = [];
 $evaluacionesId = ensureMenu($menuIds, $conn, 'Evaluaciones', null, 'clipboard-check', '/evaluaciones', 2, $adminUserId, $now);
 echo "✓ Menú 'Evaluaciones' creado/verificado (ID: {$evaluacionesId}).\n";
 
+// ── Top-level: Análisis (order 3, admin, entrenador y supervisor) ──
+$analisisId = ensureMenu($menuIds, $conn, 'Análisis', null, 'bar-chart-line', '/analisis', 3, $adminUserId, $now);
+echo "✓ Menú 'Análisis' creado/verificado (ID: {$analisisId}).\n";
+
 // ── Top-level: Configuración (order 1, solo admin) ──
 $configId = ensureMenu($menuIds, $conn, 'Configuración', null, 'settings', '/configuracion', 1, $adminUserId, $now);
 echo "✓ Menú 'Configuración' creado/verificado (ID: {$configId}).\n";
@@ -130,6 +134,19 @@ $equiposId = ensureMenu($menuIds, $conn, 'Equipos', $configId, 'people', '/confi
 echo "✓ Menú 'Equipos' creado/verificado (ID: {$equiposId}).\n";
 
 // ── Asignaciones por rol ──
+
+// Análisis: administrador, entrenador y supervisor
+foreach ($roleIds as $rid) {
+    $code = '';
+    foreach ($roles as $r) {
+        if ((int) $r['id'] === $rid) { $code = $r['code']; break; }
+    }
+    if (in_array($code, ['ADM', 'ENT', 'SUP'], true)) {
+        if (assignMenu($conn, $analisisId, $rid, $code)) {
+            echo "✓ Análisis asignado a '{$code}'.\n";
+        }
+    }
+}
 
 // Evaluaciones: todos los roles excepto administrador
 foreach ($roleIds as $rid) {

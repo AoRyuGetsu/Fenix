@@ -17,8 +17,10 @@ class ConfigController implements ControllerInterface
     {
         return new Response(
             json_encode([
-                'app_name' => Env::get('APP_NAME', 'Analítica'),
-                'api_url'  => Env::get('API_URL', ''),
+                'app_name'        => Env::get('APP_NAME', 'Analítica'),
+                'api_url'         => Env::get('API_URL', ''),
+                'jwt_access_ttl'  => Env::get('JWT_ACCESS_TTL', '3600'),
+                'jwt_refresh_ttl' => Env::get('JWT_REFRESH_TTL', '604800'),
             ]),
             Response::HTTP_OK,
             ['Content-Type' => 'application/json']

@@ -1,5 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { MessagePipe } from '../../../shared/pipes/message.pipe';
 import { MenuFacade, MenuNode } from '../../menu/facades/menu.facade';
 import { AuthFacade } from '../../auth/facades/auth.facade';
 import { ConfigService } from '../../services/config.service';
@@ -15,7 +16,7 @@ const ICON_MAP: Record<string, string> = {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, MessagePipe],
   templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent {

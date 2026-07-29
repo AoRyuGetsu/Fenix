@@ -2,28 +2,28 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title fw-bold">Nuevo administrador</h5>
+        <h5 class="modal-title fw-bold">{{ 'usr_hdr_create_admin' | message }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-12">
-            <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'usr_lbl_email' | message }} <span class="text-danger">*</span></label>
             <input #emailInput type="email" class="form-control" [value]="email()" (input)="email.set(emailInput.value)" />
           </div>
           <div class="col-12">
-            <label class="form-label">Contraseña <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'usr_lbl_password' | message }} <span class="text-danger">*</span></label>
             <input #passwordInput type="password" class="form-control" [value]="password()" (input)="password.set(passwordInput.value)" />
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">{{ 'cr_btn_cancel' | message }}</button>
         <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading() || !email() || !password()">
           @if (loading()) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          Guardar
+          {{ 'cr_btn_save' | message }}
         </button>
       </div>
     </div>

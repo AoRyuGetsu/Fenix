@@ -1,10 +1,11 @@
 import { Component, input, output, signal, effect } from '@angular/core';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { PeriodItem, PeriodPayload } from '../../services/periods-http.service';
 
 @Component({
   selector: 'app-period-form-modal',
   standalone: true,
-  imports: [],
+  imports: [MessagePipe],
   templateUrl: './period-form-modal.component.html',
 })
 export class PeriodFormModalComponent {

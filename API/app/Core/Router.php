@@ -47,8 +47,8 @@ class Router
 
         return match ($routeInfo[0]) {
             \FastRoute\Dispatcher::FOUND => $this->resolveHandler($routeInfo[1], $routeInfo[2]),
-            \FastRoute\Dispatcher::METHOD_NOT_ALLOWED => new Response(json_encode(['error' => 'Method not allowed']), 405, ['Content-Type' => 'application/json']),
-            default => new Response(json_encode(['error' => 'Route not found']), 404, ['Content-Type' => 'application/json']),
+            \FastRoute\Dispatcher::METHOD_NOT_ALLOWED => new Response(json_encode(['error' => getError('METHOD_NOT_ALLOWED'), 'code' => 'METHOD_NOT_ALLOWED']), 405, ['Content-Type' => 'application/json']),
+            default => new Response(json_encode(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND']), 404, ['Content-Type' => 'application/json']),
         };
     }
 

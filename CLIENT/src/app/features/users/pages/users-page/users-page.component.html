@@ -1,12 +1,12 @@
 <div class="container-fluid">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h4 class="text-gray-800 fw-bold mb-1">Usuarios</h4>
-      <p class="text-gray-800 mb-0" style="font-size: 0.9rem;">Gestión de usuarios del sistema</p>
+      <h4 class="text-gray-800 fw-bold mb-1">{{ 'usr_hdr_title' | message }}</h4>
+      <p class="text-gray-800 mb-0" style="font-size: 0.9rem;">{{ 'usr_lbl_subtitle' | message }}</p>
     </div>
     <button type="button" class="btn btn-primary" (click)="onOpenCreateModal()">
       <i class="bi bi-plus-lg me-1"></i>
-      Nuevo usuario
+      {{ 'usr_btn_new_user' | message }}
     </button>
   </div>
 
@@ -49,7 +49,7 @@
             #filterInput
             type="text"
             class="form-control"
-            placeholder="Buscar por nombre, apellido o documento..."
+            [placeholder]="'usr_plh_search_users' | message"
             [value]="vm().searchTerm"
             (input)="onFilter(filterInput.value)"
           />
@@ -65,7 +65,7 @@
                 (change)="facade.toggleShowDeleted()"
               />
               <label class="form-check-label" for="showDeletedCheck">
-                Mostrar eliminados
+                {{ 'usr_lbl_show_deleted' | message }}
               </label>
             </div>
           </div>
@@ -74,7 +74,7 @@
       @if (vm().loading) {
         <div class="text-center py-3">
           <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando...</span>
+            <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
           </div>
         </div>
       } @else {

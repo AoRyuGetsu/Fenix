@@ -7,8 +7,8 @@
           <div class="icon-circle bg-primary text-white mx-auto mb-3" style="width: 3rem; height: 3rem; font-size: 1.5rem;">
             <i class="bi bi-bar-chart-line"></i>
           </div>
-          <h5 class="text-gray-900 fw-bold mb-1">Analítica</h5>
-          <p class="text-gray-600 small">Panel de administración</p>
+          <h5 class="text-gray-900 fw-bold mb-1">{{ 'cr_lbl_app_name' | message }}</h5>
+          <p class="text-gray-600 small">{{ 'cr_lbl_admin_panel' | message }}</p>
         </div>
 
         @if (vm().error) {
@@ -19,29 +19,29 @@
 
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
           <div class="mb-3">
-            <label class="form-label" for="email">Correo electrónico <span class="text-danger">*</span></label>
+            <label class="form-label" for="email">{{ 'cr_lbl_email' | message }} <span class="text-danger">*</span></label>
             <input
               id="email"
               type="email"
               class="form-control"
               [class.is-invalid]="form.controls.email.invalid && form.controls.email.touched"
               formControlName="email"
-              placeholder="correo@ejemplo.com"
+               [placeholder]="'cr_plh_email' | message"
               autocomplete="email"
             />
             @if (form.controls.email.invalid && form.controls.email.touched) {
               <div class="text-danger small mt-1">
                 @if (form.controls.email.errors?.['required']) {
-                  Este campo es requerido
+                  {{ 'cr_err_field_required' | message }}
                 } @else if (form.controls.email.errors?.['email']) {
-                  Ingrese un correo electrónico válido
+                  {{ 'cr_err_invalid_email' | message }}
                 }
               </div>
             }
           </div>
 
           <div class="mb-3">
-            <label class="form-label" for="password">Contraseña <span class="text-danger">*</span></label>
+            <label class="form-label" for="password">{{ 'cr_lbl_password' | message }} <span class="text-danger">*</span></label>
             <div class="input-group">
               <input
                 id="password"
@@ -49,7 +49,7 @@
                 class="form-control"
                 [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
                 formControlName="password"
-                placeholder="Ingrese su contraseña"
+                [placeholder]="'cr_plh_password' | message"
                 autocomplete="current-password"
               />
               <button
@@ -64,7 +64,7 @@
             @if (form.controls.password.invalid && form.controls.password.touched) {
               <div class="text-danger small mt-1">
                 @if (form.controls.password.errors?.['required']) {
-                  Este campo es requerido
+                  {{ 'cr_err_field_required' | message }}
                 }
               </div>
             }
@@ -78,7 +78,7 @@
             @if (vm().loading) {
               <span class="spinner-border spinner-border-sm" role="status"></span>
             } @else {
-              Ingresar
+              {{ 'cr_btn_login' | message }}
             }
           </button>
         </form>

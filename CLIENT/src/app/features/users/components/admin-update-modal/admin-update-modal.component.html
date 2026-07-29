@@ -2,42 +2,42 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title fw-bold">Actualizar administrador</h5>
+        <h5 class="modal-title fw-bold">{{ 'usr_hdr_update_admin' | message }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-12">
-            <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+            <label class="form-label">{{ 'usr_lbl_email' | message }} <span class="text-danger">*</span></label>
             <input #emailInput type="email" class="form-control" [value]="email()" (input)="email.set(emailInput.value)" />
           </div>
           <div class="col-12">
             <div class="form-check">
               <input #activeChk type="checkbox" class="form-check-input" id="adminActive" [checked]="active()" (change)="active.set(activeChk.checked)" />
-              <label class="form-check-label" for="adminActive">Activo</label>
+              <label class="form-check-label" for="adminActive">{{ 'usr_lbl_account_active' | message }}</label>
             </div>
           </div>
           <div class="col-12">
             <div class="form-check">
               <input #changePwdChk type="checkbox" class="form-check-input" id="adminChangePassword" [checked]="changePassword()" (change)="changePassword.set(changePwdChk.checked)" />
-              <label class="form-check-label" for="adminChangePassword">Cambiar contraseña</label>
+              <label class="form-check-label" for="adminChangePassword">{{ 'usr_lbl_change_password' | message }}</label>
             </div>
           </div>
           @if (changePassword()) {
             <div class="col-12">
-              <label class="form-label">Nueva contraseña</label>
+              <label class="form-label">{{ 'usr_lbl_new_password' | message }}</label>
               <input #passwordInput type="password" class="form-control" [value]="password()" (input)="password.set(passwordInput.value)" />
             </div>
           }
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">{{ 'cr_btn_cancel' | message }}</button>
         <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading()">
           @if (loading()) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          Actualizar
+          {{ 'cr_btn_update' | message }}
         </button>
       </div>
     </div>

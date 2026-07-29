@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\Questionnaire\Domain\Repositories;
 
+use App\Features\Questionnaire\Application\DTO\SectionQuery;
 use App\Features\Questionnaire\Domain\Entities\Section;
 use App\Features\Questionnaire\Domain\Interfaces\SectionRepositoryInterface;
 use Doctrine\ORM\EntityManager;
@@ -41,6 +42,27 @@ class SectionRepository implements SectionRepositoryInterface
     {
         $section->setDeletedAt(new \DateTime());
         $this->entityManager->flush();
+    }
+
+    public function findPaginated(SectionQuery $query): array
+    {
+        $qb = $this->entityManager->createQueryBuilder()
+            ->select('s')
+            ->from(Section::class, 's')
+            ->where('s.questionnaire = :questionnaireId')
+            ->setParameter('questionnaireId', $query->questionnaireId)
+            ->orderBy('s.sectionOrder', 'ASC');
+
+        $total = (clone $qb)->select('COUNT(s.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $items = $qb->setFirstResult(($query->page - 1) * $query->perPage)
+            ->setMaxResults($query->perPage)
+            ->getQuery()
+            ->getResult();
+
+        return [$items, (int) $total];
     }
 
     public function getMaxOrder(int $questionnaireId): int

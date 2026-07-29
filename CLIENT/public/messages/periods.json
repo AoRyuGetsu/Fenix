@@ -15,5 +15,8 @@
   "per_err_update":                         { "message": "Error al actualizar periodo", "desc": "Error al actualizar" },
   "per_suc_deleted":                        { "message": "Periodo eliminado correctamente", "desc": "Éxito al eliminar" },
   "per_err_delete":                         { "message": "Error al eliminar periodo", "desc": "Error al eliminar" },
-  "per_cnf_delete":                         { "message": "¿Está seguro de eliminar este periodo?", "desc": "Confirmación eliminar" }
+  "per_cnf_delete":                         { "message": "¿Está seguro de eliminar este periodo?", "desc": "Confirmación eliminar" },
+  "per_hdr_new":                            { "message": "Nuevo periodo", "desc": "Modal header crear periodo" },
+  "per_hdr_edit":                           { "message": "Editar periodo", "desc": "Modal header editar periodo" },
+  "per_lbl_field_name":                     { "message": "Nombre", "desc": "Label campo nombre" }
 }

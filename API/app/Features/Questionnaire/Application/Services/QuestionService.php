@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Features\Questionnaire\Application\Services;
 
 use App\Core\AppException;
+use App\Features\Questionnaire\Application\DTO\QuestionQuery;
 use App\Features\Questionnaire\Domain\Interfaces\QuestionRepositoryInterface;
 use App\Features\Questionnaire\Domain\Interfaces\QuestionServiceInterface;
 use App\Features\Questionnaire\Domain\Interfaces\SectionRepositoryInterface;
@@ -94,6 +95,11 @@ class QuestionService implements QuestionServiceInterface
     public function findById(int $id): ?Question
     {
         return $this->repository->findById($id);
+    }
+
+    public function findPaginated(QuestionQuery $query): array
+    {
+        return $this->repository->findPaginated($query);
     }
 
     public function softDelete(int $id): void

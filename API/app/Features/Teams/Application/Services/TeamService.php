@@ -13,7 +13,7 @@ use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
 use App\Infrastructure\Auth\AuthContext;
 use App\Core\Env;
 
-class TeamService
+class TeamService implements \App\Features\Teams\Domain\Interfaces\TeamServiceInterface
 {
     public function __construct(
         private TeamRepositoryInterface $repository,
@@ -30,6 +30,11 @@ class TeamService
     public function findById(int $id): ?Team
     {
         return $this->repository->findById($id);
+    }
+
+    public function findByTrainerId(int $trainerUserId): array
+    {
+        return $this->repository->findByTrainerId($trainerUserId);
     }
 
     public function create(array $data): Team

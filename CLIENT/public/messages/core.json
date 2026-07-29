@@ -57,5 +57,9 @@
   "cr_lbl_my_evaluations":                  { "message": "Mis evaluaciones realizadas", "desc": "Dashboard card" },
   "cr_lbl_evaluations_by_period":           { "message": "Evaluaciones por periodo", "desc": "Dashboard table" },
   "cr_lbl_period":                          { "message": "Periodo", "desc": "Tabla columna" },
-  "cr_lbl_total":                           { "message": "Total", "desc": "Tabla columna" }
+  "cr_lbl_total":                           { "message": "Total", "desc": "Tabla columna" },
+  "cr_lbl_route_not_found":                 { "message": "La ruta a la que intentas acceder no existe.", "desc": "Mensaje 404 inline" },
+  "cr_lbl_app_name":                        { "message": "Analítica", "desc": "Nombre de la aplicación" },
+  "cr_hdr_new":                             { "message": "Nuevo", "desc": "Header modal crear" },
+  "cr_hdr_edit":                            { "message": "Editar", "desc": "Header modal editar" }
 }

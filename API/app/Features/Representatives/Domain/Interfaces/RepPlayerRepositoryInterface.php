@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\Representatives\Domain\Interfaces;
 
+use App\Features\Representatives\Application\DTO\RepPlayerQuery;
 use App\Features\Representatives\Domain\Entities\RepPlayer;
 
 interface RepPlayerRepositoryInterface
@@ -12,6 +13,8 @@ interface RepPlayerRepositoryInterface
     public function findByRepUserId(int $repUserId): array;
 
     public function findByPlayerUserId(int $playerUserId): ?RepPlayer;
+
+    public function findPaginatedByRepUserId(RepPlayerQuery $query): array;
 
     public function save(RepPlayer $repPlayer): void;
 

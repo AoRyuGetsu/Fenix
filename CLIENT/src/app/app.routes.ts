@@ -67,8 +67,16 @@ export const routes: Routes = [
         loadChildren: () => import('./features/teams/routes'),
       },
       {
+        path: 'evaluaciones/estadisticas',
+        redirectTo: '/analisis',
+      },
+      {
         path: 'evaluaciones',
         loadChildren: () => import('./features/evaluations/routes'),
+      },
+      {
+        path: 'analisis',
+        loadChildren: () => import('./features/evaluation-stats/routes'),
       },
       {
         path: '**',

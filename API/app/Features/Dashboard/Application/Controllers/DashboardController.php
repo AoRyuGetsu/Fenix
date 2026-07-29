@@ -21,7 +21,7 @@ class DashboardController implements ControllerInterface
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Method not allowed']);
+        return new JsonResponse(['error' => getError('METHOD_NOT_ALLOWED'), 'code' => 'METHOD_NOT_ALLOWED'], 405);
     }
 
     #[OA\Get(

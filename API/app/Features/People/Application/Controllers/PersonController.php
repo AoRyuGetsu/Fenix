@@ -25,7 +25,7 @@ class PersonController implements ControllerInterface
         return match ($this->request->getMethod()) {
             'POST'   => $this->create(),
             'GET'    => $this->list(),
-            default  => new JsonResponse(['error' => 'Method not allowed'], 405),
+            default  => new JsonResponse(['error' => getError('METHOD_NOT_ALLOWED'), 'code' => 'METHOD_NOT_ALLOWED'], 405),
         };
     }
 
@@ -38,13 +38,13 @@ class PersonController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $required = ['first_name', 'first_surname', 'document_number', 'email', 'type'];
         foreach ($required as $field) {
             if (!isset($data[$field]) || !is_string($data[$field])) {
-                return new JsonResponse(['error' => "$field is required"], 422);
+                return new JsonResponse(['error' => getError('VALIDATION_REQUIRED'), 'code' => 'VALIDATION_REQUIRED'], 422);
             }
         }
 
@@ -98,7 +98,7 @@ class PersonController implements ControllerInterface
         $person = $this->personService->findById($id);
 
         if ($person === null) {
-            return new JsonResponse(['error' => 'Person not found'], 404);
+            return new JsonResponse(['error' => getError('PERSON_NOT_FOUND'), 'code' => 'PERSON_NOT_FOUND'], 404);
         }
 
         return new JsonResponse($this->serialize($person));
@@ -114,7 +114,7 @@ class PersonController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         try {

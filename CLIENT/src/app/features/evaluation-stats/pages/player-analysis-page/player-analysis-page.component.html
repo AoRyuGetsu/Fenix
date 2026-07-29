@@ -1,0 +1,64 @@
+@let vm = facade.playerVm();
+@let qStats = selectedQStats();
+
+<div class="container-fluid py-3">
+  <button class="btn btn-light btn-sm mb-3" (click)="onBack()">
+    <i class="bi bi-arrow-left me-1"></i> {{ 'cr_btn_back' | message }}
+  </button>
+
+  <h4 class="text-gray-800 fw-bold mb-1">{{ 'es_lbl_player_analysis' | message }}</h4>
+  <p class="text-gray-800 mb-4" style="font-size: 0.9rem;">{{ playerName() }}</p>
+
+  @if (vm.loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (vm.error) {
+    <div class="alert alert-danger">{{ vm.error }}</div>
+  } @else if (vm.playerStats) {
+    <!-- Questionnaire selector -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <label class="form-label">{{ 'es_lbl_select_questionnaire' | message }}</label>
+        <select class="form-select" (change)="onQuestionnaireChange($event)">
+          @for (q of facade.playerQuestionnaireOptions(); track q.id) {
+            <option [value]="q.id" [selected]="q.id === vm.selectedQuestionnaireId">{{ q.title }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (qStats) {
+      <!-- Overall chart -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <app-player-regression-chart
+            [title]="'es_lbl_overall' | message"
+            [periodLabels]="overallLabels()"
+            [periodAverages]="overallAverages()"
+            [regression]="qStats.overall.regression"
+            [showMeta]="true" />
+        </div>
+      </div>
+
+      <!-- Per-question charts -->
+      <h5 class="text-gray-800 fw-semibold mb-3">{{ 'es_lbl_per_question' | message }}</h5>
+      <div class="row g-4">
+        @for (pq of qStats.per_question; track pq.question_id) {
+          <div class="col-md-6 col-lg-4">
+            <app-player-regression-chart
+              [title]="pq.question_text"
+              [periodLabels]="pq.averages.map(a => a.period_name)"
+              [periodAverages]="pq.averages"
+              [regression]="pq.regression"
+              [showMeta]="true" />
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <div class="alert alert-info">{{ 'es_lbl_no_data' | message }}</div>
+  }
+</div>

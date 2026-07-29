@@ -1,4 +1,5 @@
 import { Component, inject, computed, OnInit } from '@angular/core';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { PeriodsFacade } from '../../facades/periods.facade';
 import { GtPagination } from '../../../../shared/components/gtable/gtable.types';
 import { PeriodItem, PeriodPayload } from '../../services/periods-http.service';
@@ -8,7 +9,7 @@ import { PeriodFormModalComponent } from '../../components/period-form-modal/per
 @Component({
   selector: 'app-periods-page',
   standalone: true,
-  imports: [PeriodsTableComponent, PeriodFormModalComponent],
+  imports: [PeriodsTableComponent, PeriodFormModalComponent, MessagePipe],
   templateUrl: './periods-page.component.html',
 })
 export class PeriodsPageComponent implements OnInit {

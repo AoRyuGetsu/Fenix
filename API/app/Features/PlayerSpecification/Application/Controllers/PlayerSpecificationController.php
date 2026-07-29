@@ -23,7 +23,7 @@ class PlayerSpecificationController implements ControllerInterface
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Get(path: '/player-specifications', tags: ['PlayerSpecification'], summary: 'Listar especificaciones de jugadores')]
@@ -82,13 +82,13 @@ class PlayerSpecificationController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $required = ['user_id', 'birth_date', 'height_cm', 'weight_kg', 'gender', 'entry_date', 'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship'];
         foreach ($required as $field) {
             if (!isset($data[$field]) || (is_string($data[$field]) && trim($data[$field]) === '')) {
-                return new JsonResponse(['error' => "$field is required"], 422);
+                return new JsonResponse(['error' => getError('VALIDATION_REQUIRED'), 'code' => 'VALIDATION_REQUIRED'], 422);
             }
         }
 
@@ -112,7 +112,7 @@ class PlayerSpecificationController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         try {

@@ -25,7 +25,7 @@ class PermissionController implements ControllerInterface
         return match ($this->request->getMethod()) {
             'POST' => $this->create(),
             'GET'  => $this->list(),
-            default => new JsonResponse(['error' => 'Method not allowed'], 405),
+            default => new JsonResponse(['error' => getError('METHOD_NOT_ALLOWED'), 'code' => 'METHOD_NOT_ALLOWED'], 405),
         };
     }
 
@@ -38,13 +38,13 @@ class PermissionController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $name = $data['name'] ?? null;
 
         if ($name === null || !is_string($name)) {
-            return new JsonResponse(['error' => 'name is required'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_NAME_REQUIRED'), 'code' => 'VALIDATION_NAME_REQUIRED'], 422);
         }
 
         try {

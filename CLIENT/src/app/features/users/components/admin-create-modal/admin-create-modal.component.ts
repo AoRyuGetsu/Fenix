@@ -1,9 +1,10 @@
 import { Component, input, output, signal } from '@angular/core';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { CreateAdminPayload } from '../../services/users-http.service';
 
 @Component({
   selector: 'app-admin-create-modal',
-  imports: [],
+  imports: [MessagePipe],
   templateUrl: './admin-create-modal.component.html',
 })
 export class AdminCreateModalComponent {

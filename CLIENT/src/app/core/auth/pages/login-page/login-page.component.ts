@@ -1,10 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { AuthFacade } from '../../facades/auth.facade';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, MessagePipe],
   templateUrl: './login-page.component.html',
 })
 export class LoginPageComponent {

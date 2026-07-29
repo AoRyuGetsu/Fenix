@@ -22,7 +22,7 @@ class PeriodController implements ControllerInterface
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Get(path: '/periods', tags: ['Periods'], summary: 'Listar periodos activos')]
@@ -67,7 +67,7 @@ class PeriodController implements ControllerInterface
         $period = $this->periodService->findById($id);
 
         if ($period === null) {
-            return new JsonResponse(['error' => 'Period not found'], 404);
+            return new JsonResponse(['error' => getError('PERIOD_NOT_FOUND'), 'code' => 'PERIOD_NOT_FOUND'], 404);
         }
 
         return new JsonResponse([
@@ -91,13 +91,13 @@ class PeriodController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $required = ['name', 'start_date', 'end_date'];
         foreach ($required as $field) {
             if (!isset($data[$field]) || (is_string($data[$field]) && trim($data[$field]) === '')) {
-                return new JsonResponse(['error' => "$field is required"], 422);
+                return new JsonResponse(['error' => getError('VALIDATION_REQUIRED'), 'code' => 'VALIDATION_REQUIRED'], 422);
             }
         }
 
@@ -134,13 +134,13 @@ class PeriodController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $required = ['name', 'start_date', 'end_date'];
         foreach ($required as $field) {
             if (!isset($data[$field]) || (is_string($data[$field]) && trim($data[$field]) === '')) {
-                return new JsonResponse(['error' => "$field is required"], 422);
+                return new JsonResponse(['error' => getError('VALIDATION_REQUIRED'), 'code' => 'VALIDATION_REQUIRED'], 422);
             }
         }
 
@@ -152,10 +152,7 @@ class PeriodController implements ControllerInterface
                 $data['end_date'],
             );
         } catch (\App\Core\AppException $e) {
-            if ($e->getMessage() === 'Periodo no encontrado') {
-                return new JsonResponse(['error' => $e->getMessage()], 404);
-            }
-            return new JsonResponse(['error' => $e->getMessage()], 409);
+            return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
         }
 
         return new JsonResponse([

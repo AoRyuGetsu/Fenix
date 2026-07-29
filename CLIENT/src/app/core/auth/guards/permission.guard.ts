@@ -12,7 +12,7 @@ export const permissionGuard: CanActivateFn = (route) => {
     return true;
   }
 
-  const userRoles = authFacade.roles();
+  const userRoles = authFacade.authRoles();
 
   const hasRole = requiredRoles.some((role) => userRoles.includes(role));
 

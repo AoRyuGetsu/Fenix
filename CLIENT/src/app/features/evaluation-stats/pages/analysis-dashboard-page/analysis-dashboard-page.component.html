@@ -1,0 +1,72 @@
+@let vm = facade.dashboardVm();
+@let stats = vm.teamStats;
+
+<div class="container-fluid py-3">
+  <h4 class="text-gray-800 fw-bold mb-1">{{ 'es_lbl_team_dashboard' | message }}</h4>
+
+  @if (vm.loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  } @else if (vm.error) {
+    <div class="alert alert-danger">{{ vm.error }}</div>
+  } @else if (stats) {
+    <!-- Selectores -->
+    <div class="row g-3 mb-4">
+      @if (!auth.roles().includes('ENT')) {
+        <div class="col-md-3">
+          <label class="form-label">{{ 'es_lbl_select_team' | message }}</label>
+          <select class="form-select" (change)="onTeamChange($event)">
+            <option value="">{{ 'cr_lbl_select_option' | message }}</option>
+            @for (team of vm.teams; track team.id) {
+              <option [value]="team.id" [selected]="team.id === vm.selectedTeamId">{{ team.name }}</option>
+            }
+          </select>
+        </div>
+      }
+      <div class="col-md-3">
+        <label class="form-label">{{ 'es_lbl_select_questionnaire' | message }}</label>
+        <select class="form-select" (change)="onQuestionnaireChange($event)">
+          @for (q of facade.questionnaireOptions(); track q.id) {
+            <option [value]="q.id" [selected]="q.id === vm.selectedQuestionnaireId">{{ q.title }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <app-trend-distribution-chart
+          [data]="trendData()"
+          [title]="'es_lbl_trend_distribution' | message" />
+      </div>
+      <div class="col-md-8">
+        <app-team-averages-chart
+          [periodLabels]="teamChartLabels()"
+          [averages]="teamChartAverages()"
+          [regression]="facade.currentQStats()?.team_regression ?? null"
+          [title]="'es_lbl_team_progression' | message" />
+      </div>
+    </div>
+
+    <!-- Player table -->
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-gray-800">{{ 'es_lbl_players' | message }}</h6>
+      </div>
+      <div class="card-body">
+        <app-player-trend-table
+          [players]="facade.currentQStats()?.players ?? []"
+          [loading]="false"
+          [pagination]="pagination()"
+          [qStats]="facade.currentQStats()"
+          (viewPlayer)="onViewPlayer($event)" />
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-info">{{ 'es_lbl_no_data' | message }}</div>
+  }
+</div>

@@ -87,7 +87,7 @@
                             </td>
                             <td>
                               <div class="d-flex gap-1">
-                                <button class="btn btn-sm btn-outline-info" (click)="onShowFicha(student.user); $event.stopPropagation()" title="Ver ficha">
+                                <button class="btn btn-sm btn-outline-info" (click)="onShowFicha(student.user); $event.stopPropagation()" [title]="'eval_btn_show_profile_tip' | message">
                                   <i class="bi bi-person-badge"></i>
                                 </button>
                                 @if (student.isEvaluated) {

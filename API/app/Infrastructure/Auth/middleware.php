@@ -24,7 +24,7 @@ function middleware(Container $container, callable $handler, array $requiredRole
         $authHeader = $request->headers->get('Authorization');
 
         if ($authHeader === null || !str_starts_with($authHeader, 'Bearer ')) {
-            return new JsonResponse(['error' => 'Token required'], 401);
+            return new JsonResponse(['error' => getError('TOKEN_REQUIRED'), 'code' => 'TOKEN_REQUIRED'], 401);
         }
 
         $token = substr($authHeader, 7);
@@ -53,7 +53,7 @@ function middleware(Container $container, callable $handler, array $requiredRole
                 }
             }
             if (!$hasRole) {
-                return new JsonResponse(['error' => 'Forbidden'], 403);
+                return new JsonResponse(['error' => getError('FORBIDDEN'), 'code' => 'FORBIDDEN'], 403);
             }
         }
 

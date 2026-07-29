@@ -7,9 +7,9 @@ namespace App\Features\User\Application\Controllers;
 use App\Core\AppException;
 use App\Core\Env;
 use App\Core\Interfaces\ControllerInterface;
-use App\Features\Representatives\Application\Services\RepresentativeService;
+use App\Features\Representatives\Domain\Interfaces\RepPlayerServiceInterface;
 use App\Features\RolesPermisos\Domain\Interfaces\RoleAccessControlServiceInterface;
-use App\Features\Teams\Application\Services\TeamService;
+use App\Features\Teams\Domain\Interfaces\TeamServiceInterface;
 use App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface;
 use App\Features\User\Application\DTO\UserQuery;
 use App\Features\User\Domain\Interfaces\UserServiceInterface;
@@ -25,9 +25,9 @@ class UserController implements ControllerInterface
         private UserServiceInterface $userService,
         private RoleAccessControlServiceInterface $roleAccessControl,
         private Request $request,
-        private TeamService $teamService,
+        private TeamServiceInterface $teamService,
         private TeamRepositoryInterface $teamRepository,
-        private RepresentativeService $representativeService,
+        private RepPlayerServiceInterface $representativeService,
     ) {}
 
     public function execute(): Response
@@ -35,7 +35,7 @@ class UserController implements ControllerInterface
         return match ($this->request->getMethod()) {
             'POST'   => $this->create(),
             'GET'    => $this->list(),
-            default  => new JsonResponse(['error' => 'Method not allowed'], 405),
+            default  => new JsonResponse(['error' => getError('METHOD_NOT_ALLOWED'), 'code' => 'METHOD_NOT_ALLOWED'], 405),
         };
     }
 
@@ -54,11 +54,11 @@ class UserController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         if (!isset($data['email']) || !isset($data['password'])) {
-            return new JsonResponse(['error' => 'email and password are required'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_EMAIL_REQUIRED'), 'code' => 'VALIDATION_EMAIL_REQUIRED'], 422);
         }
 
         $personData = $data['person'] ?? null;
@@ -67,14 +67,14 @@ class UserController implements ControllerInterface
             $required = ['first_name', 'first_surname', 'document_number', 'email', 'type'];
             foreach ($required as $field) {
                 if (!isset($personData[$field]) || !is_string($personData[$field])) {
-                    return new JsonResponse(['error' => "person.$field is required"], 422);
+                    return new JsonResponse(['error' => getError('VALIDATION_REQUIRED'), 'code' => 'VALIDATION_REQUIRED'], 422);
                 }
             }
 
             $type = $personData['type'];
             if ($type === 'JUG' && !isset($data['team_id'])) {
                 return new JsonResponse([
-                    'error' => 'El equipo es obligatorio para usuarios de tipo Jugador',
+                    'error' => getError('TEAM_REQUIRED_FOR_JUG'),
                     'code'  => 'TEAM_REQUIRED_FOR_JUG',
                 ], 422);
             }
@@ -160,7 +160,7 @@ class UserController implements ControllerInterface
         $user = $this->userService->findById($id);
 
         if ($user === null) {
-            return new JsonResponse(['error' => 'User not found'], 404);
+            return new JsonResponse(['error' => getError('USER_NOT_FOUND'), 'code' => 'USER_NOT_FOUND'], 404);
         }
 
         return new JsonResponse($this->serialize($user));
@@ -183,7 +183,7 @@ class UserController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         try {

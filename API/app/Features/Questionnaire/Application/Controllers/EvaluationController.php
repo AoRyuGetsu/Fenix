@@ -11,7 +11,7 @@ use App\Features\Questionnaire\Application\DTO\QuestionnaireQuery;
 use App\Features\Questionnaire\Domain\Interfaces\EvaluationServiceInterface;
 use App\Features\Periods\Domain\Interfaces\PeriodRepositoryInterface;
 use App\Features\Questionnaire\Domain\Interfaces\QuestionnaireServiceInterface;
-use App\Features\Representatives\Application\Services\RepresentativeService;
+use App\Features\Representatives\Domain\Interfaces\RepPlayerServiceInterface;
 use App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface;
 use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
 use App\Infrastructure\Auth\AuthContext;
@@ -28,14 +28,14 @@ class EvaluationController implements ControllerInterface
         private PeriodRepositoryInterface $periodRepository,
         private UserRepositoryInterface $userRepository,
         private TeamRepositoryInterface $teamRepository,
-        private RepresentativeService $representativeService,
+        private RepPlayerServiceInterface $representativeService,
         private AuthContext $authContext,
         private Request $request,
     ) {}
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Get(path: '/evaluations/my-questionnaires', tags: ['Evaluation'], summary: 'Listar cuestionarios disponibles según roles del usuario autenticado')]
@@ -106,18 +106,18 @@ class EvaluationController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $required = ['questionnaire_id', 'target_user_id', 'period_id', 'answers'];
         foreach ($required as $field) {
             if (!isset($data[$field])) {
-                return new JsonResponse(['error' => "$field is required"], 422);
+                return new JsonResponse(['error' => getError('VALIDATION_REQUIRED'), 'code' => 'VALIDATION_REQUIRED'], 422);
             }
         }
 
         if (!is_array($data['answers']) || $data['answers'] === []) {
-            return new JsonResponse(['error' => 'answers must be a non-empty array'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_ARRAY_REQUIRED'), 'code' => 'VALIDATION_ARRAY_REQUIRED'], 422);
         }
 
         try {
@@ -152,11 +152,11 @@ class EvaluationController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         if (!isset($data['answers']) || !is_array($data['answers']) || $data['answers'] === []) {
-            return new JsonResponse(['error' => 'answers must be a non-empty array'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_ARRAY_REQUIRED'), 'code' => 'VALIDATION_ARRAY_REQUIRED'], 422);
         }
 
         try {
@@ -208,7 +208,7 @@ class EvaluationController implements ControllerInterface
         $evaluation = $this->evaluationService->findById($id);
 
         if ($evaluation === null) {
-            return new JsonResponse(['error' => 'Evaluation not found'], 404);
+            return new JsonResponse(['error' => getError('EVALUATION_NOT_FOUND'), 'code' => 'EVALUATION_NOT_FOUND'], 404);
         }
 
         return new JsonResponse($this->serialize($evaluation));
@@ -268,17 +268,17 @@ class EvaluationController implements ControllerInterface
         $perPage = max(1, min(100, (int) ($this->request->query->get('perPage', Env::get('PAGINATION_PER_PAGE', '20')))));
 
         if ($periodId <= 0 || $questionnaireId <= 0) {
-            return new JsonResponse(['error' => 'period_id and questionnaire_id are required'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_PERIOD_QUES_REQ'), 'code' => 'VALIDATION_PERIOD_QUES_REQ'], 422);
         }
 
         $period = $this->periodRepository->findById($periodId);
         if ($period === null) {
-            return new JsonResponse(['error' => 'Period not found'], 404);
+            return new JsonResponse(['error' => getError('PERIOD_NOT_FOUND'), 'code' => 'PERIOD_NOT_FOUND'], 404);
         }
 
         $questionnaire = $this->questionnaireService->findById($questionnaireId);
         if ($questionnaire === null) {
-            return new JsonResponse(['error' => 'Questionnaire not found'], 404);
+            return new JsonResponse(['error' => getError('QUESTIONNAIRE_NOT_FOUND'), 'code' => 'QUESTIONNAIRE_NOT_FOUND'], 404);
         }
 
         $targetRoleCode = $questionnaire->getTargetRole()->getCode();

@@ -254,3 +254,4 @@ Ver `ARCHITECTURE.md` §2.13 para la tabla completa de endpoints con sus requisi
 | Ficha de Jugador | `app/Features/PlayerSpecification/` | `features/users/` (PlayerSpecModal) + `features/evaluations/` (PlayerInfoModal) |
 | Cuestionarios | `app/Features/Questionnaire/` | `features/questionnaire/` |
 | Evaluaciones | `app/Features/Questionnaire/` (Evaluation + Answer) | `features/evaluations/` |
+| Estadísticas | `app/Features/EvaluationStats/` | (pendiente) |

@@ -5,17 +5,31 @@ declare(strict_types=1);
 namespace App\Features\Representatives\Application\Services;
 
 use App\Core\AppException;
+use App\Features\Representatives\Application\DTO\RepPlayerQuery;
 use App\Features\Representatives\Domain\Entities\RepPlayer;
 use App\Features\Representatives\Domain\Interfaces\RepPlayerRepositoryInterface;
 use App\Features\User\Domain\Entities\User;
 use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
 
-class RepresentativeService
+class RepresentativeService implements \App\Features\Representatives\Domain\Interfaces\RepPlayerServiceInterface
 {
     public function __construct(
         private RepPlayerRepositoryInterface $repository,
         private UserRepositoryInterface $userRepository,
     ) {}
+
+    public function findPaginatedPlayers(RepPlayerQuery $query): array
+    {
+        [$items, $total] = $this->repository->findPaginatedByRepUserId($query);
+        $players = [];
+        foreach ($items as $rp) {
+            $player = $rp->getPlayer();
+            if ($player !== null) {
+                $players[] = $player;
+            }
+        }
+        return [$players, $total];
+    }
 
     /** @return int[] */
     public function getPlayerIds(int $repUserId): array

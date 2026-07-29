@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Features\Representatives\Application\Controllers;
 
+use App\Core\Env;
 use App\Core\Interfaces\ControllerInterface;
-use App\Features\Representatives\Application\Services\RepresentativeService;
+use App\Features\Representatives\Application\DTO\RepPlayerQuery;
+use App\Features\Representatives\Domain\Interfaces\RepPlayerServiceInterface;
 use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,30 +17,42 @@ use Symfony\Component\HttpFoundation\Response;
 class RepresentativeController implements ControllerInterface
 {
     public function __construct(
-        private RepresentativeService $representativeService,
+        private RepPlayerServiceInterface $representativeService,
         private UserRepositoryInterface $userRepository,
         private Request $request,
     ) {}
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Get(path: '/representatives/{repUserId}/players', tags: ['Representatives'], summary: 'Listar jugadores de un representante')]
     #[OA\Parameter(name: 'repUserId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 200, description: 'Lista de jugadores')]
+    #[OA\Parameter(name: 'page', in: 'query', schema: new OA\Schema(type: 'integer'))]
+    #[OA\Parameter(name: 'perPage', in: 'query', schema: new OA\Schema(type: 'integer'))]
+    #[OA\Response(response: 200, description: 'Lista paginada de jugadores', content: new OA\JsonContent(ref: '#/components/schemas/PaginatedResponse'))]
     public function listPlayers(int $repUserId): Response
     {
-        $items = $this->representativeService->getPlayerIds($repUserId);
-        $players = [];
-        foreach ($items as $playerId) {
-            $user = $this->userRepository->findById($playerId);
-            if ($user !== null) {
-                $players[] = $this->serializeUser($user);
-            }
-        }
-        return new JsonResponse(['data' => $players, 'total' => count($players)]);
+        $page = max(1, (int) ($this->request->query->get('page', '1')));
+        $perPage = max(1, min(100, (int) ($this->request->query->get('perPage', Env::get('PAGINATION_PER_PAGE', '20')))));
+
+        $query = new RepPlayerQuery(
+            repUserId: $repUserId,
+            page: $page,
+            perPage: $perPage,
+        );
+
+        [$players, $total] = $this->representativeService->findPaginatedPlayers($query);
+
+        $data = array_map(fn ($u) => $this->serializeUser($u), $players);
+
+        return new JsonResponse([
+            'data' => $data,
+            'total' => $total,
+            'page' => $page,
+            'perPage' => $perPage,
+        ]);
     }
 
     #[OA\Get(path: '/players/{playerUserId}/representative', tags: ['Representatives'], summary: 'Obtener representante de un jugador')]

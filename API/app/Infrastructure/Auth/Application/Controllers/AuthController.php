@@ -28,13 +28,13 @@ class AuthController implements ControllerInterface
             'POST' => match ($this->request->getPathInfo()) {
                 '/auth/login'    => $this->login(),
                 '/auth/refresh'  => $this->refresh(),
-                default          => new JsonResponse(['error' => 'Not found'], 404),
+                default          => new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404),
             },
             'GET' => match ($this->request->getPathInfo()) {
                 '/auth/me' => $this->me(),
-                default    => new JsonResponse(['error' => 'Not found'], 404),
+                default    => new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404),
             },
-            default => new JsonResponse(['error' => 'Method not allowed'], 405),
+            default => new JsonResponse(['error' => getError('METHOD_NOT_ALLOWED'), 'code' => 'METHOD_NOT_ALLOWED'], 405),
         };
     }
 
@@ -47,14 +47,14 @@ class AuthController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $email = $data['email'] ?? null;
         $password = $data['password'] ?? null;
 
         if ($email === null || $password === null) {
-            return new JsonResponse(['error' => 'email and password are required'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_EMAIL_REQUIRED'), 'code' => 'VALIDATION_EMAIL_REQUIRED'], 422);
         }
 
         try {
@@ -68,7 +68,7 @@ class AuthController implements ControllerInterface
                 'line'    => $e->getLine(),
                 'trace'   => $e->getTraceAsString(),
             ]);
-            return new JsonResponse(['error' => 'Internal server error'], 500);
+            return new JsonResponse(['error' => getError('INTERNAL_ERROR'), 'code' => 'INTERNAL_ERROR'], 500);
         }
 
         return new JsonResponse($result);
@@ -83,13 +83,13 @@ class AuthController implements ControllerInterface
         $data = json_decode($this->request->getContent(), true);
 
         if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+            return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
         $refreshToken = $data['refresh_token'] ?? null;
 
         if ($refreshToken === null) {
-            return new JsonResponse(['error' => 'refresh_token is required'], 422);
+            return new JsonResponse(['error' => getError('VALIDATION_REFRESH_REQUIRED'), 'code' => 'VALIDATION_REFRESH_REQUIRED'], 422);
         }
 
         try {
@@ -110,7 +110,7 @@ class AuthController implements ControllerInterface
         $authHeader = $this->request->headers->get('Authorization');
 
         if ($authHeader === null || !str_starts_with($authHeader, 'Bearer ')) {
-            return new JsonResponse(['error' => 'Missing or invalid Authorization header'], 401);
+            return new JsonResponse(['error' => getError('INVALID_AUTH_HEADER'), 'code' => 'INVALID_AUTH_HEADER'], 401);
         }
 
         $token = substr($authHeader, 7);

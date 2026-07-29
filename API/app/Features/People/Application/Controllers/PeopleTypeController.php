@@ -22,7 +22,7 @@ class PeopleTypeController implements ControllerInterface
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Get(path: '/people-types', tags: ['People'], summary: 'Listar tipos de persona paginados')]

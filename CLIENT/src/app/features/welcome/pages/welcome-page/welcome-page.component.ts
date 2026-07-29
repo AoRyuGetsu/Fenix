@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed } from '@angular/core';
 import { AuthFacade } from '../../../../core/auth/facades/auth.facade';
 import { WelcomeFacade } from '../../facades/welcome.facade';
 import { MessagePipe } from '../../../../shared/pipes/message.pipe';
@@ -12,12 +12,9 @@ import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 export class WelcomePageComponent implements OnInit {
   auth = inject(AuthFacade);
   facade = inject(WelcomeFacade);
+  vm = this.facade.vm;
 
   ngOnInit(): void {
     this.facade.load();
-  }
-
-  getTotalPages(total: number, perPage: number): number {
-    return Math.max(1, Math.ceil(total / perPage));
   }
 }

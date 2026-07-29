@@ -6,6 +6,7 @@ import { PersonUpdateModalComponent } from '../../components/person-update-modal
 import { AdminCreateModalComponent } from '../../components/admin-create-modal/admin-create-modal.component';
 import { AdminUpdateModalComponent } from '../../components/admin-update-modal/admin-update-modal.component';
 import { PlayerSpecModalComponent } from '../../components/player-spec-modal/player-spec-modal.component';
+import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { PeopleType, PersonData, UserData, CreatePersonPayload, UpdatePersonPayload, CreateAdminPayload, UpdateAdminPayload, CreatePlayerSpecPayload } from '../../services/users-http.service';
 
 @Component({
@@ -17,6 +18,7 @@ import { PeopleType, PersonData, UserData, CreatePersonPayload, UpdatePersonPayl
     AdminCreateModalComponent,
     AdminUpdateModalComponent,
     PlayerSpecModalComponent,
+    MessagePipe,
   ],
   templateUrl: './users-page.component.html',
 })

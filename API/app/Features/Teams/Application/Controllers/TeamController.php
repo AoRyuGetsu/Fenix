@@ -7,9 +7,10 @@ namespace App\Features\Teams\Application\Controllers;
 use App\Core\Env;
 use App\Core\Interfaces\ControllerInterface;
 use App\Features\Teams\Application\DTO\TeamQueryDto;
-use App\Features\Teams\Application\Services\TeamService;
+use App\Features\Teams\Domain\Interfaces\TeamServiceInterface;
 use App\Features\User\Application\DTO\UserQuery;
 use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
+use App\Infrastructure\Auth\AuthContext;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,14 +19,15 @@ use Symfony\Component\HttpFoundation\Response;
 class TeamController implements ControllerInterface
 {
     public function __construct(
-        private TeamService $teamService,
+        private TeamServiceInterface $teamService,
         private UserRepositoryInterface $userRepository,
         private Request $request,
+        private AuthContext $authContext,
     ) {}
 
     public function execute(): Response
     {
-        return new JsonResponse(['error' => 'Not found'], 404);
+        return new JsonResponse(['error' => getError('NOT_FOUND'), 'code' => 'NOT_FOUND'], 404);
     }
 
     #[OA\Get(path: '/teams', tags: ['Teams'], summary: 'Listar equipos paginados')]
@@ -65,6 +67,21 @@ class TeamController implements ControllerInterface
         ]);
     }
 
+    #[OA\Get(path: '/teams/my', tags: ['Teams'], summary: 'Obtener equipos del entrenador logueado')]
+    #[OA\Response(response: 200, description: 'Lista de equipos del entrenador')]
+    public function listMyTeams(): Response
+    {
+        $teams = $this->teamService->findByTrainerId($this->authContext->getUserId());
+
+        $data = array_map(fn ($t) => [
+            'id'   => $t->getId(),
+            'name' => $t->getName(),
+            'code' => $t->getCode(),
+        ], $teams);
+
+        return new JsonResponse($data);
+    }
+
     #[OA\Get(path: '/teams/{id}', tags: ['Teams'], summary: 'Obtener un equipo')]
     #[OA\Response(response: 200, description: 'Equipo')]
     #[OA\Response(response: 404, description: 'No encontrado')]
@@ -72,7 +89,7 @@ class TeamController implements ControllerInterface
     {
         $team = $this->teamService->findById($id);
         if ($team === null) {
-            return new JsonResponse(['error' => 'Team not found'], 404);
+            return new JsonResponse(['error' => getError('TEAM_NOT_FOUND'), 'code' => 'TEAM_NOT_FOUND'], 404);
         }
 
         return new JsonResponse([
@@ -97,9 +114,8 @@ class TeamController implements ControllerInterface
 
         try {
             $team = $this->teamService->create($data);
-        } catch (\Throwable $e) {
-            $code = $e instanceof \App\Core\AppException ? $e->getErrorCode() : 'UNKNOWN';
-            return new JsonResponse(['error' => $e->getMessage(), 'code' => $code], 422);
+        } catch (\App\Core\AppException $e) {
+            return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], 422);
         }
 
         return new JsonResponse([
@@ -123,9 +139,8 @@ class TeamController implements ControllerInterface
 
         try {
             $team = $this->teamService->update($id, $data);
-        } catch (\Throwable $e) {
-            $code = $e instanceof \App\Core\AppException ? $e->getErrorCode() : 'UNKNOWN';
-            return new JsonResponse(['error' => $e->getMessage(), 'code' => $code], 422);
+        } catch (\App\Core\AppException $e) {
+            return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], 422);
         }
 
         return new JsonResponse([
@@ -146,9 +161,8 @@ class TeamController implements ControllerInterface
     {
         try {
             $this->teamService->softDelete($id);
-        } catch (\Throwable $e) {
-            $code = $e instanceof \App\Core\AppException ? $e->getErrorCode() : 'UNKNOWN';
-            return new JsonResponse(['error' => $e->getMessage(), 'code' => $code], 404);
+        } catch (\App\Core\AppException $e) {
+            return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
         }
 
         return new JsonResponse(['message' => 'Team deleted']);
