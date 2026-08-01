@@ -7,7 +7,7 @@ import { AdminCreateModalComponent } from '../../components/admin-create-modal/a
 import { AdminUpdateModalComponent } from '../../components/admin-update-modal/admin-update-modal.component';
 import { PlayerSpecModalComponent } from '../../components/player-spec-modal/player-spec-modal.component';
 import { MessagePipe } from '../../../../shared/pipes/message.pipe';
-import { PeopleType, PersonData, UserData, CreatePersonPayload, UpdatePersonPayload, CreateAdminPayload, UpdateAdminPayload, CreatePlayerSpecPayload } from '../../services/users-http.service';
+import { PeopleType, Parentesco, PersonData, UserData, CreatePersonPayload, UpdatePersonPayload, CreateAdminPayload, UpdateAdminPayload, CreatePlayerSpecPayload } from '../../services/users-http.service';
 
 @Component({
   selector: 'app-users-page',
@@ -81,6 +81,8 @@ export class UsersPageComponent implements OnInit {
       .filter(t => t.code !== 'admin')
       .map(t => ({ id: 0, code: t.code, description: t.label }))
   );
+
+  parentescos = computed<Parentesco[]>(() => this.vm().parentescos);
 
   onFilter(term: string): void {
     this.facade.setSearchTerm(term);

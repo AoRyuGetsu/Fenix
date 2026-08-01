@@ -49,13 +49,21 @@
           </div>
 
           <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ 'play_spec_lbl_sports_data' | message }}</h6>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <label class="form-label">{{ 'play_spec_lbl_position' | message }}</label>
             <input #inputPosition type="text" class="form-control" [value]="position()" (input)="position.set(inputPosition.value)" [placeholder]="'play_spec_plh_position' | message" />
           </div>
           <div class="col-md-2">
-            <label class="form-label">{{ 'play_spec_lbl_jersey_number' | message }}</label>
-            <input #inputJersey type="number" class="form-control" [value]="jerseyNumber()" (input)="jerseyNumber.set(+inputJersey.value || null)" />
+            <label class="form-label">{{ 'play_spec_lbl_jersey_number_1' | message }}</label>
+            <input #inputJersey1 type="number" class="form-control" [value]="jerseyNumber1()" (input)="jerseyNumber1.set(+inputJersey1.value || null)" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'play_spec_lbl_jersey_number_2' | message }}</label>
+            <input #inputJersey2 type="number" class="form-control" [value]="jerseyNumber2()" (input)="jerseyNumber2.set(+inputJersey2.value || null)" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">{{ 'play_spec_lbl_jersey_number_3' | message }}</label>
+            <input #inputJersey3 type="number" class="form-control" [value]="jerseyNumber3()" (input)="jerseyNumber3.set(+inputJersey3.value || null)" />
           </div>
           <div class="col-md-3">
             <label class="form-label">{{ 'play_spec_lbl_dominant_foot' | message }}</label>
@@ -67,6 +75,28 @@
             </select>
           </div>
           <div class="col-md-3">
+            <label class="form-label">{{ 'play_spec_lbl_category' | message }}</label>
+            <select #selCategory class="form-select" [value]="category()" (change)="category.set(selCategory.value)">
+              <option value="">{{ 'play_spec_plh_select' | message }}</option>
+              <option value="SUB10">Sub-10</option>
+              <option value="SUB12">Sub-12</option>
+              <option value="SUB14">Sub-14</option>
+              <option value="SUB16">Sub-16</option>
+              <option value="LIBRE">Libre</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">{{ 'play_spec_lbl_shirt_size' | message }}</label>
+            <select #selSize class="form-select" [value]="shirtSize()" (change)="shirtSize.set(selSize.value)">
+              <option value="">{{ 'play_spec_plh_select' | message }}</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+            </select>
+          </div>
+          <div class="col-md-3">
             <label class="form-label">{{ 'play_spec_lbl_player_status' | message }}</label>
             <select #selStatus class="form-select" [value]="status()" (change)="status.set(selStatus.value)">
               <option value="active">{{ 'play_spec_lbl_status_active' | message }}</option>
@@ -74,6 +104,18 @@
               <option value="suspended">{{ 'play_spec_lbl_status_suspended' | message }}</option>
               <option value="inactive">{{ 'play_spec_lbl_status_inactive' | message }}</option>
             </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ 'play_spec_lbl_basketball_experience' | message }}</label>
+            <select #selExp class="form-select" [value]="basketballExperience()" (change)="basketballExperience.set(selExp.value)">
+              <option value="">{{ 'play_spec_plh_select' | message }}</option>
+              <option value="1">{{ 'play_spec_lbl_yes' | message }}</option>
+              <option value="0">{{ 'play_spec_lbl_no' | message }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ 'play_spec_lbl_previous_club' | message }}</label>
+            <input #inputPrevClub type="text" class="form-control" [value]="previousClub()" (input)="previousClub.set(inputPrevClub.value)" />
           </div>
           <div class="col-md-4">
             <label class="form-label">{{ 'play_spec_lbl_entry_date' | message }} <span class="text-danger">*</span></label>
@@ -102,6 +144,14 @@
           <div class="col-6">
             <label class="form-label">{{ 'play_spec_lbl_allergies' | message }}</label>
             <textarea #inputAllergies class="form-control" rows="2" [value]="allergies()" (input)="allergies.set(inputAllergies.value)" [placeholder]="'play_spec_plh_allergies' | message"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ 'play_spec_lbl_insurance' | message }}</label>
+            <input #inputInsurance type="text" class="form-control" [value]="insurance()" (input)="insurance.set(inputInsurance.value)" [placeholder]="'play_spec_plh_insurance' | message" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ 'play_spec_lbl_medications' | message }}</label>
+            <textarea #inputMedications class="form-control" rows="2" [value]="medications()" (input)="medications.set(inputMedications.value)" [placeholder]="'play_spec_plh_medications' | message"></textarea>
           </div>
         </div>
       </div>

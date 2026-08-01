@@ -1,6 +1,6 @@
 import { Component, input, output, signal, computed } from '@angular/core';
 import { MessagePipe } from '../../../../shared/pipes/message.pipe';
-import { PeopleType, CreatePersonPayload } from '../../services/users-http.service';
+import { PeopleType, Parentesco, CreatePersonPayload } from '../../services/users-http.service';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 import { TeamItem } from '../../../teams/services/teams-http.service';
 
@@ -14,6 +14,7 @@ export class PersonCreateModalComponent {
   loading = input(false);
   teams = input<TeamItem[]>([]);
   representatives = input<any[]>([]);
+  parentescos = input<Parentesco[]>([]);
   loadingTeams = input(false);
   loadingReps = input(false);
 
@@ -32,6 +33,7 @@ export class PersonCreateModalComponent {
   password = signal('');
   teamId = signal<number | null>(null);
   representativeId = signal<number | null>(null);
+  parentescoId = signal<number | null>(null);
 
   isJug = computed(() => this.type() === 'JUG');
 
@@ -41,6 +43,14 @@ export class PersonCreateModalComponent {
 
   onRepresentativeSelect(item: any): void {
     this.representativeId.set(item?.id ?? null);
+    if (!item) {
+      this.parentescoId.set(null);
+    }
+  }
+
+  onParentescoSelect(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.parentescoId.set(value ? Number(value) : null);
   }
 
   onSubmit(): void {
@@ -49,6 +59,10 @@ export class PersonCreateModalComponent {
     }
 
     if (this.isJug() && !this.teamId()) {
+      return;
+    }
+
+    if (this.representativeId() && !this.parentescoId()) {
       return;
     }
 
@@ -74,6 +88,7 @@ export class PersonCreateModalComponent {
       payload.team_id = this.teamId();
       if (this.representativeId()) {
         payload.representative_id = this.representativeId();
+        payload.parentesco_id = this.parentescoId();
       }
     }
 

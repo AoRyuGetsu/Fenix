@@ -33,9 +33,12 @@ src/app/
 │   ├── users/              ← CRUD de personas, administradores y fichas de jugador
 │   │   ├── routes.ts
 │   │   ├── pages/
-│   │   ├── components/     ← Tablas, modales, PlayerSpecModalComponent
-│   │   ├── services/       ← HTTP (incluye CRUD de player specs)
-│   │   └── facades/        ← Estado (signals + vm, player specs)
+│   │   ├── components/     ← Tablas, modales (person/admin create/update), PlayerSpecModalComponent
+│   │   │                    · Modales de jugador: autocomplete de representante + select de parentesco (GET /parentescos)
+│   │   │                    · PlayerSpecModal: insurance, medications, basketball_experience, previous_club, category,
+│   │   │                      shirt_size y jersey_number_1/2/3
+│   │   ├── services/       ← HTTP (incluye CRUD de player specs + getParentescos)
+│   │   └── facades/        ← Estado (signals + vm, player specs, catálogo parentescos)
 │   ├── questionnaire/      ← Cuestionarios y preguntas
 │   │   ├── routes.ts
 │   │   ├── pages/

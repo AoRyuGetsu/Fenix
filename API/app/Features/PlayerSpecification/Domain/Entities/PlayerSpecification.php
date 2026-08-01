@@ -46,8 +46,14 @@ class PlayerSpecification
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private ?string $position = null;
 
-    #[ORM\Column(name: 'jersey_number', type: 'integer', nullable: true)]
-    private ?int $jerseyNumber = null;
+    #[ORM\Column(name: 'jersey_number_1', type: 'integer', nullable: true)]
+    private ?int $jerseyNumber1 = null;
+
+    #[ORM\Column(name: 'jersey_number_2', type: 'integer', nullable: true)]
+    private ?int $jerseyNumber2 = null;
+
+    #[ORM\Column(name: 'jersey_number_3', type: 'integer', nullable: true)]
+    private ?int $jerseyNumber3 = null;
 
     #[ORM\Column(name: 'dominant_foot', type: 'string', length: 20, nullable: true)]
     private ?string $dominantFoot = null;
@@ -60,6 +66,24 @@ class PlayerSpecification
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $allergies = null;
+
+    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    private ?string $insurance = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $medications = null;
+
+    #[ORM\Column(name: 'basketball_experience', type: 'boolean', nullable: true)]
+    private ?bool $basketballExperience = null;
+
+    #[ORM\Column(name: 'previous_club', type: 'string', length: 150, nullable: true)]
+    private ?string $previousClub = null;
+
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $category = null;
+
+    #[ORM\Column(name: 'shirt_size', type: 'string', length: 5, nullable: true)]
+    private ?string $shirtSize = null;
 
     #[ORM\Column(name: 'profile_photo_url', type: 'string', length: 500, nullable: true)]
     private ?string $profilePhotoUrl = null;
@@ -198,14 +222,34 @@ class PlayerSpecification
         $this->position = $position;
     }
 
-    public function getJerseyNumber(): ?int
+    public function getJerseyNumber1(): ?int
     {
-        return $this->jerseyNumber;
+        return $this->jerseyNumber1;
     }
 
-    public function setJerseyNumber(?int $jerseyNumber): void
+    public function setJerseyNumber1(?int $jerseyNumber1): void
     {
-        $this->jerseyNumber = $jerseyNumber;
+        $this->jerseyNumber1 = $jerseyNumber1;
+    }
+
+    public function getJerseyNumber2(): ?int
+    {
+        return $this->jerseyNumber2;
+    }
+
+    public function setJerseyNumber2(?int $jerseyNumber2): void
+    {
+        $this->jerseyNumber2 = $jerseyNumber2;
+    }
+
+    public function getJerseyNumber3(): ?int
+    {
+        return $this->jerseyNumber3;
+    }
+
+    public function setJerseyNumber3(?int $jerseyNumber3): void
+    {
+        $this->jerseyNumber3 = $jerseyNumber3;
     }
 
     public function getDominantFoot(): ?string
@@ -246,6 +290,66 @@ class PlayerSpecification
     public function setAllergies(?string $allergies): void
     {
         $this->allergies = $allergies;
+    }
+
+    public function getInsurance(): ?string
+    {
+        return $this->insurance;
+    }
+
+    public function setInsurance(?string $insurance): void
+    {
+        $this->insurance = $insurance;
+    }
+
+    public function getMedications(): ?string
+    {
+        return $this->medications;
+    }
+
+    public function setMedications(?string $medications): void
+    {
+        $this->medications = $medications;
+    }
+
+    public function getBasketballExperience(): ?bool
+    {
+        return $this->basketballExperience;
+    }
+
+    public function setBasketballExperience(?bool $basketballExperience): void
+    {
+        $this->basketballExperience = $basketballExperience;
+    }
+
+    public function getPreviousClub(): ?string
+    {
+        return $this->previousClub;
+    }
+
+    public function setPreviousClub(?string $previousClub): void
+    {
+        $this->previousClub = $previousClub;
+    }
+
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?string $category): void
+    {
+        $this->category = $category;
+    }
+
+    public function getShirtSize(): ?string
+    {
+        return $this->shirtSize;
+    }
+
+    public function setShirtSize(?string $shirtSize): void
+    {
+        $this->shirtSize = $shirtSize;
     }
 
     public function getProfilePhotoUrl(): ?string

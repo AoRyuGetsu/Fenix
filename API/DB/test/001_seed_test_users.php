@@ -213,4 +213,64 @@ foreach ($teams as $team) {
     echo "✓ Equipo '{$team['name']}' ({$team['code']}) creado.\n";
 }
 
+// ── Asignar representantes a jugadores con parentesco ──
+// Los parentescos provienen del catálogo de la tabla `parentescos`
+// (seedeado por 006_seed_parentescos.php).
+$assignments = [
+    ['player_email' => 'jugador@mail.com', 'rep_email' => 'representante@mail.com', 'parentesco' => 'PADRE_MADRE'],
+    ['player_email' => 'jugador2@mail.com', 'rep_email' => 'representante2@mail.com', 'parentesco' => 'TUTOR_LEGAL'],
+    ['player_email' => 'jugadora5@mail.com', 'rep_email' => 'representante@mail.com', 'parentesco' => 'FAMILIAR'],
+];
+
+foreach ($assignments as $assignment) {
+    $playerId = $conn->executeQuery(
+        "SELECT id FROM users WHERE email = ? AND deleted_at IS NULL",
+        [$assignment['player_email']]
+    )->fetchOne();
+
+    if ($playerId === false) {
+        echo "✗ Jugador '{$assignment['player_email']}' no encontrado. Se omite asignación.\n";
+        continue;
+    }
+    $playerId = (int) $playerId;
+
+    $repId = $conn->executeQuery(
+        "SELECT id FROM users WHERE email = ? AND deleted_at IS NULL",
+        [$assignment['rep_email']]
+    )->fetchOne();
+
+    if ($repId === false) {
+        echo "✗ Representante '{$assignment['rep_email']}' no encontrado. Se omite asignación para '{$assignment['player_email']}'.\n";
+        continue;
+    }
+    $repId = (int) $repId;
+
+    $parentescoId = $conn->executeQuery(
+        "SELECT id FROM parentescos WHERE code = ? AND deleted_at IS NULL",
+        [$assignment['parentesco']]
+    )->fetchOne();
+
+    if ($parentescoId === false) {
+        echo "✗ Parentesco '{$assignment['parentesco']}' no encontrado en catálogo. Se omite asignación para '{$assignment['player_email']}'.\n";
+        continue;
+    }
+    $parentescoId = (int) $parentescoId;
+
+    $existing = $conn->executeQuery(
+        "SELECT player_user_id FROM rep_players WHERE player_user_id = ?",
+        [$playerId]
+    )->fetchOne();
+
+    if ($existing !== false) {
+        echo "• Jugador '{$assignment['player_email']}' ya tiene representante asignado.\n";
+        continue;
+    }
+
+    $conn->executeStatement(
+        "INSERT INTO rep_players (rep_user_id, player_user_id, parentesco_id) VALUES (?, ?, ?)",
+        [$repId, $playerId, $parentescoId]
+    );
+    echo "✓ Representante '{$assignment['rep_email']}' asignado a '{$assignment['player_email']}' (parentesco: {$assignment['parentesco']}).\n";
+}
+
 echo "\nMigración de test 001 completada.\n";

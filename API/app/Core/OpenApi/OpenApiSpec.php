@@ -20,6 +20,7 @@ use OpenApi\Attributes as OA;
 #[OA\Tag(name: 'User Roles', description: 'Asignación de roles a usuarios')]
 #[OA\Tag(name: 'Menus', description: 'Gestión de menús')]
 #[OA\Tag(name: 'People', description: 'People management')]
+#[OA\Tag(name: 'Parentescos', description: 'Catálogo de parentescos')]
 #[OA\Tag(name: 'Evaluation', description: 'Evaluaciones y respuestas')]
 #[OA\Tag(name: 'Periods', description: 'Periodos de evaluación')]
 #[OA\Tag(name: 'Teams', description: 'Gestión de equipos')]
@@ -41,6 +42,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'representative', properties: [
             new OA\Property(property: 'id', type: 'integer'),
             new OA\Property(property: 'display_name', type: 'string'),
+            new OA\Property(property: 'parentesco', ref: '#/components/schemas/Parentesco', nullable: true),
         ], type: 'object', nullable: true),
         new OA\Property(property: 'deleted_at', type: 'string', format: 'date-time', nullable: true),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
@@ -55,6 +57,15 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'person', ref: '#/components/schemas/PersonCreate'),
         new OA\Property(property: 'team_id', type: 'integer', nullable: true),
         new OA\Property(property: 'representative_id', type: 'integer', nullable: true),
+        new OA\Property(property: 'parentesco_id', type: 'integer', nullable: true),
+    ]
+)]
+#[OA\Schema(
+    schema: 'Parentesco',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer'),
+        new OA\Property(property: 'code', type: 'string'),
+        new OA\Property(property: 'description', type: 'string'),
     ]
 )]
 #[OA\Schema(
@@ -446,11 +457,19 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'emergency_contact_phone', type: 'string'),
         new OA\Property(property: 'emergency_contact_relationship', type: 'string'),
         new OA\Property(property: 'position', type: 'string', nullable: true),
-        new OA\Property(property: 'jersey_number', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_1', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_2', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_3', type: 'integer', nullable: true),
         new OA\Property(property: 'dominant_foot', type: 'string', nullable: true),
         new OA\Property(property: 'nationality', type: 'string', nullable: true),
         new OA\Property(property: 'blood_type', type: 'string', nullable: true),
         new OA\Property(property: 'allergies', type: 'string', nullable: true),
+        new OA\Property(property: 'insurance', type: 'string', nullable: true),
+        new OA\Property(property: 'medications', type: 'string', nullable: true),
+        new OA\Property(property: 'basketball_experience', type: 'boolean', nullable: true),
+        new OA\Property(property: 'previous_club', type: 'string', nullable: true),
+        new OA\Property(property: 'category', type: 'string', nullable: true),
+        new OA\Property(property: 'shirt_size', type: 'string', nullable: true),
         new OA\Property(property: 'profile_photo_url', type: 'string', nullable: true),
         new OA\Property(property: 'status', type: 'string'),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
@@ -472,11 +491,19 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'emergency_contact_phone', type: 'string'),
         new OA\Property(property: 'emergency_contact_relationship', type: 'string'),
         new OA\Property(property: 'position', type: 'string', nullable: true),
-        new OA\Property(property: 'jersey_number', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_1', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_2', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_3', type: 'integer', nullable: true),
         new OA\Property(property: 'dominant_foot', type: 'string', nullable: true),
         new OA\Property(property: 'nationality', type: 'string', nullable: true),
         new OA\Property(property: 'blood_type', type: 'string', nullable: true),
         new OA\Property(property: 'allergies', type: 'string', nullable: true),
+        new OA\Property(property: 'insurance', type: 'string', nullable: true),
+        new OA\Property(property: 'medications', type: 'string', nullable: true),
+        new OA\Property(property: 'basketball_experience', type: 'boolean', nullable: true),
+        new OA\Property(property: 'previous_club', type: 'string', nullable: true),
+        new OA\Property(property: 'category', type: 'string', nullable: true),
+        new OA\Property(property: 'shirt_size', type: 'string', nullable: true),
         new OA\Property(property: 'profile_photo_url', type: 'string', nullable: true),
         new OA\Property(property: 'status', type: 'string'),
     ]
@@ -494,11 +521,19 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'emergency_contact_phone', type: 'string'),
         new OA\Property(property: 'emergency_contact_relationship', type: 'string'),
         new OA\Property(property: 'position', type: 'string', nullable: true),
-        new OA\Property(property: 'jersey_number', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_1', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_2', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_3', type: 'integer', nullable: true),
         new OA\Property(property: 'dominant_foot', type: 'string', nullable: true),
         new OA\Property(property: 'nationality', type: 'string', nullable: true),
         new OA\Property(property: 'blood_type', type: 'string', nullable: true),
         new OA\Property(property: 'allergies', type: 'string', nullable: true),
+        new OA\Property(property: 'insurance', type: 'string', nullable: true),
+        new OA\Property(property: 'medications', type: 'string', nullable: true),
+        new OA\Property(property: 'basketball_experience', type: 'boolean', nullable: true),
+        new OA\Property(property: 'previous_club', type: 'string', nullable: true),
+        new OA\Property(property: 'category', type: 'string', nullable: true),
+        new OA\Property(property: 'shirt_size', type: 'string', nullable: true),
         new OA\Property(property: 'profile_photo_url', type: 'string', nullable: true),
         new OA\Property(property: 'status', type: 'string'),
     ]

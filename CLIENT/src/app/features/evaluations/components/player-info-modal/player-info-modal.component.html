@@ -101,8 +101,8 @@
                 <p>{{ s.position || '—' }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Dorsal</label>
-                <p>{{ s.jersey_number ?? '—' }}</p>
+                <label class="form-label text-muted small mb-0">Dorsales</label>
+                <p>{{ [s.jersey_number_1, s.jersey_number_2, s.jersey_number_3].filter(v => v !== null).join(' / ') || '—' }}</p>
               </div>
               <div class="col-md-4">
                 <label class="form-label text-muted small mb-0">Pie dominante</label>

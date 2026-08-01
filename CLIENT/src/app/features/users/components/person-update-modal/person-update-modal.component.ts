@@ -1,6 +1,6 @@
 import { Component, input, output, signal, effect, computed } from '@angular/core';
 import { MessagePipe } from '../../../../shared/pipes/message.pipe';
-import { PeopleType, PersonData, UpdatePersonPayload } from '../../services/users-http.service';
+import { PeopleType, Parentesco, PersonData, UpdatePersonPayload } from '../../services/users-http.service';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 import { TeamItem } from '../../../teams/services/teams-http.service';
 
@@ -15,6 +15,7 @@ export class PersonUpdateModalComponent {
   loading = input(false);
   teams = input<TeamItem[]>([]);
   representatives = input<any[]>([]);
+  parentescos = input<Parentesco[]>([]);
   loadingTeams = input(false);
   loadingReps = input(false);
 
@@ -34,6 +35,7 @@ export class PersonUpdateModalComponent {
   password = signal('');
   teamId = signal<number | null>(null);
   representativeId = signal<number | null>(null);
+  parentescoId = signal<number | null>(null);
 
   isJug = computed(() => this.type() === 'JUG');
 
@@ -52,6 +54,13 @@ export class PersonUpdateModalComponent {
         this.address.set(i.address ?? '');
         this.changePassword.set(false);
         this.password.set('');
+        this.representativeId.set(null);
+        this.parentescoId.set(null);
+        const anyItem = i as any;
+        if ('representative' in anyItem && anyItem.representative) {
+          this.representativeId.set(anyItem.representative.id ?? null);
+          this.parentescoId.set(anyItem.representative.parentesco?.id ?? null);
+        }
       }
     });
   }
@@ -62,6 +71,14 @@ export class PersonUpdateModalComponent {
 
   onRepresentativeSelect(item: any): void {
     this.representativeId.set(item?.id ?? null);
+    if (!item) {
+      this.parentescoId.set(null);
+    }
+  }
+
+  onParentescoSelect(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.parentescoId.set(value ? Number(value) : null);
   }
 
   getInitialTeam(): any {
@@ -96,6 +113,7 @@ export class PersonUpdateModalComponent {
     if (this.isJug()) {
       payload.team_id = this.teamId();
       payload.representative_id = this.representativeId() || null;
+      payload.parentesco_id = this.parentescoId() || null;
     }
 
     this.save.emit(payload);

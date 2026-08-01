@@ -25,11 +25,19 @@ export class PlayerSpecModalComponent implements OnInit {
   emergencyContactPhone = signal('');
   emergencyContactRelationship = signal('');
   position = signal('');
-  jerseyNumber = signal<number | null>(null);
+  jerseyNumber1 = signal<number | null>(null);
+  jerseyNumber2 = signal<number | null>(null);
+  jerseyNumber3 = signal<number | null>(null);
   dominantFoot = signal('');
   nationality = signal('');
   bloodType = signal('');
   allergies = signal('');
+  insurance = signal('');
+  medications = signal('');
+  basketballExperience = signal('');
+  previousClub = signal('');
+  category = signal('');
+  shirtSize = signal('');
   profilePhotoUrl = signal('');
   status = signal('active');
 
@@ -48,11 +56,19 @@ export class PlayerSpecModalComponent implements OnInit {
       this.emergencyContactPhone.set(data.emergency_contact_phone);
       this.emergencyContactRelationship.set(data.emergency_contact_relationship);
       this.position.set(data.position ?? '');
-      this.jerseyNumber.set(data.jersey_number);
+      this.jerseyNumber1.set(data.jersey_number_1);
+      this.jerseyNumber2.set(data.jersey_number_2);
+      this.jerseyNumber3.set(data.jersey_number_3);
       this.dominantFoot.set(data.dominant_foot ?? '');
       this.nationality.set(data.nationality ?? '');
       this.bloodType.set(data.blood_type ?? '');
       this.allergies.set(data.allergies ?? '');
+      this.insurance.set(data.insurance ?? '');
+      this.medications.set(data.medications ?? '');
+      this.basketballExperience.set(data.basketball_experience === null ? '' : data.basketball_experience ? '1' : '0');
+      this.previousClub.set(data.previous_club ?? '');
+      this.category.set(data.category ?? '');
+      this.shirtSize.set(data.shirt_size ?? '');
       this.profilePhotoUrl.set(data.profile_photo_url ?? '');
       this.status.set(data.status);
     }
@@ -75,11 +91,19 @@ export class PlayerSpecModalComponent implements OnInit {
       emergency_contact_phone: this.emergencyContactPhone(),
       emergency_contact_relationship: this.emergencyContactRelationship(),
       position: this.position() || null,
-      jersey_number: this.jerseyNumber(),
+      jersey_number_1: this.jerseyNumber1(),
+      jersey_number_2: this.jerseyNumber2(),
+      jersey_number_3: this.jerseyNumber3(),
       dominant_foot: this.dominantFoot() || null,
       nationality: this.nationality() || null,
       blood_type: this.bloodType() || null,
       allergies: this.allergies() || null,
+      insurance: this.insurance() || null,
+      medications: this.medications() || null,
+      basketball_experience: this.basketballExperience() === '' ? null : this.basketballExperience() === '1',
+      previous_club: this.previousClub() || null,
+      category: this.category() || null,
+      shirt_size: this.shirtSize() || null,
       profile_photo_url: this.profilePhotoUrl() || null,
       status: this.status(),
     };

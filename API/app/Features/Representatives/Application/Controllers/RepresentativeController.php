@@ -57,29 +57,30 @@ class RepresentativeController implements ControllerInterface
 
     #[OA\Get(path: '/players/{playerUserId}/representative', tags: ['Representatives'], summary: 'Obtener representante de un jugador')]
     #[OA\Parameter(name: 'playerUserId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\Response(response: 200, description: 'Representante del jugador o null')]
+    #[OA\Response(response: 200, description: 'Representante del jugador con parentesco o null')]
     public function getRepresentative(int $playerUserId): Response
     {
-        $rep = $this->representativeService->getRepresentative($playerUserId);
-        if ($rep === null) {
+        $assignment = $this->representativeService->getAssignment($playerUserId);
+        if ($assignment === null) {
             return new JsonResponse(['data' => null]);
         }
-        return new JsonResponse(['data' => $this->serializeUser($rep)]);
+        return new JsonResponse(['data' => $this->serializeAssignment($assignment)]);
     }
 
     #[OA\Post(path: '/representatives/{repUserId}/players', tags: ['Representatives'], summary: 'Asignar jugadores a un representante (reemplaza asignaciones)')]
     #[OA\Parameter(name: 'repUserId', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
-    #[OA\RequestBody(content: new OA\JsonContent(properties: [
-        new OA\Property(property: 'player_ids', type: 'array', items: new OA\Items(type: 'integer')),
-    ]))]
+    #[OA\RequestBody(content: new OA\JsonContent(type: 'array', items: new OA\Items(properties: [
+        new OA\Property(property: 'player_user_id', type: 'integer'),
+        new OA\Property(property: 'parentesco_id', type: 'integer'),
+    ], type: 'object')))]
     #[OA\Response(response: 200, description: 'Jugadores asignados')]
     public function assignPlayers(int $repUserId): Response
     {
-        $data = json_decode($this->request->getContent(), true) ?? [];
-        $playerIds = $data['player_ids'] ?? [];
+        $data = json_decode($this->request->getContent(), true);
+        $items = is_array($data) ? $data : [];
 
         try {
-            $players = $this->representativeService->assignPlayers($repUserId, $playerIds);
+            $players = $this->representativeService->assignPlayers($repUserId, $items);
         } catch (\App\Core\AppException $e) {
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], 422);
         }
@@ -116,5 +117,18 @@ class RepresentativeController implements ControllerInterface
             'email'        => $user->getEmail(),
             'display_name' => $displayName,
         ];
+    }
+
+    private function serializeAssignment($assignment): array
+    {
+        $rep = $assignment->getRep();
+        $parentesco = $assignment->getParentesco();
+        $serialized = $this->serializeUser($rep);
+        $serialized['parentesco'] = [
+            'id'          => $parentesco->getId(),
+            'code'        => $parentesco->getCode(),
+            'description' => $parentesco->getDescription(),
+        ];
+        return $serialized;
     }
 }

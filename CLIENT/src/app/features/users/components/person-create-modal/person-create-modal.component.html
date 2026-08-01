@@ -75,12 +75,23 @@
                 (selectionChange)="onRepresentativeSelect($event)"
               />
             </div>
+            @if (representativeId()) {
+              <div class="col-12">
+                <label class="form-label">{{ 'usr_lbl_parentesco' | message }} <span class="text-danger">*</span></label>
+                <select class="form-select" [value]="parentescoId() ?? ''" (change)="onParentescoSelect($event)">
+                  <option value="">{{ 'usr_plh_select_parentesco' | message }}</option>
+                  @for (p of parentescos(); track p.id) {
+                    <option [value]="p.id">{{ p.description }}</option>
+                  }
+                </select>
+              </div>
+            }
           }
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">{{ 'cr_btn_cancel' | message }}</button>
-        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading() || !firstName() || !firstSurname() || !documentNumber() || !email() || !type() || (isJug() && !teamId())">
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading() || !firstName() || !firstSurname() || !documentNumber() || !email() || !type() || (isJug() && !teamId()) || (representativeId() && !parentescoId())">
           @if (loading()) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }

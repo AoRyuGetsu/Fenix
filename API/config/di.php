@@ -20,6 +20,10 @@ use App\Features\People\Domain\Interfaces\PersonRepositoryInterface;
 use App\Features\People\Domain\Repositories\PersonRepository;
 use App\Features\People\Application\Services\PeopleTypeService;
 use App\Features\People\Application\Services\PersonService;
+use App\Features\Parentescos\Domain\Interfaces\ParentescoServiceInterface;
+use App\Features\Parentescos\Domain\Interfaces\ParentescoRepositoryInterface;
+use App\Features\Parentescos\Domain\Repositories\ParentescoRepository;
+use App\Features\Parentescos\Application\Services\ParentescoService;
 use App\Features\User\Domain\Interfaces\UserServiceInterface;
 use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
 use App\Features\User\Domain\Repositories\UserRepository;
@@ -76,6 +80,8 @@ return [
     PersonRepositoryInterface::class => DI\autowire(PersonRepository::class),
     PeopleTypeServiceInterface::class => DI\autowire(PeopleTypeService::class),
     PeopleTypeRepositoryInterface::class => DI\autowire(PeopleTypeRepository::class),
+    ParentescoServiceInterface::class => DI\autowire(ParentescoService::class),
+    ParentescoRepositoryInterface::class => DI\autowire(ParentescoRepository::class),
     QuestionnaireServiceInterface::class => DI\autowire(QuestionnaireService::class),
     QuestionnaireRepositoryInterface::class => DI\autowire(QuestionnaireRepository::class),
     QuestionServiceInterface::class => DI\autowire(QuestionService::class),

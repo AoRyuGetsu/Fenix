@@ -68,7 +68,7 @@ El directorio `DB/test/` contiene migraciones que crean datos de prueba (usuario
 
 | Script | Descripción |
 |--------|-------------|
-| `001_seed_test_users.php` | Crea usuarios de prueba para cada rol excepto administrador: supervisor, entrenador, 5 jugadores, representante. Con persona y rol asignado. |
+| `001_seed_test_users.php` | Crea usuarios de prueba para cada rol excepto administrador: supervisor, entrenador, 5 jugadores, 2 representantes. Con persona y rol asignado. Además crea equipos y asigna representantes a 3 jugadores con parentesco (PADRE_MADRE, TUTOR_LEGAL, FAMILIAR) en `rep_players`. |
 | `002_seed_basketball_evaluations.php` | Genera 25 evaluaciones (5 jugadores × 5 periodos trimestrales) para el cuestionario "Evaluación Técnica de Jugador". Respuestas coherentes con perfil de cada jugador y progresión temporal. |
 
 ### Credenciales de usuarios de test
@@ -82,7 +82,8 @@ El directorio `DB/test/` contiene migraciones que crean datos de prueba (usuario
 | `jugador3@mail.com` | `pass1234` | jugador (Luis Fernández) |
 | `jugador4@mail.com` | `pass1234` | jugador (Diego Ramírez) |
 | `jugadora5@mail.com` | `pass1234` | jugador (Ana Torres) |
-| `representante@mail.com` | `pass1234` | representante |
+| `representante@mail.com` | `pass1234` | representante (asignado a jugador@ y jugadora5@) |
+| `representante2@mail.com` | `pass1234` | representante (asignado a jugador2@) |
 
 ## Convenciones
 
@@ -100,6 +101,9 @@ El directorio `DB/test/` contiene migraciones que crean datos de prueba (usuario
 | `001_seed_roles_and_admin_user.php` | Crea roles (administrador, entrenador, jugador, supervisor), permisos (read, write, delete), usuario administrador y asigna permisos según rol |
 | `002_seed_menus.php` | Crea todos los ítems del menú lateral (Configuración, Roles, Usuarios, Cuestionarios, Evaluaciones, Estadísticas) con sus asignaciones por rol |
 | `003_seed_basketball_questionnaire.php` | Crea el cuestionario "Evaluación Técnica de Jugador" con 4 secciones y 19 preguntas tipo selección (1-5). Responder: entrenador, evaluado: jugador |
+| `004_seed_people_types.php` | Crea los tipos de persona del catálogo (ADM, ENT, JUG, SUP, REP) |
+| `005_seed_periods.php` | Crea los periodos trimestrales de evaluación |
+| `006_seed_parentescos.php` | Crea el catálogo de parentescos del representante (TUTOR_LEGAL, PADRE_MADRE, HERMANO, TIO_TIA, FAMILIAR) usado en `rep_players.parentesco_id` |
 
 ### Credenciales del usuario administrador
 

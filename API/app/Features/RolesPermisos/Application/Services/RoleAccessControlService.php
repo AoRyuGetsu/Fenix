@@ -106,6 +106,9 @@ class RoleAccessControlService implements RoleAccessControlServiceInterface
 
         if (!$role->getUsers()->contains($user)) {
             $role->getUsers()->add($user);
+            if (!$user->getRoles()->contains($role)) {
+                $user->getRoles()->add($role);
+            }
             $this->roleRepository->save($role);
         }
     }
@@ -126,6 +129,7 @@ class RoleAccessControlService implements RoleAccessControlServiceInterface
 
         if ($role->getUsers()->contains($user)) {
             $role->getUsers()->removeElement($user);
+            $user->getRoles()->removeElement($role);
             $this->roleRepository->save($role);
         }
     }

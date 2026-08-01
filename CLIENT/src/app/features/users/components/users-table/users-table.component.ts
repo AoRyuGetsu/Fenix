@@ -140,7 +140,7 @@ export class UsersTableComponent {
           _specNationality: spec?.nationality ?? null,
           _specBlood: spec?.blood_type ?? null,
           _specPosition: spec?.position ?? null,
-          _specJersey: spec?.jersey_number ?? null,
+          _specJersey: spec?.jersey_number_1 ?? null,
           _specFoot: spec?.dominant_foot ?? null,
           _specEntryDate: spec?.entry_date ?? null,
           _specStatus: spec?.status ?? null,

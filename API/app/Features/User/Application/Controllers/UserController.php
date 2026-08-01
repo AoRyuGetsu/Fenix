@@ -46,6 +46,7 @@ class UserController implements ControllerInterface
         new OA\Property(property: 'person', ref: '#/components/schemas/PersonCreate'),
         new OA\Property(property: 'team_id', type: 'integer', nullable: true),
         new OA\Property(property: 'representative_id', type: 'integer', nullable: true),
+        new OA\Property(property: 'parentesco_id', type: 'integer', nullable: true),
     ]))]
     #[OA\Response(response: 201, description: 'Usuario creado', content: new OA\JsonContent(ref: '#/components/schemas/User'))]
     #[OA\Response(response: 422, description: 'Datos inválidos', content: new OA\JsonContent(ref: '#/components/schemas/Error'))]
@@ -103,8 +104,11 @@ class UserController implements ControllerInterface
         }
 
         if (isset($data['representative_id'])) {
+            if (!isset($data['parentesco_id'])) {
+                return new JsonResponse(['error' => getError('PARENTESCO_REQUIRED'), 'code' => 'PARENTESCO_REQUIRED'], 422);
+            }
             try {
-                $this->representativeService->assignPlayerToRep((int) $user->getId(), (int) $data['representative_id']);
+                $this->representativeService->assignPlayerToRep((int) $user->getId(), (int) $data['representative_id'], (int) $data['parentesco_id']);
             } catch (\App\Core\AppException $e) {
                 return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], 422);
             }
@@ -175,6 +179,7 @@ class UserController implements ControllerInterface
         new OA\Property(property: 'person', ref: '#/components/schemas/PersonUpdate'),
         new OA\Property(property: 'team_id', type: 'integer', nullable: true),
         new OA\Property(property: 'representative_id', type: 'integer', nullable: true),
+        new OA\Property(property: 'parentesco_id', type: 'integer', nullable: true),
     ]))]
     #[OA\Response(response: 200, description: 'Usuario actualizado', content: new OA\JsonContent(ref: '#/components/schemas/User'))]
     #[OA\Response(response: 404, description: 'Usuario no encontrado', content: new OA\JsonContent(ref: '#/components/schemas/Error'))]
@@ -208,7 +213,10 @@ class UserController implements ControllerInterface
                 $this->representativeService->removePlayer((int) $currentRep->getId(), $id);
             }
             if ($data['representative_id'] !== null) {
-                $this->representativeService->assignPlayerToRep($id, (int) $data['representative_id']);
+                if (!isset($data['parentesco_id'])) {
+                    return new JsonResponse(['error' => getError('PARENTESCO_REQUIRED'), 'code' => 'PARENTESCO_REQUIRED'], 422);
+                }
+                $this->representativeService->assignPlayerToRep($id, (int) $data['representative_id'], (int) $data['parentesco_id']);
             }
         }
 
@@ -270,11 +278,22 @@ class UserController implements ControllerInterface
             'name' => $team->getName(),
         ] : null;
 
-        $rep = $this->representativeService->getRepresentative((int) $user->getId());
-        $result['representative'] = $rep !== null ? [
-            'id'           => $rep->getId(),
-            'display_name' => $this->getUserDisplayName($rep),
-        ] : null;
+        $assignment = $this->representativeService->getAssignment((int) $user->getId());
+        if ($assignment !== null) {
+            $rep = $assignment->getRep();
+            $parentesco = $assignment->getParentesco();
+            $result['representative'] = [
+                'id'           => $rep->getId(),
+                'display_name' => $this->getUserDisplayName($rep),
+                'parentesco'   => [
+                    'id'          => $parentesco->getId(),
+                    'code'        => $parentesco->getCode(),
+                    'description' => $parentesco->getDescription(),
+                ],
+            ];
+        } else {
+            $result['representative'] = null;
+        }
 
         if ($person !== null) {
             $result['person'] = [

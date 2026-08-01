@@ -285,14 +285,32 @@ CREATE TABLE team_players (
     CONSTRAINT fk_tp_player FOREIGN KEY (player_user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Tabla pivote rep_players (representante → jugador, N:1 con UNIQUE en player)
+-- Tabla catálogo Parentescos (parentesco del representante hacia el jugador)
+CREATE TABLE parentescos (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(100) NOT NULL,
+    created_by BIGINT UNSIGNED DEFAULT NULL,
+    updated_by BIGINT UNSIGNED DEFAULT NULL,
+    deleted_by BIGINT UNSIGNED DEFAULT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    deleted_at DATETIME DEFAULT NULL,
+    CONSTRAINT fk_parentescos_created_by FOREIGN KEY (created_by) REFERENCES users(id),
+    CONSTRAINT fk_parentescos_updated_by FOREIGN KEY (updated_by) REFERENCES users(id),
+    CONSTRAINT fk_parentescos_deleted_by FOREIGN KEY (deleted_by) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla pivote rep_players (representante → jugador, N:1 con UNIQUE en player y parentesco obligatorio)
 CREATE TABLE rep_players (
     rep_user_id BIGINT UNSIGNED NOT NULL,
     player_user_id BIGINT UNSIGNED NOT NULL,
+    parentesco_id BIGINT UNSIGNED NOT NULL,
     PRIMARY KEY (rep_user_id, player_user_id),
     UNIQUE KEY uq_rep_player (player_user_id),
     CONSTRAINT fk_rp_rep FOREIGN KEY (rep_user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_rp_player FOREIGN KEY (player_user_id) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_rp_player FOREIGN KEY (player_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_rp_parentesco FOREIGN KEY (parentesco_id) REFERENCES parentescos(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabla player_specification (especificación deportiva del jugador, 1:1 con users)
@@ -308,11 +326,19 @@ CREATE TABLE player_specification (
     emergency_contact_phone VARCHAR(20) NOT NULL,
     emergency_contact_relationship VARCHAR(50) NOT NULL,
     position VARCHAR(50) NULL,
-    jersey_number INT NULL,
+    jersey_number_1 INT NULL,
+    jersey_number_2 INT NULL,
+    jersey_number_3 INT NULL,
     dominant_foot VARCHAR(20) NULL,
     nationality VARCHAR(100) NULL,
     blood_type VARCHAR(5) NULL,
     allergies TEXT NULL,
+    insurance VARCHAR(150) NULL,
+    medications TEXT NULL,
+    basketball_experience TINYINT(1) NULL,
+    previous_club VARCHAR(150) NULL,
+    category VARCHAR(20) NULL,
+    shirt_size VARCHAR(5) NULL,
     profile_photo_url VARCHAR(500) NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active',
     created_by BIGINT UNSIGNED NULL,

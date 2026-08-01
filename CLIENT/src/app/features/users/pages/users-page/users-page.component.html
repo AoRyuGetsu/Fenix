@@ -118,6 +118,7 @@
       [representatives]="vm().representatives"
       [loadingTeams]="vm().loadingTeams"
       [loadingReps]="vm().loadingReps"
+      [parentescos]="parentescos()"
       (save)="onCreatePerson($event)"
       (close)="onCloseModals()"
     />
@@ -139,6 +140,7 @@
     [representatives]="vm().representatives"
     [loadingTeams]="vm().loadingTeams"
     [loadingReps]="vm().loadingReps"
+    [parentescos]="parentescos()"
     (save)="onUpdatePerson($event)"
     (close)="onCloseModals()"
   />

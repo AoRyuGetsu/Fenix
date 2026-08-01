@@ -20,9 +20,10 @@ class RepPlayerRepository implements RepPlayerRepositoryInterface
         return $this->entityManager
             ->getRepository(RepPlayer::class)
             ->createQueryBuilder('rp')
-            ->select('rp', 'rep', 'player')
+            ->select('rp', 'rep', 'player', 'parentesco')
             ->leftJoin('rp.rep', 'rep')
             ->leftJoin('rp.player', 'player')
+            ->leftJoin('rp.parentesco', 'parentesco')
             ->where('IDENTITY(rp.rep) = :repUserId')
             ->setParameter('repUserId', $repUserId)
             ->getQuery()
@@ -34,9 +35,10 @@ class RepPlayerRepository implements RepPlayerRepositoryInterface
         $qb = $this->entityManager
             ->getRepository(RepPlayer::class)
             ->createQueryBuilder('rp')
-            ->select('rp', 'rep', 'player')
+            ->select('rp', 'rep', 'player', 'parentesco')
             ->leftJoin('rp.rep', 'rep')
             ->leftJoin('rp.player', 'player')
+            ->leftJoin('rp.parentesco', 'parentesco')
             ->where('IDENTITY(rp.rep) = :repUserId')
             ->setParameter('repUserId', $query->repUserId);
 
@@ -57,9 +59,10 @@ class RepPlayerRepository implements RepPlayerRepositoryInterface
         return $this->entityManager
             ->getRepository(RepPlayer::class)
             ->createQueryBuilder('rp')
-            ->select('rp', 'rep', 'player')
+            ->select('rp', 'rep', 'player', 'parentesco')
             ->leftJoin('rp.rep', 'rep')
             ->leftJoin('rp.player', 'player')
+            ->leftJoin('rp.parentesco', 'parentesco')
             ->where('IDENTITY(rp.player) = :playerUserId')
             ->setParameter('playerUserId', $playerUserId)
             ->getQuery()

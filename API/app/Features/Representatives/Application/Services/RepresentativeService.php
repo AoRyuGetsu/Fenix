@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Features\Representatives\Application\Services;
 
 use App\Core\AppException;
+use App\Features\Parentescos\Domain\Interfaces\ParentescoServiceInterface;
 use App\Features\Representatives\Application\DTO\RepPlayerQuery;
 use App\Features\Representatives\Domain\Entities\RepPlayer;
 use App\Features\Representatives\Domain\Interfaces\RepPlayerRepositoryInterface;
@@ -16,6 +17,7 @@ class RepresentativeService implements \App\Features\Representatives\Domain\Inte
     public function __construct(
         private RepPlayerRepositoryInterface $repository,
         private UserRepositoryInterface $userRepository,
+        private ParentescoServiceInterface $parentescoService,
     ) {}
 
     public function findPaginatedPlayers(RepPlayerQuery $query): array
@@ -44,7 +46,12 @@ class RepresentativeService implements \App\Features\Representatives\Domain\Inte
         return $rp?->getRep();
     }
 
-    public function assignPlayerToRep(int $playerUserId, int $repUserId): void
+    public function getAssignment(int $playerUserId): ?RepPlayer
+    {
+        return $this->repository->findByPlayerUserId($playerUserId);
+    }
+
+    public function assignPlayerToRep(int $playerUserId, int $repUserId, int $parentescoId): void
     {
         $rep = $this->userRepository->findById($repUserId);
         if ($rep === null) {
@@ -58,17 +65,23 @@ class RepresentativeService implements \App\Features\Representatives\Domain\Inte
         }
         $this->ensureUserHasRole($player, 'JUG', 'REP_PLAYER_NOT_JUG');
 
+        $parentesco = $this->parentescoService->findById($parentescoId);
+        if ($parentesco === null) {
+            throw new AppException('PARENTESCO_NOT_FOUND');
+        }
+
         $existing = $this->repository->findByPlayerUserId($playerUserId);
         if ($existing !== null) {
             $this->repository->remove($existing);
+            $this->repository->flush();
         }
 
-        $rp = new RepPlayer($rep, $player);
+        $rp = new RepPlayer($rep, $player, $parentesco);
         $this->repository->save($rp);
         $this->repository->flush();
     }
 
-    public function assignPlayers(int $repUserId, array $playerIds): array
+    public function assignPlayers(int $repUserId, array $items): array
     {
         $rep = $this->userRepository->findById($repUserId);
         if ($rep === null) {
@@ -77,13 +90,22 @@ class RepresentativeService implements \App\Features\Representatives\Domain\Inte
         $this->ensureUserHasRole($rep, 'REP', 'REP_USER_NOT_REP');
 
         $players = [];
-        foreach ($playerIds as $pid) {
-            $player = $this->userRepository->findById((int) $pid);
+        foreach ($items as $item) {
+            $playerUserId = (int) ($item['player_user_id'] ?? 0);
+            $parentescoId = (int) ($item['parentesco_id'] ?? 0);
+
+            $player = $this->userRepository->findById($playerUserId);
             if ($player === null) {
                 throw new AppException('REP_PLAYER_NOT_FOUND');
             }
             $this->ensureUserHasRole($player, 'JUG', 'REP_PLAYER_NOT_JUG');
-            $players[] = $player;
+
+            $parentesco = $this->parentescoService->findById($parentescoId);
+            if ($parentesco === null) {
+                throw new AppException('PARENTESCO_NOT_FOUND');
+            }
+
+            $players[] = [$player, $parentesco];
         }
 
         // Remove existing assignments for this rep
@@ -92,14 +114,24 @@ class RepresentativeService implements \App\Features\Representatives\Domain\Inte
             $this->repository->remove($rp);
         }
 
+        // Release players that currently belong to another rep
+        foreach ($players as [$player, $parentesco]) {
+            $current = $this->repository->findByPlayerUserId((int) $player->getId());
+            if ($current !== null && $current->getRep()->getId() !== $repUserId) {
+                $this->repository->remove($current);
+            }
+        }
+
+        $this->repository->flush();
+
         // Create new assignments
-        foreach ($players as $player) {
-            $rp = new RepPlayer($rep, $player);
+        foreach ($players as [$player, $parentesco]) {
+            $rp = new RepPlayer($rep, $player, $parentesco);
             $this->repository->save($rp);
         }
 
         $this->repository->flush();
-        return $players;
+        return array_map(fn ($pair) => $pair[0], $players);
     }
 
     public function removePlayer(int $repUserId, int $playerUserId): void

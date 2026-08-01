@@ -9,6 +9,12 @@ export interface PeopleType {
   description: string;
 }
 
+export interface Parentesco {
+  id: number;
+  code: string;
+  description: string;
+}
+
 export interface PersonData {
   id: number;
   user_id: number | null;
@@ -46,7 +52,7 @@ export interface UserData {
   roles: string[];
   person: UserPerson | null;
   team: { id: number; name: string } | null;
-  representative: { id: number; display_name: string } | null;
+  representative: { id: number; display_name: string; parentesco: Parentesco | null } | null;
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
@@ -63,6 +69,7 @@ export interface CreatePersonPayload {
   password?: string;
   team_id?: number | null;
   representative_id?: number | null;
+  parentesco_id?: number | null;
   person: {
     type: string;
     first_name: string;
@@ -82,6 +89,7 @@ export interface UpdatePersonPayload {
   active?: boolean;
   team_id?: number | null;
   representative_id?: number | null;
+  parentesco_id?: number | null;
   person?: {
     type?: string;
     first_name?: string;
@@ -119,11 +127,19 @@ export interface PlayerSpecData {
   emergency_contact_phone: string;
   emergency_contact_relationship: string;
   position: string | null;
-  jersey_number: number | null;
+  jersey_number_1: number | null;
+  jersey_number_2: number | null;
+  jersey_number_3: number | null;
   dominant_foot: string | null;
   nationality: string | null;
   blood_type: string | null;
   allergies: string | null;
+  insurance: string | null;
+  medications: string | null;
+  basketball_experience: boolean | null;
+  previous_club: string | null;
+  category: string | null;
+  shirt_size: string | null;
   profile_photo_url: string | null;
   status: string;
   created_at: string;
@@ -142,11 +158,19 @@ export interface CreatePlayerSpecPayload {
   emergency_contact_phone: string;
   emergency_contact_relationship: string;
   position?: string | null;
-  jersey_number?: number | null;
+  jersey_number_1?: number | null;
+  jersey_number_2?: number | null;
+  jersey_number_3?: number | null;
   dominant_foot?: string | null;
   nationality?: string | null;
   blood_type?: string | null;
   allergies?: string | null;
+  insurance?: string | null;
+  medications?: string | null;
+  basketball_experience?: boolean | null;
+  previous_club?: string | null;
+  category?: string | null;
+  shirt_size?: string | null;
   profile_photo_url?: string | null;
   status?: string;
 }
@@ -160,6 +184,10 @@ export class UsersHttpService {
 
   getPeopleTypes(): Observable<PaginatedResponse<PeopleType>> {
     return this.http.get<PaginatedResponse<PeopleType>>(`${this.configService.apiUrl}/people-types`);
+  }
+
+  getParentescos(): Observable<PaginatedResponse<Parentesco>> {
+    return this.http.get<PaginatedResponse<Parentesco>>(`${this.configService.apiUrl}/parentescos`);
   }
 
   getPeople(type: string, page: number, perPage: number, name?: string): Observable<PaginatedResponse<PersonData>> {

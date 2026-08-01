@@ -5,6 +5,7 @@ import { getErrorMessage } from '../../../shared/utils/error-messages';
 import {
   UsersHttpService,
   PeopleType,
+  Parentesco,
   PersonData,
   UserData,
   PlayerSpecData,
@@ -40,8 +41,10 @@ export interface UsersState {
   showDeleted: boolean;
   teams: TeamItem[];
   representatives: UserData[];
+  parentescos: Parentesco[];
   loadingTeams: boolean;
   loadingReps: boolean;
+  loadingParentescos: boolean;
   showSpecModal: boolean;
   specUserId: number | null;
   specData: PlayerSpecData | null;
@@ -73,8 +76,10 @@ export class UsersFacade {
     showDeleted: false,
     teams: [],
     representatives: [],
+    parentescos: [],
     loadingTeams: false,
     loadingReps: false,
+    loadingParentescos: false,
     showSpecModal: false,
     specUserId: null,
     specData: null,
@@ -203,7 +208,7 @@ export class UsersFacade {
   }
 
   private loadTeamsAndReps(): void {
-    this.state.update(s => ({ ...s, loadingTeams: true, loadingReps: true }));
+    this.state.update(s => ({ ...s, loadingTeams: true, loadingReps: true, loadingParentescos: true }));
 
     this.teamsApi.getAll(1, 500).subscribe({
       next: res => {
@@ -226,6 +231,15 @@ export class UsersFacade {
       },
       error: () => {
         this.state.update(s => ({ ...s, loadingReps: false }));
+      },
+    });
+
+    this.api.getParentescos().subscribe({
+      next: res => {
+        this.state.update(s => ({ ...s, parentescos: res.data, loadingParentescos: false }));
+      },
+      error: () => {
+        this.state.update(s => ({ ...s, parentescos: [], loadingParentescos: false }));
       },
     });
   }

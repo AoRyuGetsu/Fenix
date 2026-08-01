@@ -14,6 +14,9 @@ use App\Features\User\Domain\Interfaces\UserServiceInterface;
 
 class PlayerSpecificationService implements PlayerSpecificationServiceInterface
 {
+    private const CATEGORIES = ['SUB10', 'SUB12', 'SUB14', 'SUB16', 'LIBRE'];
+    private const SHIRT_SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+
     public function __construct(
         private PlayerSpecificationRepositoryInterface $repository,
         private UserServiceInterface $userService,
@@ -58,11 +61,25 @@ class PlayerSpecificationService implements PlayerSpecificationServiceInterface
         $spec->setEmergencyContactPhone($data['emergency_contact_phone']);
         $spec->setEmergencyContactRelationship($data['emergency_contact_relationship']);
         $spec->setPosition($data['position'] ?? null);
-        $spec->setJerseyNumber(isset($data['jersey_number']) ? (int) $data['jersey_number'] : null);
+        $spec->setJerseyNumber1(isset($data['jersey_number_1']) ? (int) $data['jersey_number_1'] : null);
+        $spec->setJerseyNumber2(isset($data['jersey_number_2']) ? (int) $data['jersey_number_2'] : null);
+        $spec->setJerseyNumber3(isset($data['jersey_number_3']) ? (int) $data['jersey_number_3'] : null);
         $spec->setDominantFoot($data['dominant_foot'] ?? null);
         $spec->setNationality($data['nationality'] ?? null);
         $spec->setBloodType($data['blood_type'] ?? null);
         $spec->setAllergies($data['allergies'] ?? null);
+        $spec->setInsurance($data['insurance'] ?? null);
+        $spec->setMedications($data['medications'] ?? null);
+        $spec->setBasketballExperience(isset($data['basketball_experience']) ? (bool) $data['basketball_experience'] : null);
+        $spec->setPreviousClub($data['previous_club'] ?? null);
+        if (isset($data['category'])) {
+            $this->assertCategory($data['category']);
+            $spec->setCategory($data['category']);
+        }
+        if (isset($data['shirt_size'])) {
+            $this->assertShirtSize($data['shirt_size']);
+            $spec->setShirtSize($data['shirt_size']);
+        }
         $spec->setProfilePhotoUrl($data['profile_photo_url'] ?? null);
         $spec->setStatus($data['status'] ?? 'active');
         $spec->setCreatedAt(new \DateTime());
@@ -113,8 +130,14 @@ class PlayerSpecificationService implements PlayerSpecificationServiceInterface
         if (array_key_exists('position', $data)) {
             $spec->setPosition($data['position']);
         }
-        if (array_key_exists('jersey_number', $data)) {
-            $spec->setJerseyNumber($data['jersey_number'] !== null ? (int) $data['jersey_number'] : null);
+        if (array_key_exists('jersey_number_1', $data)) {
+            $spec->setJerseyNumber1($data['jersey_number_1'] !== null ? (int) $data['jersey_number_1'] : null);
+        }
+        if (array_key_exists('jersey_number_2', $data)) {
+            $spec->setJerseyNumber2($data['jersey_number_2'] !== null ? (int) $data['jersey_number_2'] : null);
+        }
+        if (array_key_exists('jersey_number_3', $data)) {
+            $spec->setJerseyNumber3($data['jersey_number_3'] !== null ? (int) $data['jersey_number_3'] : null);
         }
         if (array_key_exists('dominant_foot', $data)) {
             $spec->setDominantFoot($data['dominant_foot']);
@@ -127,6 +150,30 @@ class PlayerSpecificationService implements PlayerSpecificationServiceInterface
         }
         if (array_key_exists('allergies', $data)) {
             $spec->setAllergies($data['allergies']);
+        }
+        if (array_key_exists('insurance', $data)) {
+            $spec->setInsurance($data['insurance']);
+        }
+        if (array_key_exists('medications', $data)) {
+            $spec->setMedications($data['medications']);
+        }
+        if (array_key_exists('basketball_experience', $data)) {
+            $spec->setBasketballExperience($data['basketball_experience'] !== null ? (bool) $data['basketball_experience'] : null);
+        }
+        if (array_key_exists('previous_club', $data)) {
+            $spec->setPreviousClub($data['previous_club']);
+        }
+        if (array_key_exists('category', $data)) {
+            if ($data['category'] !== null) {
+                $this->assertCategory($data['category']);
+            }
+            $spec->setCategory($data['category']);
+        }
+        if (array_key_exists('shirt_size', $data)) {
+            if ($data['shirt_size'] !== null) {
+                $this->assertShirtSize($data['shirt_size']);
+            }
+            $spec->setShirtSize($data['shirt_size']);
         }
         if (array_key_exists('profile_photo_url', $data)) {
             $spec->setProfilePhotoUrl($data['profile_photo_url']);
@@ -153,5 +200,19 @@ class PlayerSpecificationService implements PlayerSpecificationServiceInterface
         }
 
         $this->repository->softDelete($spec);
+    }
+
+    private function assertCategory(string $category): void
+    {
+        if (!in_array($category, self::CATEGORIES, true)) {
+            throw new AppException('PLAYER_SPEC_INVALID_CATEGORY');
+        }
+    }
+
+    private function assertShirtSize(string $shirtSize): void
+    {
+        if (!in_array($shirtSize, self::SHIRT_SIZES, true)) {
+            throw new AppException('PLAYER_SPEC_INVALID_SHIRT_SIZE');
+        }
     }
 }
