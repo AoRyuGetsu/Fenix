@@ -6,7 +6,7 @@ import { PersonUpdateModalComponent } from '../../components/person-update-modal
 import { AdminCreateModalComponent } from '../../components/admin-create-modal/admin-create-modal.component';
 import { AdminUpdateModalComponent } from '../../components/admin-update-modal/admin-update-modal.component';
 import { PlayerSpecModalComponent } from '../../components/player-spec-modal/player-spec-modal.component';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
+import { MessageService } from '../../../../core/services/message.service';
 import { PeopleType, Parentesco, PersonData, UserData, CreatePersonPayload, UpdatePersonPayload, CreateAdminPayload, UpdateAdminPayload, CreatePlayerSpecPayload } from '../../services/users-http.service';
 
 @Component({
@@ -18,12 +18,12 @@ import { PeopleType, Parentesco, PersonData, UserData, CreatePersonPayload, Upda
     AdminCreateModalComponent,
     AdminUpdateModalComponent,
     PlayerSpecModalComponent,
-    MessagePipe,
   ],
   templateUrl: './users-page.component.html',
 })
 export class UsersPageComponent implements OnInit {
   protected facade = inject(UsersFacade);
+  private msg = inject(MessageService);
 
   ngOnInit(): void {
     this.facade.loadTabs();
@@ -34,9 +34,9 @@ export class UsersPageComponent implements OnInit {
 
   protected tabLabel = computed(() => {
     const s = this.vm();
-    if (s.activeTab === 'admin') return 'Administradores';
+    if (s.activeTab === 'admin') return this.msg.get('cr_lbl_administrators');
     const tab = s.tabs.find(t => t.code === s.activeTab);
-    return tab?.label ?? 'Usuarios';
+    return tab?.label ?? this.msg.get('usr_lbl_users');
   });
 
   currentItems = computed<(PersonData | UserData)[]>(() => {
@@ -75,6 +75,7 @@ export class UsersPageComponent implements OnInit {
   selectedSpecData = computed(() => this.vm().specData);
   specLoading = computed(() => this.vm().specLoading);
   playerSpecs = computed(() => this.vm().playerSpecs);
+  playerReps = computed(() => this.vm().playerReps);
 
   peopleTypes = computed<PeopleType[]>(() =>
     this.vm().tabs

@@ -1,3 +1,4 @@
+@let vm = facade.vm;
 @if (vm().success) {
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     {{ vm().success }}
@@ -12,19 +13,21 @@
   </div>
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <div>
-    <h4 class="text-gray-800 fw-bold mb-1">{{ 'per_hdr_title' | message }}</h4>
-    <p class="text-gray-800 mb-0" style="font-size: 0.9rem;">{{ 'per_lbl_subtitle' | message }}</p>
+<div class="row align-items-center mb-3">
+  <div class="col">
+    <h4 class="text-gray-800 fw-bold mb-1">{{ vm().t('per_hdr_title') }}</h4>
+    <p class="text-gray-800 mb-0" style="font-size: 0.9rem;">{{ vm().t('per_lbl_subtitle') }}</p>
   </div>
-  <button class="btn btn-primary" (click)="onNew()">
-    <i class="bi bi-plus-lg me-1"></i>{{ 'per_btn_new_period' | message }}
-  </button>
+  <div class="col-auto">
+    <button class="btn btn-primary" (click)="onNew()">
+      <i class="bi bi-plus-lg me-1"></i>{{ vm().t('per_btn_new_period') }}
+    </button>
+  </div>
 </div>
 
 <div class="card shadow mb-4">
   <div class="card-header py-3">
-    <h6 class="m-0 fw-bold text-gray-800">{{ 'per_hdr_list' | message }}</h6>
+    <h6 class="m-0 fw-bold text-gray-800">{{ vm().t('per_hdr_list') }}</h6>
   </div>
   <div class="card-body">
     <div class="row mb-3">
@@ -33,7 +36,7 @@
           #filterInput
           type="text"
           class="form-control"
-          [placeholder]="'per_plh_search_name' | message"
+          [placeholder]="vm().t('per_plh_search_name')"
           [value]="vm().filterName"
           (input)="onFilter(filterInput.value)"
         />

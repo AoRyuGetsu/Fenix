@@ -1,10 +1,10 @@
 <app-gtable
-  [columns]="cols()"
-  [data]="items()"
-  [pagination]="pagination()"
-  [loading]="loading()"
-  [actions]="actions"
-  [detail]="detailConfig()"
+  [columns]="vm().cols"
+  [data]="vm().items"
+  [pagination]="vm().pagination"
+  [loading]="vm().loading"
+  [actions]="vm().actions"
+  [detail]="vm().detailConfig"
   (pageChange)="pageChange.emit($event)"
   (expandedChange)="expandedChange.emit($event)"
   (actionClick)="onAction($event)">

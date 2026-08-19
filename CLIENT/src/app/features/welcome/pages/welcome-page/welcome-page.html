@@ -1,40 +1,59 @@
-@let vm = facade.vm();
-@let roles = auth.vm().roles;
-@let stats = vm.stats;
 
 <div class="container-fluid py-3">
-  <h4 class="text-gray-800 fw-bold mb-1">{{ 'cr_hdr_welcome' | message }}</h4>
-  <p class="text-gray-600 mb-4" style="font-size: 0.9rem;">{{ 'cr_lbl_welcome_msg' | message }}</p>
+  <h4 class="text-gray-800 fw-bold mb-1">{{ vm().t('cr_hdr_welcome') }}</h4>
+  <p class="text-gray-600 mb-4" style="font-size: 0.9rem;">{{ vm().t('cr_lbl_welcome_msg') }}</p>
 
-  @if (vm.loading) {
+  @if (vm().loading) {
     <div class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
+        <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
       </div>
     </div>
-  } @else if (vm.error) {
-    <div class="alert alert-danger">{{ vm.error }}</div>
-  } @else if (stats) {
+  } @else if (vm().error) {
+    <div class="alert alert-danger">{{ vm().error }}</div>
+  } @else if (vm().stats) {
+    <!-- Mi Ficha (Jugador) -->
+    @if (vm().roles.includes('JUG')) {
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 fw-bold text-gray-800">{{ vm().t('pd_hdr_my_ficha') }}</h6>
+        </div>
+        <div class="card-body">
+          @if (vm().playerDetailLoading) {
+            <div class="text-center py-3">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
+              </div>
+            </div>
+          } @else if (vm().playerDetail; as detail) {
+            <app-player-detail-cards [model]="detail" />
+          }
+        </div>
+      </div>
+    }
+
     <div class="row g-4">
       <!-- Cuestionarios disponibles -->
-      <div class="col-xl-3 col-md-6">
-        <div class="card border-left-primary h-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div class="me-3">
-                <i class="bi bi-clipboard-check fs-1 text-primary"></i>
-              </div>
-              <div>
-                <div class="fs-3 fw-bold text-gray-800">{{ stats.questionnaires_total }}</div>
-                <div class="text-muted small">{{ 'cr_lbl_questionnaires' | message }}</div>
+      @if (showEvaluationStats()) {
+        <div class="col-xl-3 col-md-6">
+          <div class="card border-left-primary h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="bi bi-clipboard-check fs-1 text-primary"></i>
+                </div>
+                <div>
+                  <div class="fs-3 fw-bold text-gray-800">{{ vm().stats!.questionnaires_total }}</div>
+                  <div class="text-muted small">{{ vm().t('cr_lbl_questionnaires') }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- N° Administradores -->
-      @if (roles.includes('ADM')) {
+      @if (vm().roles.includes('ADM')) {
         <div class="col-xl-3 col-md-6">
           <div class="card border-left-primary h-100">
             <div class="card-body">
@@ -43,8 +62,8 @@
                   <i class="bi bi-shield-lock fs-1 text-primary"></i>
                 </div>
                 <div>
-                  <div class="fs-3 fw-bold text-gray-800">{{ stats.users_by_role['ADM'] ?? 0 }}</div>
-                  <div class="text-muted small">{{ 'cr_lbl_administrators' | message }}</div>
+                  <div class="fs-3 fw-bold text-gray-800">{{ vm().stats!.users_by_role['ADM'] ?? 0 }}</div>
+                  <div class="text-muted small">{{ vm().t('cr_lbl_administrators') }}</div>
                 </div>
               </div>
             </div>
@@ -53,7 +72,7 @@
       }
 
       <!-- N° Supervisores -->
-      @if (roles.includes('ADM') || roles.includes('SUP')) {
+      @if (vm().roles.includes('ADM') || vm().roles.includes('SUP')) {
         <div class="col-xl-3 col-md-6">
           <div class="card border-left-primary h-100">
             <div class="card-body">
@@ -62,8 +81,8 @@
                   <i class="bi bi-eye fs-1 text-primary"></i>
                 </div>
                 <div>
-                  <div class="fs-3 fw-bold text-gray-800">{{ stats.users_by_role['SUP'] ?? 0 }}</div>
-                  <div class="text-muted small">{{ 'cr_lbl_supervisors' | message }}</div>
+                  <div class="fs-3 fw-bold text-gray-800">{{ vm().stats!.users_by_role['SUP'] ?? 0 }}</div>
+                  <div class="text-muted small">{{ vm().t('cr_lbl_supervisors') }}</div>
                 </div>
               </div>
             </div>
@@ -72,41 +91,45 @@
       }
 
       <!-- N° Entrenadores -->
-      <div class="col-xl-3 col-md-6">
-        <div class="card border-left-primary h-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div class="me-3">
-                <i class="bi bi-person-badge fs-1 text-primary"></i>
-              </div>
-              <div>
-                <div class="fs-3 fw-bold text-gray-800">{{ stats.users_by_role['ENT'] ?? 0 }}</div>
-                <div class="text-muted small">{{ 'cr_lbl_trainers' | message }}</div>
+      @if (showPlayerCounts()) {
+        <div class="col-xl-3 col-md-6">
+          <div class="card border-left-primary h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="bi bi-person-badge fs-1 text-primary"></i>
+                </div>
+                <div>
+                  <div class="fs-3 fw-bold text-gray-800">{{ vm().stats!.users_by_role['ENT'] ?? 0 }}</div>
+                  <div class="text-muted small">{{ vm().t('cr_lbl_trainers') }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- N° Jugadores -->
-      <div class="col-xl-3 col-md-6">
-        <div class="card border-left-primary h-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div class="me-3">
-                <i class="bi bi-people fs-1 text-primary"></i>
-              </div>
-              <div>
-                <div class="fs-3 fw-bold text-gray-800">{{ stats.users_by_role['JUG'] ?? 0 }}</div>
-                <div class="text-muted small">{{ 'cr_lbl_players' | message }}</div>
+      @if (showPlayerCounts()) {
+        <div class="col-xl-3 col-md-6">
+          <div class="card border-left-primary h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="bi bi-people fs-1 text-primary"></i>
+                </div>
+                <div>
+                  <div class="fs-3 fw-bold text-gray-800">{{ vm().stats!.users_by_role['JUG'] ?? 0 }}</div>
+                  <div class="text-muted small">{{ vm().t('cr_lbl_players') }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- N° Representantes -->
-      @if (roles.includes('ADM') || roles.includes('SUP') || roles.includes('ENT')) {
+      @if (vm().roles.includes('ADM') || vm().roles.includes('SUP') || vm().roles.includes('ENT')) {
         <div class="col-xl-3 col-md-6">
           <div class="card border-left-primary h-100">
             <div class="card-body">
@@ -115,8 +138,8 @@
                   <i class="bi bi-person-check fs-1 text-primary"></i>
                 </div>
                 <div>
-                  <div class="fs-3 fw-bold text-gray-800">{{ stats.users_by_role['REP'] ?? 0 }}</div>
-                  <div class="text-muted small">{{ 'cr_lbl_representatives' | message }}</div>
+                  <div class="fs-3 fw-bold text-gray-800">{{ vm().stats!.users_by_role['REP'] ?? 0 }}</div>
+                  <div class="text-muted small">{{ vm().t('cr_lbl_representatives') }}</div>
                 </div>
               </div>
             </div>
@@ -125,40 +148,42 @@
       }
 
       <!-- Mis evaluaciones realizadas -->
-      <div class="col-xl-3 col-md-6">
-        <div class="card border-left-primary h-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div class="me-3">
-                <i class="bi bi-bar-chart-line fs-1 text-primary"></i>
-              </div>
-              <div>
-                <div class="fs-3 fw-bold text-gray-800">{{ stats.my_evaluations_total }}</div>
-                <div class="text-muted small">{{ 'cr_lbl_my_evaluations' | message }}</div>
+      @if (showEvaluationStats()) {
+        <div class="col-xl-3 col-md-6">
+          <div class="card border-left-primary h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <i class="bi bi-bar-chart-line fs-1 text-primary"></i>
+                </div>
+                <div>
+                  <div class="fs-3 fw-bold text-gray-800">{{ vm().stats!.my_evaluations_total }}</div>
+                  <div class="text-muted small">{{ vm().t('cr_lbl_my_evaluations') }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      }
     </div>
 
     <!-- Evaluaciones por periodo -->
-    @if ((roles.includes('ADM') || roles.includes('SUP') || roles.includes('ENT')) && stats.evaluations_by_period.length > 0) {
+    @if ((vm().roles.includes('ADM') || vm().roles.includes('SUP') || vm().roles.includes('ENT')) && vm().stats!.evaluations_by_period.length > 0) {
       <div class="row mt-4">
         <div class="col-12">
           <div class="card shadow mb-4">
-            <div class="card-header py-3 fw-semibold">{{ 'cr_lbl_evaluations_by_period' | message }}</div>
+            <div class="card-header py-3 fw-semibold">{{ vm().t('cr_lbl_evaluations_by_period') }}</div>
             <div class="card-body p-0">
               <div class="table-responsive">
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
                     <tr>
-                      <th class="ps-3">{{ 'cr_lbl_period' | message }}</th>
-                      <th class="text-center">{{ 'cr_lbl_total' | message }}</th>
+                      <th class="ps-3">{{ vm().t('cr_lbl_period') }}</th>
+                      <th class="text-center">{{ vm().t('cr_lbl_total') }}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @for (ep of stats.evaluations_by_period; track ep.period_id) {
+                    @for (ep of vm().stats!.evaluations_by_period; track ep.period_id) {
                       <tr>
                         <td class="ps-3">{{ ep.period_name }}</td>
                         <td class="text-center fw-bold">{{ ep.total }}</td>

@@ -1,0 +1,277 @@
+@if (!vm().hasSpec) {
+  <div class="alert alert-info py-2 mb-3">{{ vm().t('pd_lbl_no_spec') }}</div>
+}
+
+<div class="row g-3">
+  <!-- Tarjeta 1: Datos personales -->
+  <div class="col-xl-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header py-2 bg-transparent d-flex align-items-center">
+        <i class="bi bi-person me-2 text-primary"></i>
+        <h6 class="m-0 fw-bold">{{ vm().t('pd_hdr_personal') }}</h6>
+      </div>
+      <div class="card-body py-3">
+        <div class="d-flex justify-content-between border-bottom py-1">
+          <small class="text-muted">{{ vm().t('rep_lbl_full_name') }}</small>
+          <span class="fw-semibold text-end">{{ vm().fullName }}</span>
+        </div>
+        @if (vm().model.person?.document_number) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_document_number') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.person!.document_number }}</span>
+          </div>
+        }
+        @if (vm().model.email) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_email') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.email }}</span>
+          </div>
+        }
+        @if (vm().model.person?.phone) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_phone') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.person!.phone }}</span>
+          </div>
+        }
+        @if (vm().model.person?.address) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_address') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.person!.address }}</span>
+          </div>
+        }
+        @if (vm().model.spec?.birth_date) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('play_spec_lbl_birth_date') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.spec!.birth_date }}</span>
+          </div>
+        }
+        @if (vm().genderLabel) {
+          <div class="d-flex justify-content-between py-1">
+            <small class="text-muted">{{ vm().t('play_spec_lbl_gender') }}</small>
+            <span class="fw-semibold text-end">{{ vm().genderLabel }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta 2: Perfil deportivo -->
+  @if (vm().hasSpec) {
+    <div class="col-xl-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header py-2 bg-transparent d-flex align-items-center">
+          <i class="bi bi-trophy me-2 text-primary"></i>
+          <h6 class="m-0 fw-bold">{{ vm().t('pd_hdr_sports') }}</h6>
+        </div>
+        <div class="card-body py-3">
+          @if (vm().model.spec!.position) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_position') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.position }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.category) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_category') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.category }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.shirt_size) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_shirt_size') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.shirt_size }}</span>
+            </div>
+          }
+          @if (vm().jerseyNumbers) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('pd_lbl_jersey_numbers') }}</small>
+              <span class="fw-semibold text-end">{{ vm().jerseyNumbers }}</span>
+            </div>
+          }
+          @if (vm().footLabel) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_dominant_foot') }}</small>
+              <span class="fw-semibold text-end">{{ vm().footLabel }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.entry_date) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_entry_date') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.entry_date }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.previous_club) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_previous_club') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.previous_club }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.basketball_experience !== null && vm().model.spec!.basketball_experience !== undefined) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_basketball_experience') }}</small>
+              <span class="fw-semibold text-end">{{ vm().basketballLabel }}</span>
+            </div>
+          }
+          @if (vm().model.team) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('pd_lbl_team') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.team }}</span>
+            </div>
+          }
+          @if (vm().statusInfo) {
+            <div class="d-flex justify-content-between py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_player_status') }}</small>
+              <span>
+                <span class="badge {{ vm().statusInfo!.className }}">{{ vm().statusInfo!.label }}</span>
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Tarjeta 3: Datos físicos -->
+  @if (vm().hasSpec) {
+    <div class="col-xl-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header py-2 bg-transparent d-flex align-items-center">
+          <i class="bi bi-rulers me-2 text-primary"></i>
+          <h6 class="m-0 fw-bold">{{ vm().t('play_spec_lbl_physical_data') }}</h6>
+        </div>
+        <div class="card-body py-3">
+          @if (vm().model.spec!.height_cm) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_height_cm') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.height_cm }} cm</span>
+            </div>
+          }
+          @if (vm().model.spec!.weight_kg) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_weight_kg') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.weight_kg }} kg</span>
+            </div>
+          }
+          @if (vm().model.spec!.nationality) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_nationality') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.nationality }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.blood_type) {
+            <div class="d-flex justify-content-between py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_blood_type') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.blood_type }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Tarjeta 4: Contacto de emergencia -->
+  @if (vm().hasSpec) {
+    <div class="col-xl-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header py-2 bg-transparent d-flex align-items-center">
+          <i class="bi bi-telephone me-2 text-primary"></i>
+          <h6 class="m-0 fw-bold">{{ vm().t('play_spec_lbl_emergency_contact') }}</h6>
+        </div>
+        <div class="card-body py-3">
+          @if (vm().model.spec!.emergency_contact_name) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_contact_name') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.emergency_contact_name }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.emergency_contact_phone) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_contact_phone') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.emergency_contact_phone }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.emergency_contact_relationship) {
+            <div class="d-flex justify-content-between py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_relationship') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.emergency_contact_relationship }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Tarjeta 5: Información médica -->
+  @if (vm().hasSpec) {
+    <div class="col-xl-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header py-2 bg-transparent d-flex align-items-center">
+          <i class="bi bi-heart-pulse me-2 text-primary"></i>
+          <h6 class="m-0 fw-bold">{{ vm().t('play_spec_lbl_medical_info') }}</h6>
+        </div>
+        <div class="card-body py-3">
+          @if (vm().model.spec!.medical_conditions) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_medical_conditions') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.medical_conditions }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.allergies) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_allergies') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.allergies }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.insurance) {
+            <div class="d-flex justify-content-between border-bottom py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_insurance') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.insurance }}</span>
+            </div>
+          }
+          @if (vm().model.spec!.medications) {
+            <div class="d-flex justify-content-between py-1">
+              <small class="text-muted">{{ vm().t('play_spec_lbl_medications') }}</small>
+              <span class="fw-semibold text-end">{{ vm().model.spec!.medications }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Tarjeta 6: Representante / Responsable -->
+  @if (vm().showRepresentative) {
+    <div class="col-xl-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header py-2 bg-transparent d-flex align-items-center">
+          <i class="bi bi-person-check me-2 text-primary"></i>
+          <h6 class="m-0 fw-bold">{{ vm().t('pd_hdr_representative') }}</h6>
+        </div>
+        <div class="card-body py-3">
+          @if (vm().model.representative) {
+            @if (vm().model.representative!.display_name) {
+              <div class="d-flex justify-content-between border-bottom py-1">
+                <small class="text-muted">{{ vm().t('rep_lbl_full_name') }}</small>
+                <span class="fw-semibold text-end">{{ vm().model.representative!.display_name }}</span>
+              </div>
+            }
+            @if (vm().model.representative!.email) {
+              <div class="d-flex justify-content-between border-bottom py-1">
+                <small class="text-muted">{{ vm().t('usr_lbl_email') }}</small>
+                <span class="fw-semibold text-end">{{ vm().model.representative!.email }}</span>
+              </div>
+            }
+            @if (vm().model.parentesco) {
+              <div class="d-flex justify-content-between py-1">
+                <small class="text-muted">{{ vm().t('rep_lbl_parentesco') }}</small>
+                <span class="fw-semibold text-end">{{ vm().model.parentesco }}</span>
+              </div>
+            }
+          } @else {
+            <p class="text-muted mb-0">{{ vm().t('pd_lbl_no_representative') }}</p>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

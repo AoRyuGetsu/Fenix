@@ -113,6 +113,14 @@ echo "✓ Menú 'Evaluaciones' creado/verificado (ID: {$evaluacionesId}).\n";
 $analisisId = ensureMenu($menuIds, $conn, 'Análisis', null, 'bar-chart-line', '/analisis', 3, $adminUserId, $now);
 echo "✓ Menú 'Análisis' creado/verificado (ID: {$analisisId}).\n";
 
+// ── Top-level: Mis Representados (order 4, solo representante) ──
+$representadosId = ensureMenu($menuIds, $conn, 'Mis Representados', null, 'people', '/representados', 4, $adminUserId, $now);
+echo "✓ Menú 'Mis Representados' creado/verificado (ID: {$representadosId}).\n";
+
+// ── Top-level: Mis Datos (order 1, solo jugador → dashboard /welcome) ──
+$misDatosId = ensureMenu($menuIds, $conn, 'Mis Datos', null, 'person-badge', '/welcome', 1, $adminUserId, $now);
+echo "✓ Menú 'Mis Datos' creado/verificado (ID: {$misDatosId}).\n";
+
 // ── Top-level: Configuración (order 1, solo admin) ──
 $configId = ensureMenu($menuIds, $conn, 'Configuración', null, 'settings', '/configuracion', 1, $adminUserId, $now);
 echo "✓ Menú 'Configuración' creado/verificado (ID: {$configId}).\n";
@@ -135,24 +143,60 @@ echo "✓ Menú 'Equipos' creado/verificado (ID: {$equiposId}).\n";
 
 // ── Asignaciones por rol ──
 
-// Análisis: administrador, entrenador y supervisor
+// Análisis: administrador, entrenador, supervisor, jugador y representante
 foreach ($roleIds as $rid) {
     $code = '';
     foreach ($roles as $r) {
         if ((int) $r['id'] === $rid) { $code = $r['code']; break; }
     }
-    if (in_array($code, ['ADM', 'ENT', 'SUP'], true)) {
+    if (in_array($code, ['ADM', 'ENT', 'SUP', 'JUG', 'REP'], true)) {
         if (assignMenu($conn, $analisisId, $rid, $code)) {
             echo "✓ Análisis asignado a '{$code}'.\n";
         }
     }
 }
 
-// Evaluaciones: todos los roles excepto administrador
+// Evaluaciones: solo entrenador (limpieza de roles heredados)
 foreach ($roleIds as $rid) {
-    if ($rid === $adminRoleId) continue;
-    if (assignMenu($conn, $evaluacionesId, $rid, "role-{$rid}")) {
-        echo "✓ Evaluaciones asignado a rol ID {$rid}.\n";
+    $code = '';
+    foreach ($roles as $r) {
+        if ((int) $r['id'] === $rid) { $code = $r['code']; break; }
+    }
+    if ($code === 'ENT') {
+        if (assignMenu($conn, $evaluacionesId, $rid, $code)) {
+            echo "✓ Evaluaciones asignado a '{$code}'.\n";
+        }
+    } else {
+        $conn->executeStatement(
+            "DELETE FROM menu_role WHERE menu_id = ? AND role_id = ?",
+            [$evaluacionesId, $rid]
+        );
+    }
+}
+
+// Mis Representados: solo representante
+foreach ($roleIds as $rid) {
+    $code = '';
+    foreach ($roles as $r) {
+        if ((int) $r['id'] === $rid) { $code = $r['code']; break; }
+    }
+    if ($code === 'REP') {
+        if (assignMenu($conn, $representadosId, $rid, $code)) {
+            echo "✓ Mis Representados asignado a 'REP'.\n";
+        }
+    }
+}
+
+// Mis Datos: solo jugador
+foreach ($roleIds as $rid) {
+    $code = '';
+    foreach ($roles as $r) {
+        if ((int) $r['id'] === $rid) { $code = $r['code']; break; }
+    }
+    if ($code === 'JUG') {
+        if (assignMenu($conn, $misDatosId, $rid, $code)) {
+            echo "✓ Mis Datos asignado a 'JUG'.\n";
+        }
     }
 }
 

@@ -66,4 +66,8 @@ return [
     'EVALUATION_STATS_INSUFFICIENT_PERIODS' => 'Se requieren al menos 2 periodos con evaluaciones',
     'EVALUATION_STATS_TARGET_REQUIRED'      => 'target_user_id es requerido',
     'EVALUATION_STATS_NO_DATA'             => 'No hay datos de evaluación para los filtros especificados',
+    'TEAM_DELETED'                         => 'Team deleted',
+    'PERMISSIONS_ASSIGNED'                 => 'Permissions assigned',
+    'ROLE_ASSIGNED'                        => 'Role assigned',
+    'OK'                                   => 'ok',
 ];

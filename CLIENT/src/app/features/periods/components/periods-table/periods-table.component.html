@@ -1,16 +1,16 @@
-@if (loading()) {
+@if (vm().loading) {
   <div class="text-center py-3">
     <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
+      <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
     </div>
   </div>
 } @else {
   <app-gtable
-    [columns]="cols()"
-    [data]="items()"
-    [pagination]="pagination()"
-    [loading]="loading()"
-    [actions]="actions"
+    [columns]="vm().cols"
+    [data]="vm().items"
+    [pagination]="vm().pagination"
+    [loading]="vm().loading"
+    [actions]="vm().actions"
     (pageChange)="pageChange.emit($event)"
     (actionClick)="onAction($event)"
   />

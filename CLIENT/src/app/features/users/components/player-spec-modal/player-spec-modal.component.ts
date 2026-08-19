@@ -1,13 +1,15 @@
-import { Component, input, output, signal, computed, OnInit, effect } from '@angular/core';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
+import { Component, computed, inject, input, output, signal, OnInit } from '@angular/core';
+import { MessageService, MessageResolver } from '../../../../core/services/message.service';
 import { PlayerSpecData, CreatePlayerSpecPayload } from '../../services/users-http.service';
 
 @Component({
   selector: 'app-player-spec-modal',
-  imports: [MessagePipe],
   templateUrl: './player-spec-modal.component.html',
 })
 export class PlayerSpecModalComponent implements OnInit {
+  private msg = inject(MessageService);
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
   userId = input.required<number>();
   existingData = input<PlayerSpecData | null>(null);
   loading = input(false);
@@ -42,6 +44,37 @@ export class PlayerSpecModalComponent implements OnInit {
   status = signal('active');
 
   isUpdate = computed(() => this.existingData() !== null);
+
+  vm = computed(() => ({
+    loading: this.loading(),
+    isUpdate: this.isUpdate(),
+    birthDate: this.birthDate(),
+    heightCm: this.heightCm(),
+    weightKg: this.weightKg(),
+    gender: this.gender(),
+    entryDate: this.entryDate(),
+    medicalConditions: this.medicalConditions(),
+    emergencyContactName: this.emergencyContactName(),
+    emergencyContactPhone: this.emergencyContactPhone(),
+    emergencyContactRelationship: this.emergencyContactRelationship(),
+    position: this.position(),
+    jerseyNumber1: this.jerseyNumber1(),
+    jerseyNumber2: this.jerseyNumber2(),
+    jerseyNumber3: this.jerseyNumber3(),
+    dominantFoot: this.dominantFoot(),
+    nationality: this.nationality(),
+    bloodType: this.bloodType(),
+    allergies: this.allergies(),
+    insurance: this.insurance(),
+    medications: this.medications(),
+    basketballExperience: this.basketballExperience(),
+    previousClub: this.previousClub(),
+    category: this.category(),
+    shirtSize: this.shirtSize(),
+    profilePhotoUrl: this.profilePhotoUrl(),
+    status: this.status(),
+    t: this.t,
+  }));
 
   ngOnInit(): void {
     const data = this.existingData();

@@ -1,0 +1,77 @@
+<div class="row g-3">
+  <!-- Tarjeta 1: Datos personales -->
+  <div class="col-xl-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header py-2 bg-transparent d-flex align-items-center">
+        <i class="bi bi-person me-2 text-primary"></i>
+        <h6 class="m-0 fw-bold">{{ vm().t('pd_hdr_personal') }}</h6>
+      </div>
+      <div class="card-body py-3">
+        <div class="d-flex justify-content-between border-bottom py-1">
+          <small class="text-muted">{{ vm().t('usr_lbl_full_name') }}</small>
+          <span class="fw-semibold text-end">{{ vm().model.display_name }}</span>
+        </div>
+        @if (vm().model.document_number) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_document_number') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.document_number }}</span>
+          </div>
+        }
+        @if (vm().model.email) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_email') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.email }}</span>
+          </div>
+        }
+        @if (vm().model.phone) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_phone') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.phone }}</span>
+          </div>
+        }
+        @if (vm().model.address) {
+          <div class="d-flex justify-content-between py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_address') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.address }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Tarjeta 2: Datos del registro -->
+  <div class="col-xl-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header py-2 bg-transparent d-flex align-items-center">
+        <i class="bi bi-clipboard-data me-2 text-primary"></i>
+        <h6 class="m-0 fw-bold">{{ vm().t('pd_hdr_registration') }}</h6>
+      </div>
+      <div class="card-body py-3">
+        @if (vm().model.type) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_type') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.type }}</span>
+          </div>
+        }
+        @if (vm().model.associated_user) {
+          <div class="d-flex justify-content-between border-bottom py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_associated_user') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.associated_user }}</span>
+          </div>
+        }
+        @if (vm().model.created_at) {
+          <div class="d-flex justify-content-between py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_created') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.created_at }}</span>
+          </div>
+        }
+        @if (vm().model.updated_at) {
+          <div class="d-flex justify-content-between py-1">
+            <small class="text-muted">{{ vm().t('usr_lbl_updated') }}</small>
+            <span class="fw-semibold text-end">{{ vm().model.updated_at }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

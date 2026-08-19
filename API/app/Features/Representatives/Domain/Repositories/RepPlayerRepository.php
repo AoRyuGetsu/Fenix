@@ -35,19 +35,33 @@ class RepPlayerRepository implements RepPlayerRepositoryInterface
         $qb = $this->entityManager
             ->getRepository(RepPlayer::class)
             ->createQueryBuilder('rp')
-            ->select('rp', 'rep', 'player', 'parentesco')
+            ->select('rp', 'rep', 'player', 'parentesco', 'personUser', 'person')
             ->leftJoin('rp.rep', 'rep')
             ->leftJoin('rp.player', 'player')
             ->leftJoin('rp.parentesco', 'parentesco')
+            ->leftJoin('player.personUser', 'personUser')
+            ->leftJoin('personUser.person', 'person')
             ->where('IDENTITY(rp.rep) = :repUserId')
             ->setParameter('repUserId', $query->repUserId);
 
-        $total = (int) (clone $qb)->select('COUNT(rp.id)')
+        if ($query->search !== null && $query->search !== '') {
+            $qb
+                ->andWhere(
+                    'LOWER(player.email) LIKE :search '
+                    . 'OR LOWER(COALESCE(person.firstName, \'\')) LIKE :search '
+                    . 'OR LOWER(COALESCE(person.firstSurname, \'\')) LIKE :search '
+                    . 'OR LOWER(COALESCE(person.documentNumber, \'\')) LIKE :search'
+                )
+                ->setParameter('search', '%' . mb_strtolower($query->search) . '%');
+        }
+
+        $total = (int) (clone $qb)->select('COUNT(rp.player)')
             ->getQuery()
             ->getSingleScalarResult();
 
         $items = $qb->setFirstResult(($query->page - 1) * $query->perPage)
             ->setMaxResults($query->perPage)
+            ->orderBy('player.email', 'ASC')
             ->getQuery()
             ->getResult();
 

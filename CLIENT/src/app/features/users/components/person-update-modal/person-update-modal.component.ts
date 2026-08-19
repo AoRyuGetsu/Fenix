@@ -1,15 +1,18 @@
-import { Component, input, output, signal, effect, computed } from '@angular/core';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { MessageService, MessageResolver } from '../../../../core/services/message.service';
 import { PeopleType, Parentesco, PersonData, UpdatePersonPayload } from '../../services/users-http.service';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
 import { TeamItem } from '../../../teams/services/teams-http.service';
 
 @Component({
   selector: 'app-person-update-modal',
-  imports: [AutocompleteComponent, MessagePipe],
+  imports: [AutocompleteComponent],
   templateUrl: './person-update-modal.component.html',
 })
 export class PersonUpdateModalComponent {
+  private msg = inject(MessageService);
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
   peopleTypes = input<PeopleType[]>([]);
   item = input<PersonData | null>(null);
   loading = input(false);
@@ -37,7 +40,38 @@ export class PersonUpdateModalComponent {
   representativeId = signal<number | null>(null);
   parentescoId = signal<number | null>(null);
 
-  isJug = computed(() => this.type() === 'JUG');
+  private isJug = computed(() => this.type() === 'JUG');
+
+  private documentValid = computed(() => /^\d{10}$/.test(this.documentNumber()));
+  private documentInvalid = computed(() => this.documentNumber() !== '' && !this.documentValid());
+
+  vm = computed(() => ({
+    peopleTypes: this.peopleTypes(),
+    loading: this.loading(),
+    teams: this.teams(),
+    representatives: this.representatives(),
+    parentescos: this.parentescos(),
+    loadingTeams: this.loadingTeams(),
+    loadingReps: this.loadingReps(),
+    type: this.type(),
+    firstName: this.firstName(),
+    middleName: this.middleName(),
+    firstSurname: this.firstSurname(),
+    secondSurname: this.secondSurname(),
+    documentNumber: this.documentNumber(),
+    email: this.email(),
+    phone: this.phone(),
+    address: this.address(),
+    changePassword: this.changePassword(),
+    password: this.password(),
+    teamId: this.teamId(),
+    representativeId: this.representativeId(),
+    parentescoId: this.parentescoId(),
+    isJug: this.isJug(),
+    documentValid: this.documentValid(),
+    documentInvalid: this.documentInvalid(),
+    t: this.t,
+  }));
 
   constructor() {
     effect(() => {
@@ -65,6 +99,10 @@ export class PersonUpdateModalComponent {
     });
   }
 
+  onDocumentInput(event: Event): void {
+    this.documentNumber.set((event.target as HTMLInputElement).value.replace(/\D/g, ''));
+  }
+
   onTeamSelect(item: any): void {
     this.teamId.set(item?.id ?? null);
   }
@@ -81,17 +119,10 @@ export class PersonUpdateModalComponent {
     this.parentescoId.set(value ? Number(value) : null);
   }
 
-  getInitialTeam(): any {
-    const i = this.item();
-    return i && 'team' in i ? (i as any).team : null;
-  }
-
-  getInitialRepresentative(): any {
-    const i = this.item();
-    return i && 'representative' in i ? (i as any).representative : null;
-  }
-
   onSubmit(): void {
+    if (!this.documentValid()) {
+      return;
+    }
     const payload: UpdatePersonPayload = {
       person: {
         type: this.type(),

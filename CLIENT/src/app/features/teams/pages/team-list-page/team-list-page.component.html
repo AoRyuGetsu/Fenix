@@ -1,23 +1,27 @@
-@let state = vm();
+@let vm = facade.vm;
 
 <div class="container-fluid py-3">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h4 class="mb-0">{{ 'team_hdr_title' | message }}</h4>
-    <button class="btn btn-primary" (click)="onNew()">
-      <i class="bi bi-plus-lg"></i> {{ 'team_btn_new' | message }}
-    </button>
+  <div class="row align-items-center mb-3">
+    <div class="col">
+      <h4 class="mb-0">{{ vm().t('team_hdr_title') }}</h4>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" (click)="onNew()">
+        <i class="bi bi-plus-lg"></i> {{ vm().t('team_btn_new') }}
+      </button>
+    </div>
   </div>
 
-  @if (state.success) {
+  @if (vm().success) {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ state.success }}
+      {{ vm().success }}
       <button type="button" class="btn-close" (click)="facade.clearMessages()"></button>
     </div>
   }
 
-  @if (state.error) {
+  @if (vm().error) {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      {{ state.error }}
+      {{ vm().error }}
       <button type="button" class="btn-close" (click)="facade.clearMessages()"></button>
     </div>
   }
@@ -28,16 +32,16 @@
         #filterInput
         type="text"
         class="form-control"
-        [placeholder]="'team_plh_search' | message"
-        [value]="state.searchTerm"
+        [placeholder]="vm().t('team_plh_search')"
+        [value]="vm().searchTerm"
         (input)="onFilter(filterInput.value)"
       />
     </div>
   </div>
 
   <app-team-table
-    [items]="state.items"
-    [loading]="state.loading"
+    [items]="vm().items"
+    [loading]="vm().loading"
     [pagination]="pagination()"
     (pageChange)="onPageChange($event)"
     (edit)="onEdit($event)"
@@ -45,14 +49,14 @@
   />
 </div>
 
-@if (state.showFormModal) {
+@if (vm().showFormModal) {
   <app-team-form-modal
-    [item]="state.editingItem"
-    [saving]="state.saving"
-    [trainers]="state.trainers"
-    [players]="state.players"
-    [loadingTrainers]="state.loadingTrainers"
-    [loadingPlayers]="state.loadingPlayers"
+    [item]="vm().editingItem"
+    [saving]="vm().saving"
+    [trainers]="vm().trainers"
+    [players]="vm().players"
+    [loadingTrainers]="vm().loadingTrainers"
+    [loadingPlayers]="vm().loadingPlayers"
     (save)="facade.saveTeam($event)"
     (close)="facade.closeForm()"
   />

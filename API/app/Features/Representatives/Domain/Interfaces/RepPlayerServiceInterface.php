@@ -11,6 +11,7 @@ use App\Features\User\Domain\Entities\User;
 interface RepPlayerServiceInterface
 {
     public function findPaginatedPlayers(RepPlayerQuery $query): array;
+    public function findPaginatedAssignments(RepPlayerQuery $query): array;
     public function getPlayerIds(int $repUserId): array;
     public function getRepresentative(int $playerUserId): ?User;
     public function getAssignment(int $playerUserId): ?RepPlayer;

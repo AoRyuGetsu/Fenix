@@ -8,9 +8,9 @@ flowchart LR
 
     subgraph AngularApp ["Aplicación Angular 22+ (Standalone Components)"]
         direction TB
-        Core["🟦 Core\nAuth · Menu · Config\nInterceptors · Guards · Layout"]
-        Shared["🟩 Shared\nGTable · Utils · Types"]
-        Features["🟧 Features\nUsers · Periods · Evaluations\nQuestionnaire"]
+        Core["🟦 Core\nAuth · Menu · Config · Messages\nInterceptors · Guards · Layout"]
+        Shared["🟩 Shared\nGTable · PlayerList · PlayerDetail\nAutocomplete · Utils · Mensajes i18n"]
+        Features["🟧 Features\nUsers · Periods · Evaluations\nQuestionnaire · EvaluationStats\nRepresentados · Teams · Welcome"]
     end
 
     subgraph Backend ["Backend PHP 8.2+ (Sin Framework)"]

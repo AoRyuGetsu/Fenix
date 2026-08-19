@@ -10,6 +10,7 @@ use App\Features\PlayerSpecification\Domain\Entities\PlayerSpecification;
 interface PlayerSpecificationServiceInterface
 {
     public function findById(int $id): ?PlayerSpecification;
+    public function findByIds(array $userIds): array;
     public function findPaginated(PlayerSpecificationQuery $query): array;
     public function create(int $userId, array $data, int $authUserId): PlayerSpecification;
     public function update(int $userId, array $data, int $authUserId): PlayerSpecification;

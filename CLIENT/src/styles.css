@@ -388,6 +388,9 @@ a:focus {
   --bs-btn-active-color: #fff;
   --bs-btn-active-bg: var(--primary-dark);
   --bs-btn-active-border-color: var(--primary-dark);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--primary);
+  --bs-btn-disabled-border-color: var(--primary);
   font-weight: 500;
 }
 

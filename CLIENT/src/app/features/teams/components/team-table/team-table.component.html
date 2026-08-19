@@ -1,17 +1,17 @@
-@if (loading()) {
+@if (vm().loading) {
   <div class="text-center py-3">
     <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
+      <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
     </div>
   </div>
 } @else {
   <app-gtable
-    [columns]="cols()"
-    [data]="displayItems()"
-    [pagination]="pagination()"
-    [loading]="loading()"
-    [detail]="detailConfig()"
-    [actions]="actions"
+    [columns]="vm().cols"
+    [data]="vm().displayItems"
+    [pagination]="vm().pagination"
+    [loading]="vm().loading"
+    [detail]="vm().detailConfig"
+    [actions]="vm().actions"
     (pageChange)="pageChange.emit($event)"
     (actionClick)="onAction($event)"
     (expandedChange)="onExpand($event)"
@@ -19,33 +19,33 @@
 }
 
 <ng-template #detailTpl let-item>
-  @let detail = teamDetailMap()[item.id];
+  @let detail = vm().teamDetailMap[item.id];
   <h6 class="fw-bold mb-3">{{ item.name }}</h6>
   @if (detail) {
     <div class="row g-3 mb-3">
       <div class="col-md-4">
-        <small class="text-muted d-block">{{ 'team_lbl_code' | message }}</small>
+        <small class="text-muted d-block">{{ vm().t('team_lbl_code') }}</small>
         <span>{{ detail.code }}</span>
       </div>
       <div class="col-md-4">
-        <small class="text-muted d-block">{{ 'team_lbl_description' | message }}</small>
+        <small class="text-muted d-block">{{ vm().t('team_lbl_description') }}</small>
         <span>{{ detail.description ?? '-' }}</span>
       </div>
       <div class="col-md-4">
-        <small class="text-muted d-block">{{ 'team_lbl_trainer' | message }}</small>
+        <small class="text-muted d-block">{{ vm().t('team_lbl_trainer') }}</small>
         <span>{{ detail.trainer.display_name }}</span>
       </div>
       <div class="col-md-4">
-        <small class="text-muted d-block">{{ 'team_lbl_created' | message }}</small>
+        <small class="text-muted d-block">{{ vm().t('team_lbl_created') }}</small>
         <span>{{ detail.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
       <div class="col-md-4">
-        <small class="text-muted d-block">Actualizado</small>
+        <small class="text-muted d-block">{{ vm().t('team_lbl_updated') }}</small>
         <span>{{ detail.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
     </div>
 
-    <h6 class="fw-bold mb-2">{{ 'team_lbl_players' | message }} ({{ detail.players.length }})</h6>
+    <h6 class="fw-bold mb-2">{{ vm().t('team_lbl_players') }} ({{ detail.players.length }})</h6>
     @if (detail.players.length > 0) {
       <ul class="list-group list-group-flush">
         @for (p of detail.players; track p.id) {
@@ -56,12 +56,12 @@
         }
       </ul>
     } @else {
-      <p class="text-muted small mb-0">{{ 'team_lbl_no_players_available' | message }}</p>
+      <p class="text-muted small mb-0">{{ vm().t('team_lbl_no_players_available') }}</p>
     }
   } @else {
     <div class="text-center py-3">
       <div class="spinner-border spinner-border-sm text-primary" role="status">
-        <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
+        <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
       </div>
     </div>
   }

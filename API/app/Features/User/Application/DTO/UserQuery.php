@@ -14,7 +14,7 @@ final class UserQuery
         public readonly ?\DateTime $createdBefore = null,
         public readonly ?string $role = null,
         public readonly ?bool $includeDeleted = null,
-        public readonly ?array $teamIds = null,
+        public readonly ?array $playerIds = null,
         public readonly ?bool $unassigned = null,
         public readonly int $page = 1,
         public readonly int $perPage = 20,

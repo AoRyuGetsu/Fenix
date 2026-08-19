@@ -3,173 +3,166 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title fw-bold">
-          <i class="bi bi-person-badge me-2"></i>Ficha de Jugador
+          <i class="bi bi-person-badge me-2"></i>{{ vm().t('eval_hdr_player_ficha') }}
         </h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
-        @if (loading()) {
+        @if (vm().loading) {
           <div class="text-center py-4">
             <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Cargando...</span>
+              <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
             </div>
           </div>
         } @else {
-          @let u = user();
-          @let p = u.person;
-          @let r = rep();
-          @let s = spec();
-
           <div class="row g-3">
             <!-- Sección 1: Datos personales -->
-            <h6 class="text-primary border-bottom pb-2 mb-0">Datos personales</h6>
+            <h6 class="text-primary border-bottom pb-2 mb-0">{{ vm().t('pd_hdr_personal') }}</h6>
             <div class="col-md-6">
-              <label class="form-label text-muted small mb-0">Nombre completo</label>
-              <p class="fw-semibold">{{ personName() }}</p>
+              <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_full_name') }}</label>
+              <p class="fw-semibold">{{ vm().personName }}</p>
             </div>
             <div class="col-md-6">
-              <label class="form-label text-muted small mb-0">Correo electrónico</label>
-              <p class="fw-semibold">{{ u.email }}</p>
+              <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_email') }}</label>
+              <p class="fw-semibold">{{ vm().user.email }}</p>
             </div>
-            @if (p) {
+            @if (vm().user.person) {
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Cédula</label>
-                <p>{{ p.document_number }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_document_number') }}</label>
+                <p>{{ vm().user.person!.document_number }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Teléfono</label>
-                <p>{{ p.phone || '—' }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_phone') }}</label>
+                <p>{{ vm().user.person!.phone || '—' }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Tipo</label>
-                <p>{{ p.type }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_type') }}</label>
+                <p>{{ vm().user.person!.type }}</p>
               </div>
-              @if (p.address) {
+              @if (vm().user.person!.address) {
                 <div class="col-12">
-                  <label class="form-label text-muted small mb-0">Dirección</label>
-                  <p>{{ p.address }}</p>
+                  <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_address') }}</label>
+                  <p>{{ vm().user.person!.address }}</p>
                 </div>
               }
             }
 
-            <!-- Sección 2: Representante -->
-            <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">Representante</h6>
-            @if (r) {
+            <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ vm().t('pd_hdr_representative') }}</h6>
+            @if (vm().rep) {
               <div class="col-md-6">
-                <label class="form-label text-muted small mb-0">Nombre</label>
-                <p class="fw-semibold">{{ r.display_name }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_contact_name') }}</label>
+                <p class="fw-semibold">{{ vm().rep!.display_name }}</p>
               </div>
               <div class="col-md-6">
-                <label class="form-label text-muted small mb-0">Correo</label>
-                <p>{{ r.email }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_email') }}</label>
+                <p>{{ vm().rep!.email }}</p>
               </div>
             } @else {
               <div class="col-12">
-                <p class="text-muted">Sin representante asignado</p>
+                <p class="text-muted">{{ vm().t('pd_lbl_no_representative') }}</p>
               </div>
             }
 
-            <!-- Sección 3: Ficha deportiva -->
-            <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">Ficha deportiva</h6>
-            @if (s) {
+            <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ vm().t('pd_hdr_sports_ficha') }}</h6>
+            @if (vm().spec) {
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Fecha de nacimiento</label>
-                <p>{{ s.birth_date }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_birth_date') }}</label>
+                <p>{{ vm().spec!.birth_date }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Estatura</label>
-                <p>{{ s.height_cm }} cm</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_height') }}</label>
+                <p>{{ vm().spec!.height_cm }} cm</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Peso</label>
-                <p>{{ s.weight_kg }} kg</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('usr_lbl_weight') }}</label>
+                <p>{{ vm().spec!.weight_kg }} kg</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Género</label>
-                <p>{{ s.gender === 'male' ? 'Masculino' : s.gender === 'female' ? 'Femenino' : s.gender }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_gender') }}</label>
+                <p>{{ vm().spec!.gender === 'male' ? (vm().t('play_spec_lbl_male')) : vm().spec!.gender === 'female' ? (vm().t('play_spec_lbl_female')) : vm().spec!.gender }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Nacionalidad</label>
-                <p>{{ s.nationality || '—' }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_nationality') }}</label>
+                <p>{{ vm().spec!.nationality || '—' }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Tipo de sangre</label>
-                <p>{{ s.blood_type || '—' }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_blood_type') }}</label>
+                <p>{{ vm().spec!.blood_type || '—' }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Posición</label>
-                <p>{{ s.position || '—' }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_position') }}</label>
+                <p>{{ vm().spec!.position || '—' }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Dorsales</label>
-                <p>{{ [s.jersey_number_1, s.jersey_number_2, s.jersey_number_3].filter(v => v !== null).join(' / ') || '—' }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('pd_lbl_jersey_numbers') }}</label>
+                <p>{{ [vm().spec!.jersey_number_1, vm().spec!.jersey_number_2, vm().spec!.jersey_number_3].filter(v => v !== null).join(' / ') || '—' }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Pie dominante</label>
-                <p>{{ s.dominant_foot === 'left' ? 'Izquierdo' : s.dominant_foot === 'right' ? 'Derecho' : s.dominant_foot === 'ambidextrous' ? 'Ambidiestro' : '—' }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_dominant_foot') }}</label>
+                <p>{{ vm().spec!.dominant_foot === 'left' ? (vm().t('play_spec_lbl_foot_left')) : vm().spec!.dominant_foot === 'right' ? (vm().t('play_spec_lbl_foot_right')) : vm().spec!.dominant_foot === 'ambidextrous' ? (vm().t('play_spec_lbl_foot_ambidextrous')) : '—' }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Fecha de ingreso</label>
-                <p>{{ s.entry_date }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_entry_date') }}</label>
+                <p>{{ vm().spec!.entry_date }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Estado</label>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_player_status') }}</label>
                 <p>
-                  @if (s.status === 'active') {
-                    <span class="badge bg-success">Activo</span>
-                  } @else if (s.status === 'injured') {
-                    <span class="badge bg-warning text-dark">Lesionado</span>
-                  } @else if (s.status === 'suspended') {
-                    <span class="badge bg-danger">Suspendido</span>
+                  @if (vm().spec!.status === 'active') {
+                    <span class="badge bg-success">{{ vm().t('play_spec_lbl_status_active') }}</span>
+                  } @else if (vm().spec!.status === 'injured') {
+                    <span class="badge bg-warning text-dark">{{ vm().t('play_spec_lbl_status_injured') }}</span>
+                  } @else if (vm().spec!.status === 'suspended') {
+                    <span class="badge bg-danger">{{ vm().t('play_spec_lbl_status_suspended') }}</span>
                   } @else {
-                    <span class="badge bg-secondary">Inactivo</span>
+                    <span class="badge bg-secondary">{{ vm().t('play_spec_lbl_status_inactive') }}</span>
                   }
                 </p>
               </div>
 
               <div class="col-12 mt-2">
-                <h6 class="text-muted small border-bottom pb-1 mb-2">Contacto de emergencia</h6>
+                <h6 class="text-muted small border-bottom pb-1 mb-2">{{ vm().t('play_spec_lbl_emergency_contact') }}</h6>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Nombre</label>
-                <p>{{ s.emergency_contact_name }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_contact_name') }}</label>
+                <p>{{ vm().spec!.emergency_contact_name }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Teléfono</label>
-                <p>{{ s.emergency_contact_phone }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_contact_phone') }}</label>
+                <p>{{ vm().spec!.emergency_contact_phone }}</p>
               </div>
               <div class="col-md-4">
-                <label class="form-label text-muted small mb-0">Parentesco</label>
-                <p>{{ s.emergency_contact_relationship }}</p>
+                <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_relationship') }}</label>
+                <p>{{ vm().spec!.emergency_contact_relationship }}</p>
               </div>
 
-              @if (s.medical_conditions || s.allergies) {
+              @if (vm().spec!.medical_conditions || vm().spec!.allergies) {
                 <div class="col-12 mt-2">
-                  <h6 class="text-muted small border-bottom pb-1 mb-2">Información médica</h6>
+                  <h6 class="text-muted small border-bottom pb-1 mb-2">{{ vm().t('play_spec_lbl_medical_info') }}</h6>
                 </div>
-                @if (s.medical_conditions) {
+                @if (vm().spec!.medical_conditions) {
                   <div class="col-6">
-                    <label class="form-label text-muted small mb-0">Condiciones médicas</label>
-                    <p>{{ s.medical_conditions }}</p>
+                    <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_medical_conditions') }}</label>
+                    <p>{{ vm().spec!.medical_conditions }}</p>
                   </div>
                 }
-                @if (s.allergies) {
+                @if (vm().spec!.allergies) {
                   <div class="col-6">
-                    <label class="form-label text-muted small mb-0">Alergias</label>
-                    <p>{{ s.allergies }}</p>
+                    <label class="form-label text-muted small mb-0">{{ vm().t('play_spec_lbl_allergies') }}</label>
+                    <p>{{ vm().spec!.allergies }}</p>
                   </div>
                 }
               }
             } @else {
               <div class="col-12">
-                <p class="text-muted">Este jugador no tiene ficha deportiva registrada</p>
+                <p class="text-muted">{{ vm().t('pd_lbl_no_spec') }}</p>
               </div>
             }
           </div>
         }
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="onClose()">Cerrar</button>
+        <button type="button" class="btn btn-secondary" (click)="onClose()">{{ vm().t('cr_btn_close') }}</button>
       </div>
     </div>
   </div>

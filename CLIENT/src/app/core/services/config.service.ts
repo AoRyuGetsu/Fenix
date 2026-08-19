@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 export interface AppConfigJson {
   apiUrl: string;
   logoUrl: string;
+  loginLogoUrl: string;
   backgroundUrl: string;
 }
 
@@ -13,6 +14,7 @@ export class ConfigService {
   private http = inject(HttpClient);
   private _apiUrl = '';
   private _logoUrl = '';
+  private _loginLogoUrl = '';
   private _backgroundUrl = '';
 
   get apiUrl(): string {
@@ -21,6 +23,10 @@ export class ConfigService {
 
   get logoUrl(): string {
     return this._logoUrl;
+  }
+
+  get loginLogoUrl(): string {
+    return this._loginLogoUrl;
   }
 
   get backgroundUrl(): string {
@@ -33,6 +39,7 @@ export class ConfigService {
     ).then((data) => {
         this._apiUrl = data?.apiUrl ?? '';
         this._logoUrl = data?.logoUrl ?? '';
+        this._loginLogoUrl = data?.loginLogoUrl ?? '';
         this._backgroundUrl = data?.backgroundUrl ?? '';
       });
   }

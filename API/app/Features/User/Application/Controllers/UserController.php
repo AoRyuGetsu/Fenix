@@ -155,6 +155,49 @@ class UserController implements ControllerInterface
         ]);
     }
 
+    #[OA\Get(path: '/users/players', tags: ['Users'], summary: 'Obtener roster paginado de todos los jugadores (rol JUG)')]
+    #[OA\Parameter(name: 'search', in: 'query', required: false, description: 'Filtro LIKE sobre nombre del jugador', schema: new OA\Schema(type: 'string'))]
+    #[OA\Parameter(name: 'team_id', in: 'query', required: false, description: 'Filtrar jugadores de un equipo', schema: new OA\Schema(type: 'integer'))]
+    #[OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Parameter(name: 'perPage', in: 'query', required: false, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Response(response: 200, description: 'Lista paginada de jugadores', content: new OA\JsonContent(ref: '#/components/schemas/PaginatedResponse'))]
+    public function players(): Response
+    {
+        $page = max(1, (int) ($this->request->query->get('page', '1')));
+        $perPage = max(1, min(100, (int) ($this->request->query->get('perPage', Env::get('PAGINATION_PER_PAGE', '20')))));
+
+        $search = $this->request->query->get('search');
+        $teamId = $this->request->query->get('team_id');
+
+        $playerIds = null;
+        if ($teamId !== null && $teamId !== '') {
+            $playerIds = $this->teamRepository->findPlayerIdsByTeamIds([(int) $teamId]);
+        }
+
+        $query = new UserQuery(
+            role: 'JUG',
+            name: $search !== null && $search !== '' ? $search : null,
+            playerIds: $playerIds,
+            page: $page,
+            perPage: $perPage,
+        );
+
+        [$players, $total] = $this->userService->list($query);
+
+        $data = array_map(fn ($user) => [
+            'id'           => $user->getId(),
+            'email'        => $user->getEmail(),
+            'display_name' => $this->getUserDisplayName($user),
+        ], $players);
+
+        return new JsonResponse([
+            'data'    => $data,
+            'total'   => $total,
+            'page'    => $page,
+            'perPage' => $perPage,
+        ]);
+    }
+
     #[OA\Get(path: '/users/{id}', tags: ['Users'], summary: 'Obtener usuario por ID')]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Usuario encontrado', content: new OA\JsonContent(ref: '#/components/schemas/User'))]

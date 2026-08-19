@@ -8,9 +8,6 @@ use App\Core\Interfaces\ControllerInterface;
 use App\Features\EvaluationStats\Application\DTO\EvaluationStatsQuery;
 use App\Features\EvaluationStats\Application\DTO\TeamStatsQuery;
 use App\Features\EvaluationStats\Domain\Interfaces\EvaluationStatsServiceInterface;
-use App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface;
-use App\Infrastructure\Auth\AuthContext;
-use Doctrine\ORM\EntityManager;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,9 +18,6 @@ class EvaluationStatsController implements ControllerInterface
     public function __construct(
         private EvaluationStatsServiceInterface $evaluationStatsService,
         private Request $request,
-        private AuthContext $authContext,
-        private TeamRepositoryInterface $teamRepository,
-        private EntityManager $entityManager,
     ) {}
 
     public function execute(): Response
@@ -55,43 +49,6 @@ class EvaluationStatsController implements ControllerInterface
                 ['error' => getError('EVALUATION_STATS_TARGET_REQUIRED'), 'code' => 'EVALUATION_STATS_TARGET_REQUIRED'],
                 422
             );
-        }
-
-        $currentUserId = $this->authContext->getUserId();
-        $currentRoles = $this->authContext->getRoles() ?? [];
-
-        if (in_array('JUG', $currentRoles, true) && (int) $targetUserId !== $currentUserId) {
-            return new JsonResponse(
-                ['error' => getError('FORBIDDEN'), 'code' => 'FORBIDDEN'],
-                403
-            );
-        }
-
-        if (in_array('REP', $currentRoles, true)) {
-            $count = (int) $this->entityManager->createQueryBuilder()
-                ->select('COUNT(rp.id)')
-                ->from(\App\Features\Representatives\Domain\Entities\RepPlayer::class, 'rp')
-                ->where('IDENTITY(rp.rep) = :repId AND IDENTITY(rp.player) = :playerId')
-                ->setParameter('repId', $currentUserId)
-                ->setParameter('playerId', (int) $targetUserId)
-                ->getQuery()
-                ->getSingleScalarResult();
-            if ($count === 0) {
-                return new JsonResponse(
-                    ['error' => getError('FORBIDDEN'), 'code' => 'FORBIDDEN'],
-                    403
-                );
-            }
-        }
-
-        if (in_array('ENT', $currentRoles, true)) {
-            $playerIds = $this->teamRepository->findPlayerIdsByTrainerId($currentUserId);
-            if (!in_array((int) $targetUserId, $playerIds, true)) {
-                return new JsonResponse(
-                    ['error' => getError('FORBIDDEN'), 'code' => 'FORBIDDEN'],
-                    403
-                );
-            }
         }
 
         $questionnaireId = $this->request->query->get('questionnaire_id');
@@ -138,19 +95,6 @@ class EvaluationStatsController implements ControllerInterface
     )]
     public function teamStats(int $teamId): Response
     {
-        $currentRoles = $this->authContext->getRoles() ?? [];
-
-        if (in_array('ENT', $currentRoles, true)) {
-            $teams = $this->teamRepository->findByTrainerId($this->authContext->getUserId());
-            $teamIds = array_map(fn ($t) => $t->getId(), $teams);
-            if (!in_array($teamId, $teamIds, true)) {
-                return new JsonResponse(
-                    ['error' => getError('FORBIDDEN'), 'code' => 'FORBIDDEN'],
-                    403
-                );
-            }
-        }
-
         $questionnaireId = $this->request->query->get('questionnaire_id');
         $periodIdsRaw = $this->request->query->get('period_ids');
         $periodIds = null;

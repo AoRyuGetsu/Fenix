@@ -1,5 +1,6 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
+import { MessageService, MessageResolver } from '../../../core/services/message.service';
 import {
   PeriodsHttpService,
   PeriodItem,
@@ -24,6 +25,7 @@ export interface PeriodsState {
 @Injectable({ providedIn: 'root' })
 export class PeriodsFacade {
   private api = inject(PeriodsHttpService);
+  private msg = inject(MessageService);
 
   private state = signal<PeriodsState>({
     items: [],
@@ -39,7 +41,9 @@ export class PeriodsFacade {
     filterName: '',
   });
 
-  vm = this.state.asReadonly();
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
+  vm = computed(() => ({ ...this.state(), t: this.t }));
 
   load(page?: number): void {
     const s = this.state();
@@ -58,7 +62,7 @@ export class PeriodsFacade {
       error: (err) => this.state.update(st => ({
         ...st,
         loading: false,
-        error: getErrorMessage(err, 'Error al cargar periodos'),
+        error: getErrorMessage(err, 'per_err_load', this.msg),
       })),
     });
   }
@@ -99,7 +103,7 @@ export class PeriodsFacade {
           saving: false,
           showFormModal: false,
           editingItem: null,
-          success: editing ? 'Periodo actualizado correctamente' : 'Periodo creado correctamente',
+          success: editing ? this.msg.get('per_suc_updated') : this.msg.get('per_suc_created'),
         }));
         this.load();
         this.clearSuccessAfterDelay();
@@ -107,13 +111,13 @@ export class PeriodsFacade {
       error: (err) => this.state.update(st => ({
         ...st,
         saving: false,
-        error: getErrorMessage(err, editing ? 'Error al actualizar periodo' : 'Error al crear periodo'),
+        error: getErrorMessage(err, editing ? 'per_err_update' : 'per_err_create', this.msg),
       })),
     });
   }
 
   deletePeriod(id: number): void {
-    if (!confirm('¿Está seguro de eliminar este periodo?')) return;
+    if (!confirm(this.msg.get('per_cnf_delete'))) return;
 
     this.state.update(st => ({ ...st, loading: true, error: null, success: null }));
 
@@ -122,7 +126,7 @@ export class PeriodsFacade {
         this.state.update(st => ({
           ...st,
           loading: false,
-          success: 'Periodo eliminado correctamente',
+          success: this.msg.get('per_suc_deleted'),
         }));
         this.load();
         this.clearSuccessAfterDelay();
@@ -130,7 +134,7 @@ export class PeriodsFacade {
       error: (err) => this.state.update(st => ({
         ...st,
         loading: false,
-        error: getErrorMessage(err, 'Error al eliminar periodo'),
+        error: getErrorMessage(err, 'per_err_delete', this.msg),
       })),
     });
   }

@@ -146,6 +146,13 @@ export interface PlayerSpecData {
   updated_at: string;
 }
 
+export interface PlayerRepData {
+  id: number;
+  email: string;
+  display_name: string;
+  parentesco: { id: number; code: string; description: string } | null;
+}
+
 export interface CreatePlayerSpecPayload {
   user_id: number;
   birth_date: string;
@@ -236,6 +243,10 @@ export class UsersHttpService {
 
   getPlayerSpec(userId: number): Observable<PlayerSpecData> {
     return this.http.get<PlayerSpecData>(`${this.configService.apiUrl}/player-specifications/${userId}`);
+  }
+
+  getPlayerRepresentative(userId: number): Observable<{ data: PlayerRepData | null }> {
+    return this.http.get<{ data: PlayerRepData | null }>(`${this.configService.apiUrl}/players/${userId}/representative`);
   }
 
   createPlayerSpec(data: CreatePlayerSpecPayload): Observable<PlayerSpecData> {

@@ -39,6 +39,8 @@ class AppException extends \RuntimeException
             $code === 'PERIOD_DATES_INVALID',
             $code === 'INVALID_QUESTION_TYPE',
             $code === 'INVALID_TYPE',
+            $code === 'EVALUATION_STATS_INSUFFICIENT_PERIODS',
+            $code === 'EVALUATION_STATS_NO_DATA',
             str_starts_with($code, 'VALIDATION_')                   => 422,
             default                                                 => 400,
         };

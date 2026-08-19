@@ -1,7 +1,8 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
+import { MessageService, MessageResolver } from '../../../core/services/message.service';
 import {
   UsersHttpService,
   PeopleType,
@@ -9,6 +10,7 @@ import {
   PersonData,
   UserData,
   PlayerSpecData,
+  PlayerRepData,
   CreatePlayerSpecPayload,
   UpdatePlayerSpecPayload,
   PaginatedResponse,
@@ -50,6 +52,7 @@ export interface UsersState {
   specData: PlayerSpecData | null;
   specLoading: boolean;
   playerSpecs: Record<number, PlayerSpecData>;
+  playerReps: Record<number, PlayerRepData>;
 }
 
 const EMPTY_PAGINATED = { data: [], total: 0, page: 1, perPage: 20 };
@@ -58,6 +61,7 @@ const EMPTY_PAGINATED = { data: [], total: 0, page: 1, perPage: 20 };
 export class UsersFacade {
   private api = inject(UsersHttpService);
   private teamsApi = inject(TeamsHttpService);
+  private msg = inject(MessageService);
 
   private state = signal<UsersState>({
     tabs: [],
@@ -85,9 +89,12 @@ export class UsersFacade {
     specData: null,
     specLoading: false,
     playerSpecs: {},
+    playerReps: {},
   });
 
-  vm = this.state.asReadonly();
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
+  vm = computed(() => ({ ...this.state(), t: this.t }));
 
   loadTabs(): void {
     this.state.update(s => ({ ...s, loading: true, error: null }));
@@ -95,7 +102,7 @@ export class UsersFacade {
     this.api.getPeopleTypes().subscribe({
       next: types => {
         const tabs: TabItem[] = types.data.filter(t => t.code !== 'ADM').map(t => ({ code: t.code, label: t.description }));
-        tabs.push({ code: 'admin', label: 'Administradores' });
+        tabs.push({ code: 'admin', label: this.msg.get('cr_lbl_administrators') });
         const activeTab = tabs.length > 1 ? tabs[0].code : 'admin';
         this.state.update(s => ({ ...s, tabs, activeTab, loading: false }));
         this.loadTabData(activeTab);
@@ -104,7 +111,7 @@ export class UsersFacade {
         this.state.update(s => ({
           ...s,
           loading: false,
-          error: getErrorMessage(err, 'Error al cargar tipos de persona'),
+          error: getErrorMessage(err, 'usr_err_load_people_types', this.msg),
         }));
       },
     });
@@ -112,7 +119,7 @@ export class UsersFacade {
 
   switchTab(code: string): void {
     if (this.state().activeTab === code) return;
-    this.state.update(s => ({ ...s, activeTab: code, activePage: 1, searchTerm: '', error: null, playerSpecs: {} }));
+    this.state.update(s => ({ ...s, activeTab: code, activePage: 1, searchTerm: '', error: null, playerSpecs: {}, playerReps: {} }));
     this.loadTabData(code);
   }
 
@@ -123,7 +130,7 @@ export class UsersFacade {
 
   loadTabData(tab: string, page: number = 1): void {
     const searchTerm = this.state().searchTerm;
-    this.state.update(s => ({ ...s, loading: true, error: null, playerSpecs: {} }));
+    this.state.update(s => ({ ...s, loading: true, error: null, playerSpecs: {}, playerReps: {} }));
 
     if (tab === 'admin') {
       const includeDeleted = this.state().showDeleted || undefined;
@@ -141,7 +148,7 @@ export class UsersFacade {
           this.state.update(s => ({
             ...s,
             loading: false,
-            error: getErrorMessage(err, 'Error al cargar administradores'),
+            error: getErrorMessage(err, 'usr_err_load_admins', this.msg),
           }));
         },
       });
@@ -155,20 +162,22 @@ export class UsersFacade {
             activePage: page,
             totalPages: Math.ceil(res.total / res.perPage),
           }));
-          this.loadPlayerSpecs(res.data);
+          this.loadPlayerSpecs(res.data, tab);
         },
         error: err => {
           this.state.update(s => ({
             ...s,
             loading: false,
-            error: getErrorMessage(err, 'Error al cargar personas'),
+            error: getErrorMessage(err, 'usr_err_load_people', this.msg),
           }));
         },
       });
     }
   }
 
-  private loadPlayerSpecs(people: PersonData[]): void {
+  private loadPlayerSpecs(people: PersonData[], tab: string): void {
+    if (tab !== 'JUG') return;
+
     const userIds = people
       .map(p => p.user_id)
       .filter((id): id is number => id !== null);
@@ -185,6 +194,18 @@ export class UsersFacade {
         if (results[i]) specsMap[id] = results[i]!;
       });
       this.state.update(s => ({ ...s, playerSpecs: specsMap }));
+    });
+
+    forkJoin(
+      userIds.map(id =>
+        this.api.getPlayerRepresentative(id).pipe(catchError(() => of(null)))
+      )
+    ).subscribe(results => {
+      const repsMap: Record<number, PlayerRepData> = {};
+      userIds.forEach((id, i) => {
+        if (results[i]?.data) repsMap[id] = results[i]!.data!;
+      });
+      this.state.update(s => ({ ...s, playerReps: repsMap }));
     });
   }
 
@@ -248,7 +269,7 @@ export class UsersFacade {
     this.state.update(s => ({ ...s, loading: true, error: null }));
     this.api.createUser(data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, loading: false, showCreateModal: false, success: 'Persona creada correctamente' }));
+        this.state.update(s => ({ ...s, loading: false, showCreateModal: false, success: this.msg.get('usr_lbl_person_created') }));
         this.loadTabData(this.state().activeTab, this.state().activePage);
         this.clearSuccessAfterDelay();
       },
@@ -256,7 +277,7 @@ export class UsersFacade {
         this.state.update(s => ({
           ...s,
           loading: false,
-          error: getErrorMessage(err, 'Error al crear persona'),
+          error: getErrorMessage(err, 'usr_err_create_person', this.msg),
         }));
       },
     });
@@ -266,7 +287,7 @@ export class UsersFacade {
     this.state.update(s => ({ ...s, loading: true, error: null }));
     this.api.createAdmin(data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, loading: false, showCreateModal: false, success: 'Administrador creado correctamente' }));
+        this.state.update(s => ({ ...s, loading: false, showCreateModal: false, success: this.msg.get('usr_lbl_admin_created') }));
         this.loadTabData(this.state().activeTab, this.state().activePage);
         this.clearSuccessAfterDelay();
       },
@@ -274,7 +295,7 @@ export class UsersFacade {
         this.state.update(s => ({
           ...s,
           loading: false,
-          error: getErrorMessage(err, 'Error al crear administrador'),
+          error: getErrorMessage(err, 'usr_err_create_admin', this.msg),
         }));
       },
     });
@@ -284,7 +305,7 @@ export class UsersFacade {
     this.state.update(s => ({ ...s, loading: true, error: null }));
     this.api.updateUser(id, data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, loading: false, showUpdateModal: false, selectedItem: null, success: 'Persona actualizada correctamente' }));
+        this.state.update(s => ({ ...s, loading: false, showUpdateModal: false, selectedItem: null, success: this.msg.get('usr_lbl_person_updated') }));
         this.loadTabData(this.state().activeTab, this.state().activePage);
         this.clearSuccessAfterDelay();
       },
@@ -292,7 +313,7 @@ export class UsersFacade {
         this.state.update(s => ({
           ...s,
           loading: false,
-          error: getErrorMessage(err, 'Error al actualizar persona'),
+          error: getErrorMessage(err, 'usr_err_update_person', this.msg),
         }));
       },
     });
@@ -302,7 +323,7 @@ export class UsersFacade {
     this.state.update(s => ({ ...s, loading: true, error: null }));
     this.api.updateAdmin(id, data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, loading: false, showUpdateModal: false, selectedItem: null, success: 'Administrador actualizado correctamente' }));
+        this.state.update(s => ({ ...s, loading: false, showUpdateModal: false, selectedItem: null, success: this.msg.get('usr_lbl_admin_updated') }));
         this.loadTabData(this.state().activeTab, this.state().activePage);
         this.clearSuccessAfterDelay();
       },
@@ -310,19 +331,19 @@ export class UsersFacade {
         this.state.update(s => ({
           ...s,
           loading: false,
-          error: getErrorMessage(err, 'Error al actualizar administrador'),
+          error: getErrorMessage(err, 'usr_err_update_admin', this.msg),
         }));
       },
     });
   }
 
   deleteUser(id: number): void {
-    if (!confirm('¿Está seguro de eliminar este usuario?')) return;
+    if (!confirm(this.msg.get('usr_cnf_delete_user'))) return;
 
     this.state.update(s => ({ ...s, loading: true, error: null }));
     this.api.deleteUser(id).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, loading: false, success: 'Usuario eliminado correctamente' }));
+        this.state.update(s => ({ ...s, loading: false, success: this.msg.get('usr_suc_user_deleted') }));
         this.loadTabData(this.state().activeTab, this.state().activePage);
         this.clearSuccessAfterDelay();
       },
@@ -330,7 +351,7 @@ export class UsersFacade {
         this.state.update(s => ({
           ...s,
           loading: false,
-          error: getErrorMessage(err, 'Error al eliminar usuario'),
+          error: getErrorMessage(err, 'usr_err_delete_user', this.msg),
         }));
       },
     });
@@ -384,7 +405,7 @@ export class UsersFacade {
           showSpecModal: false,
           specUserId: null,
           specData: null,
-          success: 'Ficha de jugador guardada correctamente',
+          success: this.msg.get('usr_suc_spec_saved'),
         }));
         this.clearSuccessAfterDelay();
       },
@@ -392,7 +413,7 @@ export class UsersFacade {
         this.state.update(s => ({
           ...s,
           specLoading: false,
-          error: getErrorMessage(err, 'Error al guardar ficha de jugador'),
+          error: getErrorMessage(err, 'usr_err_save_spec', this.msg),
         }));
       },
     });
@@ -417,7 +438,7 @@ export class UsersFacade {
     this.state.update(s => ({ ...s, loading: true, error: null }));
     this.api.restoreUser(id).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, loading: false, success: 'Usuario restaurado correctamente' }));
+        this.state.update(s => ({ ...s, loading: false, success: this.msg.get('usr_suc_user_restored') }));
         this.loadTabData(this.state().activeTab, this.state().activePage);
         this.clearSuccessAfterDelay();
       },
@@ -425,7 +446,7 @@ export class UsersFacade {
         this.state.update(s => ({
           ...s,
           loading: false,
-          error: getErrorMessage(err, 'Error al restaurar usuario'),
+          error: getErrorMessage(err, 'usr_err_restore_user', this.msg),
         }));
       },
     });

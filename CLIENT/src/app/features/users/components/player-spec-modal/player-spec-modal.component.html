@@ -2,41 +2,41 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title fw-bold">{{ isUpdate() ? ('play_spec_hdr_edit' | message) : ('play_spec_hdr_new' | message) }}</h5>
+        <h5 class="modal-title fw-bold">{{ vm().isUpdate ? (vm().t('play_spec_hdr_edit')) : (vm().t('play_spec_hdr_new')) }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
-          <h6 class="text-primary border-bottom pb-2 mb-0">{{ 'play_spec_lbl_physical_data' | message }}</h6>
+          <h6 class="text-primary border-bottom pb-2 mb-0">{{ vm().t('play_spec_lbl_physical_data') }}</h6>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_birth_date' | message }} <span class="text-danger">*</span></label>
-            <input #inputBirth type="date" class="form-control" [value]="birthDate()" (input)="birthDate.set(inputBirth.value)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_birth_date') }} <span class="text-danger">*</span></label>
+            <input #inputBirth type="date" class="form-control" [value]="vm().birthDate" (input)="birthDate.set(inputBirth.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_height_cm' | message }} <span class="text-danger">*</span></label>
-            <input #inputHeight type="number" step="0.01" class="form-control" [value]="heightCm()" (input)="heightCm.set(+inputHeight.value)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_height_cm') }} <span class="text-danger">*</span></label>
+            <input #inputHeight type="number" step="0.01" class="form-control" [value]="vm().heightCm" (input)="heightCm.set(+inputHeight.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_weight_kg' | message }} <span class="text-danger">*</span></label>
-            <input #inputWeight type="number" step="0.01" class="form-control" [value]="weightKg()" (input)="weightKg.set(+inputWeight.value)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_weight_kg') }} <span class="text-danger">*</span></label>
+            <input #inputWeight type="number" step="0.01" class="form-control" [value]="vm().weightKg" (input)="weightKg.set(+inputWeight.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_gender' | message }} <span class="text-danger">*</span></label>
-            <select #selGender class="form-select" [value]="gender()" (change)="gender.set(selGender.value)">
-              <option value="">{{ 'play_spec_plh_select' | message }}</option>
-              <option value="male">{{ 'play_spec_lbl_male' | message }}</option>
-              <option value="female">{{ 'play_spec_lbl_female' | message }}</option>
-              <option value="other">{{ 'play_spec_lbl_other' | message }}</option>
+            <label class="form-label">{{ vm().t('play_spec_lbl_gender') }} <span class="text-danger">*</span></label>
+            <select #selGender class="form-select" [value]="vm().gender" (change)="gender.set(selGender.value)">
+              <option value="">{{ vm().t('play_spec_plh_select') }}</option>
+              <option value="male">{{ vm().t('play_spec_lbl_male') }}</option>
+              <option value="female">{{ vm().t('play_spec_lbl_female') }}</option>
+              <option value="other">{{ vm().t('play_spec_lbl_other') }}</option>
             </select>
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_nationality' | message }}</label>
-            <input #inputNationality type="text" class="form-control" [value]="nationality()" (input)="nationality.set(inputNationality.value)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_nationality') }}</label>
+            <input #inputNationality type="text" class="form-control" [value]="vm().nationality" (input)="nationality.set(inputNationality.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_blood_type' | message }}</label>
-            <select #selBlood class="form-select" [value]="bloodType()" (change)="bloodType.set(selBlood.value)">
-              <option value="">{{ 'play_spec_plh_select' | message }}</option>
+            <label class="form-label">{{ vm().t('play_spec_lbl_blood_type') }}</label>
+            <select #selBlood class="form-select" [value]="vm().bloodType" (change)="bloodType.set(selBlood.value)">
+              <option value="">{{ vm().t('play_spec_plh_select') }}</option>
               <option value="A+">A+</option>
               <option value="A-">A-</option>
               <option value="B+">B+</option>
@@ -48,36 +48,36 @@
             </select>
           </div>
 
-          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ 'play_spec_lbl_sports_data' | message }}</h6>
+          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ vm().t('play_spec_lbl_sports_data') }}</h6>
           <div class="col-md-6">
-            <label class="form-label">{{ 'play_spec_lbl_position' | message }}</label>
-            <input #inputPosition type="text" class="form-control" [value]="position()" (input)="position.set(inputPosition.value)" [placeholder]="'play_spec_plh_position' | message" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_position') }}</label>
+            <input #inputPosition type="text" class="form-control" [value]="vm().position" (input)="position.set(inputPosition.value)" [placeholder]="vm().t('play_spec_plh_position')" />
           </div>
           <div class="col-md-2">
-            <label class="form-label">{{ 'play_spec_lbl_jersey_number_1' | message }}</label>
-            <input #inputJersey1 type="number" class="form-control" [value]="jerseyNumber1()" (input)="jerseyNumber1.set(+inputJersey1.value || null)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_jersey_number_1') }}</label>
+            <input #inputJersey1 type="number" class="form-control" [value]="vm().jerseyNumber1" (input)="jerseyNumber1.set(+inputJersey1.value || null)" />
           </div>
           <div class="col-md-2">
-            <label class="form-label">{{ 'play_spec_lbl_jersey_number_2' | message }}</label>
-            <input #inputJersey2 type="number" class="form-control" [value]="jerseyNumber2()" (input)="jerseyNumber2.set(+inputJersey2.value || null)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_jersey_number_2') }}</label>
+            <input #inputJersey2 type="number" class="form-control" [value]="vm().jerseyNumber2" (input)="jerseyNumber2.set(+inputJersey2.value || null)" />
           </div>
           <div class="col-md-2">
-            <label class="form-label">{{ 'play_spec_lbl_jersey_number_3' | message }}</label>
-            <input #inputJersey3 type="number" class="form-control" [value]="jerseyNumber3()" (input)="jerseyNumber3.set(+inputJersey3.value || null)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_jersey_number_3') }}</label>
+            <input #inputJersey3 type="number" class="form-control" [value]="vm().jerseyNumber3" (input)="jerseyNumber3.set(+inputJersey3.value || null)" />
           </div>
           <div class="col-md-3">
-            <label class="form-label">{{ 'play_spec_lbl_dominant_foot' | message }}</label>
-            <select #selFoot class="form-select" [value]="dominantFoot()" (change)="dominantFoot.set(selFoot.value)">
-              <option value="">{{ 'play_spec_plh_select' | message }}</option>
-              <option value="left">{{ 'play_spec_lbl_foot_left' | message }}</option>
-              <option value="right">{{ 'play_spec_lbl_foot_right' | message }}</option>
-              <option value="ambidextrous">{{ 'play_spec_lbl_foot_ambidextrous' | message }}</option>
+            <label class="form-label">{{ vm().t('play_spec_lbl_dominant_foot') }}</label>
+            <select #selFoot class="form-select" [value]="vm().dominantFoot" (change)="dominantFoot.set(selFoot.value)">
+              <option value="">{{ vm().t('play_spec_plh_select') }}</option>
+              <option value="left">{{ vm().t('play_spec_lbl_foot_left') }}</option>
+              <option value="right">{{ vm().t('play_spec_lbl_foot_right') }}</option>
+              <option value="ambidextrous">{{ vm().t('play_spec_lbl_foot_ambidextrous') }}</option>
             </select>
           </div>
           <div class="col-md-3">
-            <label class="form-label">{{ 'play_spec_lbl_category' | message }}</label>
-            <select #selCategory class="form-select" [value]="category()" (change)="category.set(selCategory.value)">
-              <option value="">{{ 'play_spec_plh_select' | message }}</option>
+            <label class="form-label">{{ vm().t('play_spec_lbl_category') }}</label>
+            <select #selCategory class="form-select" [value]="vm().category" (change)="category.set(selCategory.value)">
+              <option value="">{{ vm().t('play_spec_plh_select') }}</option>
               <option value="SUB10">Sub-10</option>
               <option value="SUB12">Sub-12</option>
               <option value="SUB14">Sub-14</option>
@@ -86,9 +86,9 @@
             </select>
           </div>
           <div class="col-md-3">
-            <label class="form-label">{{ 'play_spec_lbl_shirt_size' | message }}</label>
-            <select #selSize class="form-select" [value]="shirtSize()" (change)="shirtSize.set(selSize.value)">
-              <option value="">{{ 'play_spec_plh_select' | message }}</option>
+            <label class="form-label">{{ vm().t('play_spec_lbl_shirt_size') }}</label>
+            <select #selSize class="form-select" [value]="vm().shirtSize" (change)="shirtSize.set(selSize.value)">
+              <option value="">{{ vm().t('play_spec_plh_select') }}</option>
               <option value="XS">XS</option>
               <option value="S">S</option>
               <option value="M">M</option>
@@ -97,71 +97,71 @@
             </select>
           </div>
           <div class="col-md-3">
-            <label class="form-label">{{ 'play_spec_lbl_player_status' | message }}</label>
-            <select #selStatus class="form-select" [value]="status()" (change)="status.set(selStatus.value)">
-              <option value="active">{{ 'play_spec_lbl_status_active' | message }}</option>
-              <option value="injured">{{ 'play_spec_lbl_status_injured' | message }}</option>
-              <option value="suspended">{{ 'play_spec_lbl_status_suspended' | message }}</option>
-              <option value="inactive">{{ 'play_spec_lbl_status_inactive' | message }}</option>
+            <label class="form-label">{{ vm().t('play_spec_lbl_player_status') }}</label>
+            <select #selStatus class="form-select" [value]="vm().status" (change)="status.set(selStatus.value)">
+              <option value="active">{{ vm().t('play_spec_lbl_status_active') }}</option>
+              <option value="injured">{{ vm().t('play_spec_lbl_status_injured') }}</option>
+              <option value="suspended">{{ vm().t('play_spec_lbl_status_suspended') }}</option>
+              <option value="inactive">{{ vm().t('play_spec_lbl_status_inactive') }}</option>
             </select>
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_basketball_experience' | message }}</label>
-            <select #selExp class="form-select" [value]="basketballExperience()" (change)="basketballExperience.set(selExp.value)">
-              <option value="">{{ 'play_spec_plh_select' | message }}</option>
-              <option value="1">{{ 'play_spec_lbl_yes' | message }}</option>
-              <option value="0">{{ 'play_spec_lbl_no' | message }}</option>
+            <label class="form-label">{{ vm().t('play_spec_lbl_basketball_experience') }}</label>
+            <select #selExp class="form-select" [value]="vm().basketballExperience" (change)="basketballExperience.set(selExp.value)">
+              <option value="">{{ vm().t('play_spec_plh_select') }}</option>
+              <option value="1">{{ vm().t('play_spec_lbl_yes') }}</option>
+              <option value="0">{{ vm().t('play_spec_lbl_no') }}</option>
             </select>
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_previous_club' | message }}</label>
-            <input #inputPrevClub type="text" class="form-control" [value]="previousClub()" (input)="previousClub.set(inputPrevClub.value)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_previous_club') }}</label>
+            <input #inputPrevClub type="text" class="form-control" [value]="vm().previousClub" (input)="previousClub.set(inputPrevClub.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_entry_date' | message }} <span class="text-danger">*</span></label>
-            <input #inputEntry type="date" class="form-control" [value]="entryDate()" (input)="entryDate.set(inputEntry.value)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_entry_date') }} <span class="text-danger">*</span></label>
+            <input #inputEntry type="date" class="form-control" [value]="vm().entryDate" (input)="entryDate.set(inputEntry.value)" />
           </div>
 
-          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ 'play_spec_lbl_emergency_contact' | message }}</h6>
+          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ vm().t('play_spec_lbl_emergency_contact') }}</h6>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_contact_name' | message }} <span class="text-danger">*</span></label>
-            <input #inputEmerName type="text" class="form-control" [value]="emergencyContactName()" (input)="emergencyContactName.set(inputEmerName.value)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_contact_name') }} <span class="text-danger">*</span></label>
+            <input #inputEmerName type="text" class="form-control" [value]="vm().emergencyContactName" (input)="emergencyContactName.set(inputEmerName.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_contact_phone' | message }} <span class="text-danger">*</span></label>
-            <input #inputEmerPhone type="text" class="form-control" [value]="emergencyContactPhone()" (input)="emergencyContactPhone.set(inputEmerPhone.value)" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_contact_phone') }} <span class="text-danger">*</span></label>
+            <input #inputEmerPhone type="text" class="form-control" [value]="vm().emergencyContactPhone" (input)="emergencyContactPhone.set(inputEmerPhone.value)" />
           </div>
           <div class="col-md-4">
-            <label class="form-label">{{ 'play_spec_lbl_relationship' | message }} <span class="text-danger">*</span></label>
-            <input #inputEmerRel type="text" class="form-control" [value]="emergencyContactRelationship()" (input)="emergencyContactRelationship.set(inputEmerRel.value)" [placeholder]="'play_spec_plh_relationship' | message" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_relationship') }} <span class="text-danger">*</span></label>
+            <input #inputEmerRel type="text" class="form-control" [value]="vm().emergencyContactRelationship" (input)="emergencyContactRelationship.set(inputEmerRel.value)" [placeholder]="vm().t('play_spec_plh_relationship')" />
           </div>
 
-          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ 'play_spec_lbl_medical_info' | message }}</h6>
+          <h6 class="text-primary border-bottom pb-2 mb-0 mt-2">{{ vm().t('play_spec_lbl_medical_info') }}</h6>
           <div class="col-6">
-            <label class="form-label">{{ 'play_spec_lbl_medical_conditions' | message }}</label>
-            <textarea #inputMedCond class="form-control" rows="2" [value]="medicalConditions()" (input)="medicalConditions.set(inputMedCond.value)" [placeholder]="'play_spec_plh_medical' | message"></textarea>
+            <label class="form-label">{{ vm().t('play_spec_lbl_medical_conditions') }}</label>
+            <textarea #inputMedCond class="form-control" rows="2" [value]="vm().medicalConditions" (input)="medicalConditions.set(inputMedCond.value)" [placeholder]="vm().t('play_spec_plh_medical')"></textarea>
           </div>
           <div class="col-6">
-            <label class="form-label">{{ 'play_spec_lbl_allergies' | message }}</label>
-            <textarea #inputAllergies class="form-control" rows="2" [value]="allergies()" (input)="allergies.set(inputAllergies.value)" [placeholder]="'play_spec_plh_allergies' | message"></textarea>
+            <label class="form-label">{{ vm().t('play_spec_lbl_allergies') }}</label>
+            <textarea #inputAllergies class="form-control" rows="2" [value]="vm().allergies" (input)="allergies.set(inputAllergies.value)" [placeholder]="vm().t('play_spec_plh_allergies')"></textarea>
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'play_spec_lbl_insurance' | message }}</label>
-            <input #inputInsurance type="text" class="form-control" [value]="insurance()" (input)="insurance.set(inputInsurance.value)" [placeholder]="'play_spec_plh_insurance' | message" />
+            <label class="form-label">{{ vm().t('play_spec_lbl_insurance') }}</label>
+            <input #inputInsurance type="text" class="form-control" [value]="vm().insurance" (input)="insurance.set(inputInsurance.value)" [placeholder]="vm().t('play_spec_plh_insurance')" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'play_spec_lbl_medications' | message }}</label>
-            <textarea #inputMedications class="form-control" rows="2" [value]="medications()" (input)="medications.set(inputMedications.value)" [placeholder]="'play_spec_plh_medications' | message"></textarea>
+            <label class="form-label">{{ vm().t('play_spec_lbl_medications') }}</label>
+            <textarea #inputMedications class="form-control" rows="2" [value]="vm().medications" (input)="medications.set(inputMedications.value)" [placeholder]="vm().t('play_spec_plh_medications')"></textarea>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">{{ 'cr_btn_cancel' | message }}</button>
-        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading() || !birthDate() || !heightCm() || !weightKg() || !gender() || !entryDate() || !emergencyContactName() || !emergencyContactPhone() || !emergencyContactRelationship()">
-          @if (loading()) {
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="vm().loading">{{ vm().t('cr_btn_cancel') }}</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="vm().loading || !vm().birthDate || !vm().heightCm || !vm().weightKg || !vm().gender || !vm().entryDate || !vm().emergencyContactName || !vm().emergencyContactPhone || !vm().emergencyContactRelationship">
+          @if (vm().loading) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          {{ isUpdate() ? ('cr_btn_update' | message) : ('cr_btn_save' | message) }}
+          {{ vm().isUpdate ? (vm().t('cr_btn_update')) : (vm().t('cr_btn_save')) }}
         </button>
       </div>
     </div>

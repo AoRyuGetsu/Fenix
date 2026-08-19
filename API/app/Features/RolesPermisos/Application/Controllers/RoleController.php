@@ -166,6 +166,6 @@ class RoleController implements ControllerInterface
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
         }
 
-        return new JsonResponse(['message' => 'Permissions assigned']);
+        return new JsonResponse(['message' => getError('PERMISSIONS_ASSIGNED')]);
     }
 }

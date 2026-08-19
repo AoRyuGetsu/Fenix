@@ -1,7 +1,7 @@
 @if (loading()) {
   <div class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
+      <span class="visually-hidden">{{ msg.get('cr_lbl_loading') }}</span>
     </div>
   </div>
 } @else {
@@ -16,7 +16,7 @@
             <th [style.width]="col.width ?? undefined">{{ col.label }}</th>
           }
           @if (actions().length > 0) {
-            <th style="width: 140px;">Acciones</th>
+            <th style="width: 140px;">{{ msg.get('cr_lbl_actions') }}</th>
           }
         </tr>
       </thead>
@@ -26,7 +26,7 @@
             @if (detail() !== null) {
               <td class="text-center">
                 <button type="button" class="btn btn-sm btn-outline-secondary border-0"
-                  (click)="toggleExpand(item.id)" title="Detalles">
+                  (click)="toggleExpand(item.id)" [attr.title]="msg.get('cr_tip_details')">
                   <i class="bi"
                     [class.bi-chevron-down]="!isExpanded(item.id)"
                     [class.bi-chevron-up]="isExpanded(item.id)"></i>
@@ -47,9 +47,9 @@
                   }
                   @case ('boolean') {
                     @if (cellValue(item, col.key)) {
-                      <span class="badge bg-success">Sí</span>
+                      <span class="badge bg-success">{{ msg.get('cr_lbl_yes') }}</span>
                     } @else {
-                      <span class="badge bg-danger">No</span>
+                      <span class="badge bg-danger">{{ msg.get('cr_lbl_no') }}</span>
                     }
                   }
                   @case ('date') {
@@ -94,7 +94,7 @@
                           [ngTemplateOutletContext]="{ $implicit: item }">
                         </ng-container>
                       } @else {
-                        <h6 class="fw-bold mb-3">Detalles</h6>
+                        <h6 class="fw-bold mb-3">{{ msg.get('cr_tip_details') }}</h6>
                         <div class="row g-3">
                           @for (field of detail()!.fields!; track field.key) {
                             <div class="{{ field.colspan ?? 'col-md-4' }}">
@@ -111,9 +111,9 @@
                                 }
                                 @case ('boolean') {
                                   @if (cellValue(item, field.key)) {
-                                    <span class="badge bg-success">Sí</span>
+                                    <span class="badge bg-success">{{ msg.get('cr_lbl_yes') }}</span>
                                   } @else {
-                                    <span class="badge bg-danger">No</span>
+                                    <span class="badge bg-danger">{{ msg.get('cr_lbl_no') }}</span>
                                   }
                                 }
                                 @case ('date') {
@@ -136,7 +136,7 @@
         } @empty {
           <tr>
             <td [attr.colspan]="colspan()" class="text-center text-muted py-4">
-              {{ emptyMsg() }}
+              {{ emptyMsg() || msg.get('cr_lbl_no_records') }}
             </td>
           </tr>
         }

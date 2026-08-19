@@ -6,7 +6,7 @@ export const authRedirectGuard: CanActivateFn = () => {
   const router = inject(Router);
   const authFacade = inject(AuthFacade);
 
-  if (authFacade.isAuthenticated()) {
+  if (authFacade.isSessionValid()) {
     return router.parseUrl('/welcome');
   }
 

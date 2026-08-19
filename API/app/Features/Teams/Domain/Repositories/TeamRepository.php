@@ -8,6 +8,7 @@ use App\Features\Teams\Application\DTO\TeamQueryDto;
 use App\Features\Teams\Domain\Entities\Team;
 use App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface;
 use App\Features\User\Domain\Entities\User;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManager;
 
 class TeamRepository implements TeamRepositoryInterface
@@ -17,6 +18,38 @@ class TeamRepository implements TeamRepositoryInterface
     ) {}
 
     public function findPaginated(TeamQueryDto $query): array
+    {
+        $qb = $this->buildTeamQuery($query);
+
+        $countQb = clone $qb;
+        $countQb->select('COUNT(DISTINCT t.id)');
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        $qb->orderBy('t.id', 'ASC')
+            ->setFirstResult(($query->page - 1) * $query->perPage)
+            ->setMaxResults($query->perPage);
+
+        return [$qb->getQuery()->getResult(), $total];
+    }
+
+    public function findPaginatedByTrainerId(TeamQueryDto $query, int $trainerUserId): array
+    {
+        $qb = $this->buildTeamQuery($query)
+            ->andWhere('t.trainer = :trainerId')
+            ->setParameter('trainerId', $trainerUserId);
+
+        $countQb = clone $qb;
+        $countQb->select('COUNT(DISTINCT t.id)');
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
+
+        $qb->orderBy('t.id', 'ASC')
+            ->setFirstResult(($query->page - 1) * $query->perPage)
+            ->setMaxResults($query->perPage);
+
+        return [$qb->getQuery()->getResult(), $total];
+    }
+
+    private function buildTeamQuery(TeamQueryDto $query): \Doctrine\ORM\QueryBuilder
     {
         $qb = $this->entityManager
             ->getRepository(Team::class)
@@ -33,15 +66,7 @@ class TeamRepository implements TeamRepositoryInterface
             ))->setParameter('search', '%' . $query->search . '%');
         }
 
-        $countQb = clone $qb;
-        $countQb->select('COUNT(DISTINCT t.id)');
-        $total = (int) $countQb->getQuery()->getSingleScalarResult();
-
-        $qb->orderBy('t.id', 'ASC')
-            ->setFirstResult(($query->page - 1) * $query->perPage)
-            ->setMaxResults($query->perPage);
-
-        return [$qb->getQuery()->getResult(), $total];
+        return $qb;
     }
 
     public function findById(int $id): ?Team
@@ -91,6 +116,25 @@ class TeamRepository implements TeamRepositoryInterface
     {
         $this->entityManager->persist($team);
         $this->entityManager->flush();
+    }
+
+    public function findPlayerIdsByTeamIds(array $teamIds): array
+    {
+        if ($teamIds === []) {
+            return [];
+        }
+
+        $conn = $this->entityManager->getConnection();
+        $result = $conn->executeQuery(
+            'SELECT DISTINCT tp.player_user_id
+             FROM team_players tp
+             JOIN teams t ON t.id = tp.team_id
+             WHERE t.id IN (:teamIds)
+               AND t.deleted_at IS NULL',
+            ['teamIds' => $teamIds],
+            ['teamIds' => ArrayParameterType::INTEGER]
+        );
+        return array_map('intval', $result->fetchFirstColumn());
     }
 
     public function findByPlayerId(int $playerUserId): ?Team

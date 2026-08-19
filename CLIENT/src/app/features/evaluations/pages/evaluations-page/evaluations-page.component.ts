@@ -4,12 +4,11 @@ import { EvaluationsFacade } from '../../facades/evaluations.facade';
 import { GtPagination } from '../../../../shared/components/gtable/gtable.types';
 import { MyQuestionnaireItem } from '../../services/evaluations-http.service';
 import { EvaluationsTableComponent } from '../../components/evaluations-table/evaluations-table.component';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 
 @Component({
   selector: 'app-evaluations-page',
   standalone: true,
-  imports: [EvaluationsTableComponent, MessagePipe],
+  imports: [EvaluationsTableComponent],
   templateUrl: './evaluations-page.component.html',
 })
 export class EvaluationsPageComponent implements OnInit {

@@ -1,14 +1,16 @@
-import { Component, input, output, signal, effect } from '@angular/core';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { MessageService, MessageResolver } from '../../../../core/services/message.service';
 import { PeriodItem, PeriodPayload } from '../../services/periods-http.service';
 
 @Component({
   selector: 'app-period-form-modal',
   standalone: true,
-  imports: [MessagePipe],
   templateUrl: './period-form-modal.component.html',
 })
 export class PeriodFormModalComponent {
+  private msg = inject(MessageService);
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
   editing = input<PeriodItem | null>(null);
   saving = input(false);
 
@@ -18,6 +20,15 @@ export class PeriodFormModalComponent {
   name = signal('');
   startDate = signal('');
   endDate = signal('');
+
+  vm = computed(() => ({
+    editing: this.editing(),
+    saving: this.saving(),
+    name: this.name(),
+    startDate: this.startDate(),
+    endDate: this.endDate(),
+    t: this.t,
+  }));
 
   constructor() {
     effect(() => {

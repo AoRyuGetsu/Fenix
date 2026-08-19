@@ -1,5 +1,6 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
+import { MessageService, MessageResolver } from '../../../core/services/message.service';
 import { TeamsHttpService, TeamDetail, TeamItem, TeamPayload } from '../services/teams-http.service';
 import { UsersHttpService } from '../../users/services/users-http.service';
 
@@ -25,6 +26,7 @@ export interface TeamsState {
 export class TeamsFacade {
   private api = inject(TeamsHttpService);
   private usersApi = inject(UsersHttpService);
+  private msg = inject(MessageService);
 
   private state = signal<TeamsState>({
     items: [],
@@ -44,7 +46,9 @@ export class TeamsFacade {
     loadingPlayers: false,
   });
 
-  vm = this.state.asReadonly();
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
+  vm = computed(() => ({ ...this.state(), t: this.t }));
 
   load(page?: number): void {
     const s = this.state();
@@ -63,7 +67,7 @@ export class TeamsFacade {
       error: err => this.state.update(st => ({
         ...st,
         loading: false,
-        error: getErrorMessage(err, 'Error al cargar equipos'),
+        error: getErrorMessage(err, 'team_err_load', this.msg),
       })),
     });
   }
@@ -80,12 +84,12 @@ export class TeamsFacade {
   delete(id: number): void {
     this.api.delete(id).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, success: 'Equipo eliminado correctamente' }));
+        this.state.update(s => ({ ...s, success: this.msg.get('team_suc_deleted') }));
         this.load();
       },
       error: err => this.state.update(s => ({
         ...s,
-        error: getErrorMessage(err, 'Error al eliminar equipo'),
+        error: getErrorMessage(err, 'team_err_delete', this.msg),
       })),
     });
   }
@@ -151,8 +155,8 @@ export class TeamsFacade {
           trainers: [],
           players: [],
           success: editing
-            ? 'Equipo actualizado correctamente'
-            : 'Equipo creado correctamente',
+            ? this.msg.get('team_suc_updated')
+            : this.msg.get('team_suc_created'),
         }));
         this.load();
         this.clearSuccessAfterDelay();
@@ -161,7 +165,7 @@ export class TeamsFacade {
         this.state.update(s => ({
           ...s,
           saving: false,
-          error: getErrorMessage(err, 'Error al guardar equipo'),
+          error: getErrorMessage(err, 'team_err_save', this.msg),
         }));
       },
     });

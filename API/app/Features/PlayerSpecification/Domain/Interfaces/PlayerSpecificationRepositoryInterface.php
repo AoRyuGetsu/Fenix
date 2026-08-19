@@ -10,6 +10,7 @@ use App\Features\PlayerSpecification\Domain\Entities\PlayerSpecification;
 interface PlayerSpecificationRepositoryInterface
 {
     public function findById(int $id): ?PlayerSpecification;
+    public function findByIds(array $userIds): array;
     public function findPaginated(PlayerSpecificationQuery $query): array;
     public function findByUserId(int $userId): ?PlayerSpecification;
     public function save(PlayerSpecification $spec): void;

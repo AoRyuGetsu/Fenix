@@ -18,10 +18,4 @@ CLIENT/.angular/
 # ──────────────────────────────────────────────
 .vscode/
 
-# ──────────────────────────────────────────────
-# Documentos del proyecto (solo desarrollo)
-# ──────────────────────────────────────────────
-/AGENT_CONTEXT.md
-/AGENTS.md
-/PENDIENTES.md
-/ARCHITECTURE.md
+

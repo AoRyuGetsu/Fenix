@@ -213,6 +213,54 @@ foreach ($teams as $team) {
     echo "✓ Equipo '{$team['name']}' ({$team['code']}) creado.\n";
 }
 
+// ── Asignar jugadores a equipos (team_players) ──
+$teamAssignments = [
+    'SUB12' => ['jugador@mail.com', 'jugador2@mail.com', 'jugador3@mail.com'],
+    'SUB18' => ['jugador4@mail.com', 'jugadora5@mail.com'],
+];
+
+foreach ($teamAssignments as $teamCode => $playerEmails) {
+    $teamId = $conn->executeQuery(
+        "SELECT id FROM teams WHERE code = ? AND deleted_at IS NULL",
+        [$teamCode]
+    )->fetchOne();
+
+    if ($teamId === false) {
+        echo "✗ Equipo '{$teamCode}' no encontrado. No se asignan jugadores.\n";
+        continue;
+    }
+    $teamId = (int) $teamId;
+
+    foreach ($playerEmails as $playerEmail) {
+        $playerId = $conn->executeQuery(
+            "SELECT id FROM users WHERE email = ? AND deleted_at IS NULL",
+            [$playerEmail]
+        )->fetchOne();
+
+        if ($playerId === false) {
+            echo "✗ Jugador '{$playerEmail}' no encontrado. Se omite asignación al equipo '{$teamCode}'.\n";
+            continue;
+        }
+        $playerId = (int) $playerId;
+
+        $existing = $conn->executeQuery(
+            "SELECT 1 FROM team_players WHERE player_user_id = ?",
+            [$playerId]
+        )->fetchOne();
+
+        if ($existing !== false) {
+            echo "• Jugador '{$playerEmail}' ya está asignado a un equipo.\n";
+            continue;
+        }
+
+        $conn->executeStatement(
+            "INSERT INTO team_players (team_id, player_user_id) VALUES (?, ?)",
+            [$teamId, $playerId]
+        );
+        echo "✓ Jugador '{$playerEmail}' asignado al equipo '{$teamCode}'.\n";
+    }
+}
+
 // ── Asignar representantes a jugadores con parentesco ──
 // Los parentescos provienen del catálogo de la tabla `parentescos`
 // (seedeado por 006_seed_parentescos.php).

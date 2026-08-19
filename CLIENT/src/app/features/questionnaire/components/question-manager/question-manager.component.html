@@ -1,21 +1,21 @@
 <div class="mb-3">
   <button class="btn btn-sm btn-primary" (click)="add.emit()">
-    <i class="bi-plus-lg me-1"></i>Agregar Pregunta
+    <i class="bi-plus-lg me-1"></i>{{ vm().t('qnr_btn_add_question') }}
   </button>
 </div>
 
-@if (questions().length === 0 && !loading()) {
-  <p class="text-muted text-sm">No hay preguntas aún.</p>
+@if (vm().questions.length === 0 && !vm().loading) {
+  <p class="text-muted text-sm">{{ vm().t('qnr_lbl_no_questions') }}</p>
 }
 
-@if (loading()) {
+@if (vm().loading) {
   <div class="text-center py-2">
     <div class="spinner-border spinner-border-sm text-primary"></div>
   </div>
 }
 
 <div class="list-group">
-  @for (question of questions(); track question.id) {
+  @for (question of vm().questions; track question.id) {
     <div class="list-group-item list-group-item-action">
       <div class="d-flex justify-content-between align-items-start">
         <div class="flex-grow-1">
@@ -24,7 +24,7 @@
           <span class="badge bg-info ms-2 text-xs">{{ question.type }}</span>
           @if (question.type === 'selection' && question.options?.length) {
             <div class="mt-1 text-sm text-muted">
-              Opciones: {{ question.options!.map(o => o.option_text).join(', ') }}
+              {{ vm().t('qnr_lbl_options_prefix') }} {{ question.options!.map(o => o.option_text).join(', ') }}
             </div>
           }
         </div>

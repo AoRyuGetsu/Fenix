@@ -7,7 +7,6 @@ import { QuestionnaireCreateModalComponent } from '../../components/questionnair
 import { QuestionnaireUpdateModalComponent } from '../../components/questionnaire-update-modal/questionnaire-update-modal.component';
 import { QuestionManagerComponent } from '../../components/question-manager/question-manager.component';
 import { QuestionnaireEditQuestionModalComponent } from '../../components/questionnaire-edit-question-modal/questionnaire-edit-question-modal.component';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 
 @Component({
   selector: 'app-questionnaire-page',
@@ -18,7 +17,6 @@ import { MessagePipe } from '../../../../shared/pipes/message.pipe';
     QuestionnaireUpdateModalComponent,
     QuestionManagerComponent,
     QuestionnaireEditQuestionModalComponent,
-    MessagePipe,
   ],
   templateUrl: './questionnaire-page.component.html',
 })

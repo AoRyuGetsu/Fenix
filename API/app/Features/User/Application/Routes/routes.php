@@ -14,6 +14,11 @@ return function (Router $router, Container $container): void {
         return $controller->execute();
     }));
 
+    $router->addRoute('GET', '/users/players', middleware($container, function () use ($container) {
+        $controller = $container->make(UserController::class);
+        return $controller->players();
+    }, ['SUP', 'ADM', 'ENT']));
+
     $router->addRoute('POST', '/users', middleware($container, function () use ($container) {
         $controller = $container->make(UserController::class);
         return $controller->execute();

@@ -72,11 +72,19 @@ export const routes: Routes = [
       },
       {
         path: 'evaluaciones',
+        canActivate: [permissionGuard],
+        data: { roles: ['ENT'] },
         loadChildren: () => import('./features/evaluations/routes'),
       },
       {
         path: 'analisis',
         loadChildren: () => import('./features/evaluation-stats/routes'),
+      },
+      {
+        path: 'representados',
+        canActivate: [permissionGuard],
+        data: { roles: ['REP'] },
+        loadChildren: () => import('./features/representados/routes'),
       },
       {
         path: '**',

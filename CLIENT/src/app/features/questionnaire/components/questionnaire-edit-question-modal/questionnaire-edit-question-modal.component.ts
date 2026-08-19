@@ -1,5 +1,6 @@
-import { Component, input, output, signal, effect } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { QuestionItem } from '../../services/questionnaire-http.service';
+import { MessageService, MessageResolver } from '../../../../core/services/message.service';
 
 @Component({
   selector: 'app-questionnaire-edit-question-modal',
@@ -7,6 +8,9 @@ import { QuestionItem } from '../../services/questionnaire-http.service';
   templateUrl: './questionnaire-edit-question-modal.component.html',
 })
 export class QuestionnaireEditQuestionModalComponent {
+  private msg = inject(MessageService);
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
   visible = input(false);
   loading = input(false);
   question = input<QuestionItem | null>(null);
@@ -17,6 +21,17 @@ export class QuestionnaireEditQuestionModalComponent {
   editType = signal('text');
   editOptions = signal('');
   editOrder = signal(0);
+
+  vm = computed(() => ({
+    visible: this.visible(),
+    loading: this.loading(),
+    question: this.question(),
+    editText: this.editText(),
+    editType: this.editType(),
+    editOptions: this.editOptions(),
+    editOrder: this.editOrder(),
+    t: this.t,
+  }));
 
   constructor() {
     effect(() => {

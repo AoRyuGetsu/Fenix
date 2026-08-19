@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
-import { MessageService } from '../../../core/services/message.service';
+import { MessageService, MessageResolver } from '../../../core/services/message.service';
 import {
   EvaluationsHttpService,
   MyQuestionnaireItem,
@@ -95,7 +95,9 @@ export class EvaluationsFacade {
     playerInfoLoading: false,
   });
 
-  vm = this.listState.asReadonly();
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
+  vm = computed(() => ({ ...this.listState(), t: this.t }));
 
   private studentsList = computed<EvaluationsStudentItem[]>(() => {
     const s = this.fillState();
@@ -122,6 +124,7 @@ export class EvaluationsFacade {
       studentsList: this.studentsList(),
       selectedUserDisplayName: this.selectedUserDisplayName(),
       totalPages: Math.max(1, Math.ceil(s.total / s.perPage)),
+      t: this.t,
     };
   });
 
@@ -140,7 +143,7 @@ export class EvaluationsFacade {
       error: err => this.listState.update(s => ({
         ...s,
         loading: false,
-        error: getErrorMessage(err, this.msg.get('eval_err_load_evaluations')),
+        error: getErrorMessage(err, 'eval_err_load_evaluations', this.msg),
       })),
     });
   }
@@ -194,7 +197,7 @@ export class EvaluationsFacade {
       },
       error: err => this.fillState.update(s => ({
         ...s,
-        error: getErrorMessage(err, this.msg.get('eval_err_load_periods')),
+        error: getErrorMessage(err, 'eval_err_load_periods', this.msg),
       })),
     });
 
@@ -210,7 +213,7 @@ export class EvaluationsFacade {
         ...s,
         questionsLoading: false,
         usersLoading: false,
-        error: getErrorMessage(err, this.msg.get('eval_err_load_questionnaire')),
+        error: getErrorMessage(err, 'eval_err_load_questionnaire', this.msg),
       })),
     });
   }
@@ -238,7 +241,7 @@ export class EvaluationsFacade {
       error: err => this.fillState.update(s => ({
         ...s,
         usersLoading: false,
-        error: getErrorMessage(err, this.msg.get('eval_err_load_students')),
+        error: getErrorMessage(err, 'eval_err_load_students', this.msg),
       })),
     });
   }
@@ -329,7 +332,7 @@ export class EvaluationsFacade {
         error: err => this.fillState.update(s => ({
           ...s,
           saving: false,
-          error: getErrorMessage(err, this.msg.get('eval_err_update_evaluation')),
+          error: getErrorMessage(err, 'eval_err_update_evaluation', this.msg),
         })),
       });
     } else {
@@ -350,7 +353,7 @@ export class EvaluationsFacade {
         error: err => this.fillState.update(s => ({
           ...s,
           saving: false,
-          error: getErrorMessage(err, this.msg.get('eval_err_save_evaluation')),
+          error: getErrorMessage(err, 'eval_err_save_evaluation', this.msg),
         })),
       });
     }

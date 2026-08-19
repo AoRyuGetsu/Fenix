@@ -1,0 +1,12 @@
+{
+  "rep_hdr_title":                          { "message": "Mis Representados", "desc": "Título página representados" },
+  "rep_lbl_subtitle":                       { "message": "Información de los jugadores que representas", "desc": "Subtítulo página" },
+  "rep_hdr_list":                           { "message": "Lista de jugadores", "desc": "Header card lista" },
+  "rep_err_load":                           { "message": "Error al cargar tus representados", "desc": "Error al cargar lista" },
+  "rep_col_player":                         { "message": "Jugador", "desc": "Columna jugador" },
+  "rep_lbl_parentesco":                     { "message": "Parentesco", "desc": "Label/columna parentesco" },
+  "rep_lbl_document_number":                { "message": "Cédula", "desc": "Label cédula en detalle" },
+  "rep_lbl_full_name":                      { "message": "Nombre completo", "desc": "Label nombre completo en detalle" },
+  "rep_lbl_select_player":                  { "message": "Seleccione un jugador de la lista", "desc": "Aviso sin jugador seleccionado" },
+  "rep_plh_search":                         { "message": "Buscar por nombre, cédula o email...", "desc": "Placeholder búsqueda" }
+}

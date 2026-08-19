@@ -1,52 +1,52 @@
-@let state = vm();
+@let vm = facade.fillVm;
 
 <div class="container-fluid py-3">
   <div class="d-flex align-items-center gap-2 mb-3">
     <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">
-      <i class="bi bi-arrow-left"></i> {{ 'cr_btn_back' | message }}
+      <i class="bi bi-arrow-left"></i> {{ vm().t('cr_btn_back') }}
     </button>
     <h4 class="mb-0">
-      @if (state.questionnaire) {
-        {{ state.questionnaire!.title }}
+      @if (vm().questionnaire) {
+        {{ vm().questionnaire!.title }}
       } @else {
-        {{ 'eval_lbl_loading_questionnaire' | message }}
+        {{ vm().t('eval_lbl_loading_questionnaire') }}
       }
     </h4>
   </div>
 
-  @if (state.error) {
+  @if (vm().error) {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      {{ state.error }}
+      {{ vm().error }}
       <button type="button" class="btn-close" (click)="facade.clearFillMessages()"></button>
     </div>
   }
 
-  @if (state.success) {
+  @if (vm().success) {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ state.success }}
+      {{ vm().success }}
       <button type="button" class="btn-close" (click)="facade.clearFillMessages()"></button>
     </div>
   }
 
-  @if (state.questionsLoading) {
+  @if (vm().questionsLoading) {
     <div class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">{{ 'eval_alr_loading_questionnaire' | message }}</span>
+        <span class="visually-hidden">{{ vm().t('eval_alr_loading_questionnaire') }}</span>
       </div>
     </div>
   } @else {
-    @if (state.questionnaire) {
-      @if (state.questionnaire!.description) {
-        <p class="text-muted mb-3">{{ state.questionnaire!.description }}</p>
+    @if (vm().questionnaire) {
+      @if (vm().questionnaire!.description) {
+        <p class="text-muted mb-3">{{ vm().questionnaire!.description }}</p>
       }
 
       <!-- Selector de periodo -->
       <div class="card mb-4">
-        <div class="card-header fw-semibold">{{ 'eval_hdr_period_selector' | message }}</div>
+        <div class="card-header fw-semibold">{{ vm().t('eval_hdr_period_selector') }}</div>
         <div class="card-body">
-          <select class="form-select" [value]="state.selectedPeriodId ?? ''" (change)="onPeriodChange($event)">
-            <option value="" disabled>{{ 'eval_plh_select_period' | message }}</option>
-            @for (p of state.periods; track p.id) {
+          <select class="form-select" [value]="vm().selectedPeriodId ?? ''" (change)="onPeriodChange($event)">
+            <option value="" disabled>{{ vm().t('eval_plh_select_period') }}</option>
+            @for (p of vm().periods; track p.id) {
               <option [value]="p.id">{{ p.name }}</option>
             }
           </select>
@@ -55,48 +55,48 @@
 
       <div class="row">
         <!-- Tabla de estudiantes -->
-        <div class="col-12" [class.col-lg-4]="state.selectedUserId !== null">
-          @if (!state.usersLoading) {
-            @if (state.studentsList.length > 0) {
+        <div class="col-12" [class.col-lg-4]="vm().selectedUserId !== null">
+          @if (!vm().usersLoading) {
+            @if (vm().studentsList.length > 0) {
               <div class="card mb-4">
-                <div class="card-header fw-semibold">{{ 'eval_hdr_students_unevaluated' | message }}</div>
+                <div class="card-header fw-semibold">{{ vm().t('eval_hdr_students_unevaluated') }}</div>
                 <div class="card-body p-0">
                   <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle mb-0">
                       <thead class="table-light">
                         <tr>
-                          <th>{{ 'eval_lbl_student_name' | message }}</th>
-                          <th>{{ 'eval_lbl_status' | message }}</th>
-                          <th style="width: 200px;">{{ 'cr_lbl_actions' | message }}</th>
+                          <th>{{ vm().t('eval_lbl_student_name') }}</th>
+                          <th>{{ vm().t('eval_lbl_status') }}</th>
+                          <th style="width: 200px;">{{ vm().t('cr_lbl_actions') }}</th>
                         </tr>
                       </thead>
                       <tbody>
-                        @for (student of state.studentsList; track trackByStudentId($index, student)) {
+                        @for (student of vm().studentsList; track trackByStudentId($index, student)) {
                           <tr
                             class="cursor-pointer"
-                            [class.table-primary]="state.selectedUserId === student.user.id"
+                            [class.table-primary]="vm().selectedUserId === student.user.id"
                             (click)="onUserSelect(student.user.id)"
                           >
                             <td>{{ student.user.display_name || student.user.email }}</td>
                             <td>
                               @if (student.isEvaluated) {
-                                <span class="badge bg-success">{{ 'eval_badge_evaluated' | message }}</span>
+                                <span class="badge bg-success">{{ vm().t('eval_badge_evaluated') }}</span>
                               } @else {
-                                <span class="badge bg-secondary">{{ 'eval_badge_unevaluated' | message }}</span>
+                                <span class="badge bg-secondary">{{ vm().t('eval_badge_unevaluated') }}</span>
                               }
                             </td>
                             <td>
                               <div class="d-flex gap-1">
-                                <button class="btn btn-sm btn-outline-info" (click)="onShowFicha(student.user); $event.stopPropagation()" [title]="'eval_btn_show_profile_tip' | message">
+                                <button class="btn btn-sm btn-outline-info" (click)="onShowFicha(student.user); $event.stopPropagation()" [title]="vm().t('eval_btn_show_profile_tip')">
                                   <i class="bi bi-person-badge"></i>
                                 </button>
                                 @if (student.isEvaluated) {
-                                  <button class="btn btn-sm btn-outline-success" (click)="onUserSelect(student.user.id); $event.stopPropagation()" title="{{ 'cr_btn_edit' | message }}">
+                                  <button class="btn btn-sm btn-outline-success" (click)="onUserSelect(student.user.id); $event.stopPropagation()" title="{{ vm().t('cr_btn_edit') }}">
                                     <i class="bi-pencil"></i>
                                   </button>
                                 } @else {
                                   <button class="btn btn-sm btn-primary flex-grow-1" (click)="onUserSelect(student.user.id); $event.stopPropagation()">
-                                    <i class="bi bi-check-lg"></i> {{ 'eval_btn_answer' | message }}
+                                    <i class="bi bi-check-lg"></i> {{ vm().t('eval_btn_answer') }}
                                   </button>
                                 }
                               </div>
@@ -109,53 +109,59 @@
                 </div>
               </div>
 
-              @if (state.total > state.perPage) {
-                <div class="d-flex justify-content-center align-items-center gap-3 mb-4">
-                  <button
-                    class="btn btn-outline-secondary btn-sm"
-                    [disabled]="state.page <= 1"
-                    (click)="onFillPageChange(state.page - 1)"
-                  >
-                    <i class="bi bi-chevron-left"></i> {{ 'eval_btn_previous' | message }}
-                  </button>
-                  <span class="text-muted small">
-                    {{ 'eval_lbl_page_x_of_y' | message : { page: state.page, total: state.totalPages } }}
-                  </span>
-                  <button
-                    class="btn btn-outline-secondary btn-sm"
-                    [disabled]="state.page >= state.totalPages"
-                    (click)="onFillPageChange(state.page + 1)"
-                  >
-                    {{ 'eval_btn_next' | message }} <i class="bi bi-chevron-right"></i>
-                  </button>
+              @if (vm().total > vm().perPage) {
+                <div class="row justify-content-center align-items-center mb-4 g-3">
+                  <div class="col-auto">
+                    <button
+                      class="btn btn-outline-secondary btn-sm"
+                      [disabled]="vm().page <= 1"
+                      (click)="onFillPageChange(vm().page - 1)"
+                    >
+                      <i class="bi bi-chevron-left"></i> {{ vm().t('eval_btn_previous') }}
+                    </button>
+                  </div>
+                  <div class="col-auto">
+                    <span class="text-muted small">
+                      {{ vm().t('eval_lbl_page_x_of_y', { page: vm().page, total: vm().totalPages }) }}
+                    </span>
+                  </div>
+                  <div class="col-auto">
+                    <button
+                      class="btn btn-outline-secondary btn-sm"
+                      [disabled]="vm().page >= vm().totalPages"
+                      (click)="onFillPageChange(vm().page + 1)"
+                    >
+                      {{ vm().t('eval_btn_next') }} <i class="bi bi-chevron-right"></i>
+                    </button>
+                  </div>
                 </div>
               }
             } @else {
-              <div class="text-muted text-center py-3">{{ 'eval_lbl_no_students' | message }}</div>
+              <div class="text-muted text-center py-3">{{ vm().t('eval_lbl_no_students') }}</div>
             }
           } @else {
             <div class="text-center py-3">
               <div class="spinner-border spinner-border-sm text-primary" role="status">
-                <span class="visually-hidden">{{ 'eval_alr_loading_students' | message }}</span>
+                <span class="visually-hidden">{{ vm().t('eval_alr_loading_students') }}</span>
               </div>
             </div>
           }
         </div>
 
         <!-- Card de evaluación -->
-        @if (state.selectedUserId !== null) {
+        @if (vm().selectedUserId !== null) {
           <div class="col-12 col-lg-8">
             <div class="card mb-4">
               <div class="card-header d-flex align-items-center justify-content-between">
                 <span class="fw-semibold">
-                  {{ state.selectedUserDisplayName }}
+                  {{ vm().selectedUserDisplayName }}
                 </span>
-                @if (state.editingEvaluationId !== null) {
-                  <span class="badge bg-info">{{ 'eval_alr_editing_evaluation' | message }}</span>
+                @if (vm().editingEvaluationId !== null) {
+                  <span class="badge bg-info">{{ vm().t('eval_alr_editing_evaluation') }}</span>
                 }
               </div>
               <div class="card-body">
-                @for (section of state.questionnaire!.sections; track section.id) {
+                @for (section of vm().questionnaire!.sections; track section.id) {
                   <div class="mb-4">
                     <h5 class="mb-1">{{ section.title }}</h5>
                     @if (section.description) {
@@ -165,7 +171,7 @@
                     @for (q of section.questions; track trackByQuestionId($index, q)) {
                       <app-question-card
                         [question]="q"
-                        [value]="state.answers[q.id] || ''"
+                        [value]="vm().answers[q.id] || ''"
                         (valueChange)="onAnswerChange(q.id, $event)"
                       />
                     }
@@ -176,12 +182,12 @@
                   <button
                     class="btn btn-success btn-lg px-4"
                     (click)="onSave()"
-                    [disabled]="state.saving"
+                    [disabled]="vm().saving"
                   >
-                    @if (state.saving) {
+                    @if (vm().saving) {
                       <span class="spinner-border spinner-border-sm me-1" role="status"></span>
                     }
-                    {{ state.editingEvaluationId !== null ? ('eval_btn_update_evaluation' | message) : ('eval_btn_save_evaluation' | message) }}
+                    {{ vm().editingEvaluationId !== null ? (vm().t('eval_btn_update_evaluation')) : (vm().t('eval_btn_save_evaluation')) }}
                   </button>
                 </div>
               </div>
@@ -193,11 +199,11 @@
   }
 </div>
 
-@if (state.showPlayerInfoModal && state.playerInfoUser) {
+@if (vm().showPlayerInfoModal && vm().playerInfoUser) {
   <app-player-info-modal
-    [user]="state.playerInfoUser"
-    [spec]="state.playerInfoSpec"
-    [loading]="state.playerInfoLoading"
+    [user]="vm().playerInfoUser!"
+    [spec]="vm().playerInfoSpec"
+    [loading]="vm().playerInfoLoading"
     (close)="onCloseFicha()"
   />
 }

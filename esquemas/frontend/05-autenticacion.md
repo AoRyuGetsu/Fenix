@@ -61,7 +61,7 @@ sequenceDiagram
 
     Interceptor->>AuthHttp: refresh(refresh_token)
     AuthHttp->>API: POST /api/auth/refresh\n{ refresh_token }
-    API-->>AuthHttp: 200 JSON\n{ access_token, refresh_token }
+    API-->>AuthHttp: 200 JSON\n{ access_token, refresh_token,\n  expires_in, roles, menus, catalogs }\n(sin user)
     AuthHttp-->>Interceptor: Observable emits
 
     Interceptor->>Storage: setItem('access_token', res.access_token)

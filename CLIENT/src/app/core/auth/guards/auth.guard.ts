@@ -8,9 +8,10 @@ export class AuthGuard implements CanActivate {
   private router = inject(Router);
 
   canActivate(): boolean | UrlTree {
-    if (this.auth.isAuthenticated()) {
+    if (this.auth.isSessionValid()) {
       return true;
     }
-    return this.router.parseUrl('/not-logged-in');
+    this.auth.clearSession();
+    return this.router.parseUrl('/login');
   }
 }

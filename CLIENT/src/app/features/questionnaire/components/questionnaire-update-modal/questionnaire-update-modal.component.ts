@@ -1,6 +1,7 @@
-import { Component, input, output, signal, effect } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { RoleItem } from '../../../../core/auth/services/auth-http.service';
 import { QuestionnaireItem } from '../../services/questionnaire-http.service';
+import { MessageService, MessageResolver } from '../../../../core/services/message.service';
 
 @Component({
   selector: 'app-questionnaire-update-modal',
@@ -8,6 +9,9 @@ import { QuestionnaireItem } from '../../services/questionnaire-http.service';
   templateUrl: './questionnaire-update-modal.component.html',
 })
 export class QuestionnaireUpdateModalComponent {
+  private msg = inject(MessageService);
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
   visible = input(false);
   loading = input(false);
   item = input<QuestionnaireItem | null>(null);
@@ -20,6 +24,18 @@ export class QuestionnaireUpdateModalComponent {
   active = signal(true);
   responderRoleId = signal(0);
   targetRoleId = signal(0);
+
+  vm = computed(() => ({
+    visible: this.visible(),
+    loading: this.loading(),
+    roles: this.roles(),
+    title: this.title(),
+    description: this.description(),
+    active: this.active(),
+    responderRoleId: this.responderRoleId(),
+    targetRoleId: this.targetRoleId(),
+    t: this.t,
+  }));
 
   constructor() {
     effect(() => {

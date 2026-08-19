@@ -1,0 +1,67 @@
+@if (vm().searchPlaceholder) {
+  <div class="input-group input-group-sm mb-3">
+    <input
+      #searchInput
+      type="text"
+      class="form-control"
+      [value]="vm().searchValue"
+      [placeholder]="vm().t(vm().searchPlaceholder!)"
+      (keyup.enter)="onSearchInput($event)"
+      (blur)="onSearchInput($event)"
+    />
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      (click)="onSearchButtonClick(searchInput)"
+      tabindex="-1"
+      aria-label="{{ vm().t('cr_btn_search') }}">
+      <i class="bi bi-search"></i>
+    </button>
+  </div>
+}
+
+@if (vm().loading) {
+  <div class="text-center py-3">
+    <div class="spinner-border spinner-border-sm text-primary" role="status">
+      <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
+    </div>
+  </div>
+} @else if (vm().items.length === 0) {
+  <div class="text-muted small text-center py-3">{{ vm().t(vm().emptyLabel) }}</div>
+} @else {
+  <div class="list-group list-group-flush overflow-auto" style="max-height: 60vh;">
+    @for (item of vm().items; track item.id) {
+      <a
+        href="javascript:void(0)"
+        class="list-group-item list-group-item-action border-0"
+        [class.active]="item.id === vm().activeId"
+        (click)="onSelect(item.id)">
+        {{ item.display_name }}
+      </a>
+    }
+  </div>
+}
+
+@if (vm().pagination; as pag) {
+  @if (pag.total > 0) {
+    <nav class="mt-2">
+      <ul class="pagination pagination-sm justify-content-center mb-0">
+        <li class="page-item" [class.disabled]="pag.page <= 1">
+          <button type="button" class="page-link" (click)="pageChange.emit(pag.page - 1)">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+        </li>
+        @for (p of vm().pages; track p) {
+          <li class="page-item" [class.active]="p === pag.page">
+            <button type="button" class="page-link" (click)="pageChange.emit(p)">{{ p }}</button>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="pag.page >= vm().totalPages">
+          <button type="button" class="page-link" (click)="pageChange.emit(pag.page + 1)">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  }
+}

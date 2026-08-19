@@ -1,18 +1,24 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 import { AuthFacade } from '../../facades/auth.facade';
+import { ConfigService } from '../../../services/config.service';
 
 @Component({
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, MessagePipe],
+  imports: [ReactiveFormsModule],
   templateUrl: './login-page.component.html',
 })
 export class LoginPageComponent {
   private facade = inject(AuthFacade);
-  vm = this.facade.vm;
+  private configService = inject(ConfigService);
 
-  showPassword = signal(false);
+  private showPassword = signal(false);
+
+  vm = computed(() => ({
+    ...this.facade.vm(),
+    showPassword: this.showPassword(),
+    loginLogoUrl: this.configService.loginLogoUrl,
+  }));
 
   togglePassword(): void {
     this.showPassword.update(v => !v);

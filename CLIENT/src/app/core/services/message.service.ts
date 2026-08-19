@@ -7,6 +7,8 @@ interface MessageEntry {
   desc: string;
 }
 
+export type MessageResolver = (key: string, params?: Record<string, string | number>) => string;
+
 @Injectable({ providedIn: 'root' })
 export class MessageService {
   private http = inject(HttpClient);

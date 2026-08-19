@@ -1,67 +1,42 @@
-import { Component, OnInit, inject, computed } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
 import { AuthFacade } from '../../../../core/auth/facades/auth.facade';
 import { EvaluationStatsFacade } from '../../facades/evaluation-stats.facade';
-import { TrendDistributionChartComponent } from '../../components/trend-distribution-chart/trend-distribution-chart.component';
-import { TeamAveragesChartComponent } from '../../components/team-averages-chart/team-averages-chart.component';
-import { PlayerTrendTableComponent } from '../../components/player-trend-table/player-trend-table.component';
-import { GtPagination } from '../../../../shared/components/gtable/gtable.types';
-import { PlayerTrend } from '../../services/evaluation-stats-http.service';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
+import { PlayerListComponent } from '../../../../shared/components/player-list/player-list.component';
+import { PlayerStatsPanelComponent } from '../../components/player-stats-panel/player-stats-panel.component';
 
 @Component({
   selector: 'app-analysis-dashboard-page',
   standalone: true,
-  imports: [
-    MessagePipe,
-    TrendDistributionChartComponent,
-    TeamAveragesChartComponent,
-    PlayerTrendTableComponent,
-  ],
+  imports: [PlayerListComponent, PlayerStatsPanelComponent],
   templateUrl: './analysis-dashboard-page.component.html',
 })
 export class AnalysisDashboardPageComponent implements OnInit {
   auth = inject(AuthFacade);
   facade = inject(EvaluationStatsFacade);
-  router = inject(Router);
   vm = this.facade.dashboardVm;
 
   ngOnInit(): void {
-    if (this.auth.authRoles().includes('ENT')) {
+    const roles = this.auth.authRoles();
+    if (roles.includes('JUG')) {
+      this.facade.loadMyAnalysis();
+    } else if (roles.includes('REP')) {
+      this.facade.loadRepresentedPlayers();
+    } else if (roles.includes('ENT')) {
       this.facade.loadMyTeam();
     } else {
-      this.facade.loadTeams();
+      this.facade.loadAllPlayers();
     }
   }
 
-  trendData = computed(() => this.vm().teamStats?.trend_summary ?? { upward: 0, downward: 0, stable: 0 });
-
-  teamChartLabels = computed(() => {
-    const q = this.facade.currentQStats();
-    return q?.team_averages.map(a => a.period_name) ?? [];
-  });
-
-  teamChartAverages = computed(() => {
-    const q = this.facade.currentQStats();
-    return q?.team_averages.map(a => a.average) ?? [];
-  });
-
-  pagination = computed<GtPagination>(() => {
-    const players = this.facade.currentQStats()?.players ?? [];
-    return { page: 1, perPage: 20, total: players.length };
-  });
-
-  onTeamChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.facade.selectTeam(Number(select.value));
+  onSelectPlayer(id: number): void {
+    this.facade.selectPlayer(id);
   }
 
-  onQuestionnaireChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.facade.selectQuestionnaire(Number(select.value));
+  onChangePage(page: number): void {
+    this.facade.changeRosterPage(page);
   }
 
-  onViewPlayer(player: PlayerTrend): void {
-    this.router.navigate(['/analisis', 'jugador', player.user.id]);
+  onSearch(term: string): void {
+    this.facade.setRosterSearch(term);
   }
 }

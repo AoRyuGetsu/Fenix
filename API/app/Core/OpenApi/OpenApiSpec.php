@@ -69,6 +69,15 @@ use OpenApi\Attributes as OA;
     ]
 )]
 #[OA\Schema(
+    schema: 'PlayerSummary',
+    description: 'Resumen de un jugador para listados',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer'),
+        new OA\Property(property: 'email', type: 'string'),
+        new OA\Property(property: 'display_name', type: 'string'),
+    ]
+)]
+#[OA\Schema(
     schema: 'LoginRequest',
     properties: [
         new OA\Property(property: 'email', type: 'string'),
@@ -240,6 +249,65 @@ use OpenApi\Attributes as OA;
     description: 'Respuesta paginada genérica. Los campos data, total, page, perPage varían según el endpoint.',
     properties: [
         new OA\Property(property: 'data', type: 'array', items: new OA\Items(type: 'object')),
+        new OA\Property(property: 'total', type: 'integer'),
+        new OA\Property(property: 'page', type: 'integer'),
+        new OA\Property(property: 'perPage', type: 'integer'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'RepresentedPlayer',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer'),
+        new OA\Property(property: 'email', type: 'string'),
+        new OA\Property(property: 'display_name', type: 'string'),
+        new OA\Property(property: 'person', nullable: true, properties: [
+            new OA\Property(property: 'first_name', type: 'string'),
+            new OA\Property(property: 'middle_name', type: 'string', nullable: true),
+            new OA\Property(property: 'first_surname', type: 'string'),
+            new OA\Property(property: 'second_surname', type: 'string', nullable: true),
+            new OA\Property(property: 'document_number', type: 'string'),
+            new OA\Property(property: 'email', type: 'string', nullable: true),
+            new OA\Property(property: 'phone', type: 'string', nullable: true),
+            new OA\Property(property: 'address', type: 'string', nullable: true),
+        ], type: 'object'),
+        new OA\Property(property: 'parentesco', ref: '#/components/schemas/Parentesco'),
+        new OA\Property(property: 'player_spec', ref: '#/components/schemas/RepresentedPlayerSpec', nullable: true),
+    ]
+)]
+#[OA\Schema(
+    schema: 'RepresentedPlayerSpec',
+    properties: [
+        new OA\Property(property: 'birth_date', type: 'string', format: 'date'),
+        new OA\Property(property: 'height_cm', type: 'number', format: 'float'),
+        new OA\Property(property: 'weight_kg', type: 'number', format: 'float'),
+        new OA\Property(property: 'gender', type: 'string'),
+        new OA\Property(property: 'entry_date', type: 'string', format: 'date'),
+        new OA\Property(property: 'medical_conditions', type: 'string', nullable: true),
+        new OA\Property(property: 'emergency_contact_name', type: 'string', nullable: true),
+        new OA\Property(property: 'emergency_contact_phone', type: 'string', nullable: true),
+        new OA\Property(property: 'emergency_contact_relationship', type: 'string', nullable: true),
+        new OA\Property(property: 'position', type: 'string', nullable: true),
+        new OA\Property(property: 'jersey_number_1', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_2', type: 'integer', nullable: true),
+        new OA\Property(property: 'jersey_number_3', type: 'integer', nullable: true),
+        new OA\Property(property: 'dominant_foot', type: 'string', nullable: true),
+        new OA\Property(property: 'nationality', type: 'string', nullable: true),
+        new OA\Property(property: 'blood_type', type: 'string', nullable: true),
+        new OA\Property(property: 'allergies', type: 'string', nullable: true),
+        new OA\Property(property: 'insurance', type: 'string', nullable: true),
+        new OA\Property(property: 'medications', type: 'string', nullable: true),
+        new OA\Property(property: 'basketball_experience', type: 'boolean', nullable: true),
+        new OA\Property(property: 'previous_club', type: 'string', nullable: true),
+        new OA\Property(property: 'category', type: 'string', nullable: true),
+        new OA\Property(property: 'shirt_size', type: 'string', nullable: true),
+        new OA\Property(property: 'status', type: 'string'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'RepresentedPlayerResponse',
+    description: 'Respuesta paginada de jugadores representados por un representante.',
+    properties: [
+        new OA\Property(property: 'data', type: 'array', items: new OA\Items(ref: '#/components/schemas/RepresentedPlayer')),
         new OA\Property(property: 'total', type: 'integer'),
         new OA\Property(property: 'page', type: 'integer'),
         new OA\Property(property: 'perPage', type: 'integer'),
@@ -575,7 +643,9 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'question_text', type: 'string'),
         new OA\Property(property: 'question_type', type: 'string'),
         new OA\Property(property: 'averages', type: 'array', items: new OA\Items(ref: '#/components/schemas/PerPeriodAverage')),
+        new OA\Property(property: 'observations', type: 'array', items: new OA\Items(ref: '#/components/schemas/Observation')),
         new OA\Property(property: 'regression', ref: '#/components/schemas/RegressionResult', nullable: true),
+        new OA\Property(property: 'historial_regression', ref: '#/components/schemas/RegressionResult', nullable: true),
     ]
 )]
 #[OA\Schema(
@@ -583,6 +653,7 @@ use OpenApi\Attributes as OA;
     properties: [
         new OA\Property(property: 'period_id', type: 'integer'),
         new OA\Property(property: 'period_name', type: 'string'),
+        new OA\Property(property: 'index', type: 'integer'),
         new OA\Property(property: 'average', type: 'number', format: 'float'),
         new OA\Property(property: 'count', type: 'integer'),
     ]
@@ -591,7 +662,9 @@ use OpenApi\Attributes as OA;
     schema: 'OverallStats',
     properties: [
         new OA\Property(property: 'averages', type: 'array', items: new OA\Items(ref: '#/components/schemas/PerPeriodAverage')),
+        new OA\Property(property: 'observations', type: 'array', items: new OA\Items(ref: '#/components/schemas/Observation')),
         new OA\Property(property: 'regression', ref: '#/components/schemas/RegressionResult', nullable: true),
+        new OA\Property(property: 'historial_regression', ref: '#/components/schemas/RegressionResult', nullable: true),
     ]
 )]
 #[OA\Schema(
@@ -601,6 +674,20 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'intercept', type: 'number', format: 'float'),
         new OA\Property(property: 'r_squared', type: 'number', format: 'float'),
         new OA\Property(property: 'trend', type: 'string', enum: ['upward', 'downward', 'stable']),
+        new OA\Property(property: 'sse', type: 'number', format: 'float', description: 'Suma de cuadrados residual (margen de error ε)'),
+        new OA\Property(property: 'std_error_slope', type: 'number', format: 'float'),
+        new OA\Property(property: 'std_error_intercept', type: 'number', format: 'float'),
+        new OA\Property(property: 'n', type: 'integer'),
+    ]
+)]
+#[OA\Schema(
+    schema: 'Observation',
+    properties: [
+        new OA\Property(property: 'evaluated_at', type: 'string', format: 'date-time'),
+        new OA\Property(property: 'x_days', type: 'number', format: 'float'),
+        new OA\Property(property: 'value', type: 'number', format: 'float'),
+        new OA\Property(property: 'fitted', type: 'number', format: 'float'),
+        new OA\Property(property: 'residual', type: 'number', format: 'float'),
     ]
 )]
 #[OA\Schema(

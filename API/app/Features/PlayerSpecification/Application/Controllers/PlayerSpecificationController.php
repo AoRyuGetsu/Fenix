@@ -9,6 +9,7 @@ use App\Core\Env;
 use App\Core\Interfaces\ControllerInterface;
 use App\Features\PlayerSpecification\Application\DTO\PlayerSpecificationQuery;
 use App\Features\PlayerSpecification\Domain\Interfaces\PlayerSpecificationServiceInterface;
+use App\Infrastructure\Auth\AuthContext;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,7 @@ class PlayerSpecificationController implements ControllerInterface
     public function __construct(
         private PlayerSpecificationServiceInterface $playerSpecService,
         private Request $request,
+        private AuthContext $authContext,
     ) {}
 
     public function execute(): Response
@@ -93,8 +95,7 @@ class PlayerSpecificationController implements ControllerInterface
         }
 
         try {
-            $auth = $this->request->attributes->get('auth_user_id');
-            $spec = $this->playerSpecService->create((int) $data['user_id'], $data, (int) $auth);
+            $spec = $this->playerSpecService->create((int) $data['user_id'], $data, $this->authContext->getUserId());
         } catch (AppException $e) {
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
         }
@@ -116,8 +117,7 @@ class PlayerSpecificationController implements ControllerInterface
         }
 
         try {
-            $auth = $this->request->attributes->get('auth_user_id');
-            $spec = $this->playerSpecService->update($id, $data, (int) $auth);
+            $spec = $this->playerSpecService->update($id, $data, $this->authContext->getUserId());
         } catch (AppException $e) {
             if ($e->getErrorCode() === 'PLAYER_SPEC_NOT_FOUND') {
                 return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], 404);

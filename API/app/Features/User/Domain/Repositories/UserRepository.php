@@ -62,9 +62,11 @@ class UserRepository implements UserRepositoryInterface
                ->setParameter('name', '%' . $query->name . '%');
         }
 
-        if ($query->teamIds !== null && $query->teamIds !== []) {
-            $idQb->andWhere($idQb->expr()->in('u.id', ':teamIds'))
-                ->setParameter('teamIds', $query->teamIds);
+        if ($query->playerIds !== null && $query->playerIds === []) {
+            $idQb->andWhere('1 = 0');
+        } elseif ($query->playerIds !== null) {
+            $idQb->andWhere($idQb->expr()->in('u.id', ':playerIds'))
+                ->setParameter('playerIds', $query->playerIds);
         }
 
         if ($query->unassigned === true) {

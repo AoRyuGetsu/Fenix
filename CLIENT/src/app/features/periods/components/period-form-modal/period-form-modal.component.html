@@ -2,36 +2,36 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        @if (editing()) {
-          <h5 class="modal-title fw-bold">{{ 'per_hdr_edit' | message }}</h5>
+        @if (vm().editing) {
+          <h5 class="modal-title fw-bold">{{ vm().t('per_hdr_edit') }}</h5>
         } @else {
-          <h5 class="modal-title fw-bold">{{ 'per_hdr_new' | message }}</h5>
+          <h5 class="modal-title fw-bold">{{ vm().t('per_hdr_new') }}</h5>
         }
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-12">
-            <label class="form-label">{{ 'per_lbl_field_name' | message }} <span class="text-danger">*</span></label>
-            <input #inputName type="text" class="form-control" [value]="name()" (input)="name.set(inputName.value)" [placeholder]="'per_plh_period_example' | message" />
+            <label class="form-label">{{ vm().t('per_lbl_field_name') }} <span class="text-danger">*</span></label>
+            <input #inputName type="text" class="form-control" [value]="vm().name" (input)="name.set(inputName.value)" [placeholder]="vm().t('per_plh_period_example')" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'per_lbl_start_date' | message }} <span class="text-danger">*</span></label>
-            <input #inputStart type="date" class="form-control" [value]="startDate()" (input)="startDate.set(inputStart.value)" />
+            <label class="form-label">{{ vm().t('per_lbl_start_date') }} <span class="text-danger">*</span></label>
+            <input #inputStart type="date" class="form-control" [value]="vm().startDate" (input)="startDate.set(inputStart.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'per_lbl_end_date' | message }} <span class="text-danger">*</span></label>
-            <input #inputEnd type="date" class="form-control" [value]="endDate()" (input)="endDate.set(inputEnd.value)" />
+            <label class="form-label">{{ vm().t('per_lbl_end_date') }} <span class="text-danger">*</span></label>
+            <input #inputEnd type="date" class="form-control" [value]="vm().endDate" (input)="endDate.set(inputEnd.value)" />
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="saving()">{{ 'cr_btn_cancel' | message }}</button>
-        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="saving() || !name() || !startDate() || !endDate()">
-          @if (saving()) {
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="vm().saving">{{ vm().t('cr_btn_cancel') }}</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="vm().saving || !vm().name || !vm().startDate || !vm().endDate">
+          @if (vm().saving) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          {{ 'cr_btn_save' | message }}
+          {{ vm().t('cr_btn_save') }}
         </button>
       </div>
     </div>

@@ -67,11 +67,23 @@ class TeamController implements ControllerInterface
         ]);
     }
 
-    #[OA\Get(path: '/teams/my', tags: ['Teams'], summary: 'Obtener equipos del entrenador logueado')]
-    #[OA\Response(response: 200, description: 'Lista de equipos del entrenador')]
+    #[OA\Get(path: '/teams/my', tags: ['Teams'], summary: 'Obtener equipos del entrenador logueado (paginados)')]
+    #[OA\Parameter(name: 'search', in: 'query', required: false, schema: new OA\Schema(type: 'string'))]
+    #[OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Parameter(name: 'perPage', in: 'query', required: false, schema: new OA\Schema(type: 'integer'))]
+    #[OA\Response(response: 200, description: 'Lista paginada de equipos del entrenador')]
     public function listMyTeams(): Response
     {
-        $teams = $this->teamService->findByTrainerId($this->authContext->getUserId());
+        $page = max(1, (int) ($this->request->query->get('page', '1')));
+        $perPage = max(1, min(100, (int) ($this->request->query->get('perPage', Env::get('PAGINATION_PER_PAGE', '20')))));
+
+        $query = new TeamQueryDto(
+            search: $this->request->query->get('search'),
+            page: $page,
+            perPage: $perPage,
+        );
+
+        [$teams, $total] = $this->teamService->findMyTeams($query);
 
         $data = array_map(fn ($t) => [
             'id'   => $t->getId(),
@@ -79,7 +91,12 @@ class TeamController implements ControllerInterface
             'code' => $t->getCode(),
         ], $teams);
 
-        return new JsonResponse($data);
+        return new JsonResponse([
+            'data'    => $data,
+            'total'   => $total,
+            'page'    => $page,
+            'perPage' => $perPage,
+        ]);
     }
 
     #[OA\Get(path: '/teams/{id}', tags: ['Teams'], summary: 'Obtener un equipo')]
@@ -87,7 +104,12 @@ class TeamController implements ControllerInterface
     #[OA\Response(response: 404, description: 'No encontrado')]
     public function show(int $id): Response
     {
-        $team = $this->teamService->findById($id);
+        try {
+            $team = $this->teamService->findByIdIfViewable($id);
+        } catch (\App\Core\AppException $e) {
+            return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
+        }
+
         if ($team === null) {
             return new JsonResponse(['error' => getError('TEAM_NOT_FOUND'), 'code' => 'TEAM_NOT_FOUND'], 404);
         }
@@ -165,7 +187,7 @@ class TeamController implements ControllerInterface
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
         }
 
-        return new JsonResponse(['message' => 'Team deleted']);
+        return new JsonResponse(['message' => getError('TEAM_DELETED')]);
     }
 
     private function serializeTrainer($user): array

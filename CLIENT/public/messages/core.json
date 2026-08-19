@@ -59,7 +59,20 @@
   "cr_lbl_period":                          { "message": "Periodo", "desc": "Tabla columna" },
   "cr_lbl_total":                           { "message": "Total", "desc": "Tabla columna" },
   "cr_lbl_route_not_found":                 { "message": "La ruta a la que intentas acceder no existe.", "desc": "Mensaje 404 inline" },
-  "cr_lbl_app_name":                        { "message": "Analítica", "desc": "Nombre de la aplicación" },
+  "cr_lbl_app_name":                        { "message": "Analítica Fénix", "desc": "Nombre de la aplicación" },
   "cr_hdr_new":                             { "message": "Nuevo", "desc": "Header modal crear" },
-  "cr_hdr_edit":                            { "message": "Editar", "desc": "Header modal editar" }
+  "cr_hdr_edit":                            { "message": "Editar", "desc": "Header modal editar" },
+  "cr_err_load_dashboard":                  { "message": "Error al cargar dashboard", "desc": "Error cargar dashboard" },
+  "cr_btn_search":                          { "message": "Buscar", "desc": "Botón/aria buscar" },
+  "cr_btn_close":                           { "message": "Cerrar", "desc": "Botón cerrar modal" },
+  "pd_hdr_my_ficha":                        { "message": "Mi Ficha", "desc": "Título sección ficha del jugador" },
+  "pd_hdr_personal":                        { "message": "Datos personales", "desc": "Tarjeta ficha: datos personales" },
+  "pd_hdr_sports":                          { "message": "Perfil deportivo", "desc": "Tarjeta ficha: perfil deportivo" },
+  "pd_hdr_sports_ficha":                    { "message": "Ficha deportiva", "desc": "Sección ficha deportiva" },
+  "pd_hdr_representative":                  { "message": "Representante", "desc": "Tarjeta ficha: representante" },
+  "pd_hdr_registration":                    { "message": "Datos del registro", "desc": "Tarjeta detalle persona: datos del registro" },
+  "pd_lbl_jersey_numbers":                  { "message": "Dorsales", "desc": "Label dorsales en ficha" },
+  "pd_lbl_team":                            { "message": "Equipo", "desc": "Label equipo en ficha" },
+  "pd_lbl_no_spec":                         { "message": "Este jugador no tiene ficha deportiva registrada", "desc": "Aviso sin ficha deportiva" },
+  "pd_lbl_no_representative":               { "message": "Sin representante asignado", "desc": "Aviso sin representante" }
 }

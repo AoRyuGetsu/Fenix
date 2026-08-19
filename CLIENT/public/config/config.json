@@ -1,5 +1,6 @@
 {
   "apiUrl": "http://localhost:8000",
   "logoUrl": "/shared/images/logo-fenix.jpeg",
+  "loginLogoUrl": "/shared/images/logo.jpeg",
   "backgroundUrl": "/shared/images/fondo.jpeg"
 }

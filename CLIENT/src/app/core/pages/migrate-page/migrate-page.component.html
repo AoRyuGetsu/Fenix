@@ -2,11 +2,11 @@
   <div class="col-11 col-sm-10 col-md-8 col-lg-6">
 
     <div class="text-center mb-4">
-      <h4 class="fw-bold text-gray-900 mb-2">Migraciones de base de datos</h4>
-      <p class="text-gray-600 small">Ejecuta las migraciones pendientes del sistema.</p>
+      <h4 class="fw-bold text-gray-900 mb-2">{{ vm().t('cr_hdr_migrations') }}</h4>
+      <p class="text-gray-600 small">{{ vm().t('cr_lbl_migrations_desc') }}</p>
     </div>
 
-    @if (error(); as err) {
+    @if (vm().error; as err) {
       <div class="alert alert-danger text-center small py-2" role="alert">
         {{ err }}
       </div>
@@ -17,18 +17,18 @@
         type="button"
         class="btn btn-primary btn-lg px-5"
         (click)="run()"
-        [disabled]="loading()"
+        [disabled]="vm().loading"
       >
-        @if (loading()) {
+        @if (vm().loading) {
           <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-          Ejecutando…
+          {{ vm().t('cr_btn_migrate_loading') }}
         } @else {
-          Ejecutar migraciones
+          {{ vm().t('cr_btn_migrate') }}
         }
       </button>
     </div>
 
-    @if (output(); as html) {
+    @if (vm().output; as html) {
       <div class="card">
         <div class="card-body p-4 overflow-auto" style="max-height: 70vh;">
           <div [innerHTML]="html"></div>

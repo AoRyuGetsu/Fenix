@@ -1,40 +1,40 @@
-@if (visible()) {
+@if (vm().visible) {
   <div class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title fw-bold">{{ question() ? 'Editar' : 'Agregar' }} Pregunta</h5>
+          <h5 class="modal-title fw-bold">{{ vm().question ? (vm().t('qnr_hdr_edit_question')) : (vm().t('qnr_hdr_add_question')) }}</h5>
           <button type="button" class="btn-close" (click)="close.emit()"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Texto de la pregunta <span class="text-danger">*</span></label>
-            <input #textInput type="text" class="form-control" [value]="editText()" (input)="editText.set(textInput.value)" />
+            <label class="form-label">{{ vm().t('qnr_lbl_question_text') }} <span class="text-danger">*</span></label>
+            <input #textInput type="text" class="form-control" [value]="vm().editText" (input)="editText.set(textInput.value)" />
           </div>
           <div class="mb-3">
-            <label class="form-label">Tipo</label>
-            <select #typeSel class="form-select" [value]="editType()" (change)="editType.set(typeSel.value)">
-              <option value="text">Texto</option>
-              <option value="number">Numérico</option>
-              <option value="selection">Selección</option>
+            <label class="form-label">{{ vm().t('qnr_lbl_type') }}</label>
+            <select #typeSel class="form-select" [value]="vm().editType" (change)="editType.set(typeSel.value)">
+              <option value="text">{{ vm().t('qnr_lbl_type_text') }}</option>
+              <option value="number">{{ vm().t('qnr_lbl_type_numeric') }}</option>
+              <option value="selection">{{ vm().t('qnr_lbl_type_selection') }}</option>
             </select>
           </div>
-          @if (editType() === 'selection') {
+          @if (vm().editType === 'selection') {
             <div class="mb-3">
-              <label class="form-label">Opciones (una por línea)</label>
-              <textarea #optsInput class="form-control" rows="3" [value]="editOptions()" (input)="editOptions.set(optsInput.value)"></textarea>
+              <label class="form-label">{{ vm().t('qnr_lbl_options_per_line') }}</label>
+              <textarea #optsInput class="form-control" rows="3" [value]="vm().editOptions" (input)="editOptions.set(optsInput.value)"></textarea>
             </div>
           }
           <div class="mb-3">
-            <label class="form-label">Orden</label>
-            <input #orderInput type="number" class="form-control" style="width: 100px" [value]="editOrder()" (input)="editOrder.set(+orderInput.value)" />
+            <label class="form-label">{{ vm().t('qnr_lbl_order') }}</label>
+            <input #orderInput type="number" class="form-control" style="width: 100px" [value]="vm().editOrder" (input)="editOrder.set(+orderInput.value)" />
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-danger" (click)="close.emit()" [disabled]="loading()">Cancelar</button>
-          <button class="btn btn-primary" (click)="onSave()" [disabled]="loading() || !editText()">
-            @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            {{ question() ? 'Actualizar' : 'Guardar' }}
+          <button class="btn btn-danger" (click)="close.emit()" [disabled]="vm().loading">{{ vm().t('cr_btn_cancel') }}</button>
+          <button class="btn btn-primary" (click)="onSave()" [disabled]="vm().loading || !vm().editText">
+            @if (vm().loading) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            {{ vm().question ? (vm().t('cr_btn_update')) : (vm().t('cr_btn_save')) }}
           </button>
         </div>
       </div>

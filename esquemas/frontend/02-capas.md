@@ -7,11 +7,13 @@ flowchart TB
     subgraph Core ["🟦 CORE"]
         direction TB
         Auth["Auth"]
-        AuthSub["├─ AuthFacade\n│  └─ vm() state signal\n├─ AuthHttpService\n├─ AuthGuard\n├─ AuthRedirectGuard\n└─ PermissionGuard"]
+        AuthSub["├─ AuthFacade\n│  └─ vm() state signal\n├─ AuthHttpService\n├─ AuthGuard\n├─ AuthRedirectGuard\n├─ PermissionGuard\n├─ AuthRoutes (login)\n└─ NotLoggedInPage"]
         Menu["Menu"]
         MenuSub["├─ MenuFacade\n│  └─ menuTree computed\n│  └─ flatMenus signal"]
         Config["Config"]
         ConfigSub["└─ ConfigService\n   └─ load() APP_INITIALIZER\n   └─ apiUrl / logoUrl"]
+        Messages["Messages"]
+        MessagesSub["└─ MessageService\n   └─ catalogs de mensajes (JSON)"]
         Interceptors["Interceptors"]
         InterceptorsSub["└─ authInterceptor\n   ├─ JWT injection\n   └─ 401 Subject mutex\n      refresh / retry"]
         Layout["Layout"]
@@ -21,6 +23,10 @@ flowchart TB
     subgraph Shared ["🟩 SHARED"]
         direction TB
         GTable["GTableComponent\n├─ app-gtable selector\n├─ GtColumn / GtAction\n├─ GtPagination\n├─ GtDetailConfig\n└─ pageChange / actionClick"]
+        PlayerList["PlayerListComponent\n├─ app-player-list\n├─ items / pagination / search\n├─ searchPlaceholder (i18n)\n└─ botón buscar (bi-search)"]
+        PlayerDetail["PlayerDetail\n├─ app-player-detail-cards\n├─ player-detail.types.ts\n└─ buildPlayerDetail() util"]
+        Autocomplete["AutocompleteComponent\n└─ input-group con filtrado"]
+        Messages["Mensajes (i18n)\n└─ MessageService.get(key, params)\n   └─ templates solo vía vm().t(...)\n   └─ (message.pipe eliminado 2026-08)"]
         Utils["Utils\n└─ getErrorMessage()\n   ├─ err.status 401\n   ├─ err.error.error\n   └─ fallback string"]
         Types["Types\n└─ gtable.types.ts\n   ├─ GtColumn<T>\n   ├─ GtAction<T>\n   ├─ GtPagination\n   └─ GtDetailConfig"]
     end
@@ -31,12 +37,16 @@ flowchart TB
         Periods["Periods"]
         Evaluations["Evaluations"]
         Questionnaire["Questionnaire"]
+        EvaluationStats["EvaluationStats"]
+        Representados["Representados"]
+        Teams["Teams"]
+        Welcome["Welcome"]
 
         subgraph UsersExpanded ["┄┄┄ Ejemplo expandido: Users ┄┄┄┄┄┄┄┄┄┄"]
             direction TB
             URoutes["routes.ts\n└─ lazy-loaded route"]
             UPages["pages/\n└─ UsersPageComponent"]
-            UComponents["components/\n├─ UsersTableComponent\n├─ PersonCreateModal\n├─ PersonUpdateModal\n├─ AdminCreateModal\n└─ AdminUpdateModal"]
+            UComponents["components/\n├─ UsersTableComponent\n├─ PersonCreateModal\n├─ PersonUpdateModal\n├─ AdminCreateModal\n├─ AdminUpdateModal\n└─ PlayerSpecModal"]
             UServices["services/\n└─ UsersHttpService"]
             UFacades["facades/\n└─ UsersFacade\n   ├─ state signal<UsersState>\n   ├─ vm = state.asReadonly()\n   ├─ loadTabs()\n   ├─ changePage()\n   ├─ createPerson()\n   └─ deleteUser()"]
         end

@@ -40,7 +40,7 @@ sequenceDiagram
     end
 
     alt Endpoint público (sin middleware)
-        Note over M: /health, /config, /auth/login,<br>/auth/refresh, /people-types, /people
+        Note over M: /health, /config, /auth/login, /auth/refresh,<br>/people-types, /parentescos, /people, /people/{id},<br>/periods (GET)
     else Endpoint protegido
         M->>M: 15. Extrae Bearer token
         M->>M: 16. AuthService::validateToken()
@@ -68,7 +68,8 @@ sequenceDiagram
 
     M->>CT: 22. Controller::execute() o método específico
     CT->>CT: 23. json_decode($request->getContent())
-    CT->>CT: 24. Extrae query params (page, perPage, filtros)
+    CT->>CT: 24. Extrae query params (page, perPage, filtros:
+        search, team_id, questionnaire_id, period_ids)
 
     alt Error de validación
         CT-->>C: 400/422 {"error": "VALIDATION_*", "code": "..."}

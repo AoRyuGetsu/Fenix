@@ -31,6 +31,7 @@ flowchart TB
             CT3["PersonUpdateModalComponent\n├─ @Input() item\n├─ @Output() update\n└─ template Bootstrap modal"]
             CT4["AdminCreateModalComponent\n├─ @Input() show\n├─ @Output() create\n└─ template Bootstrap modal"]
             CT5["AdminUpdateModalComponent\n├─ @Input() item\n├─ @Output() update\n└─ template Bootstrap modal"]
+            CT6["PlayerSpecModalComponent\n├─ @Input() user (jugador)\n├─ @Output() save\n└─ ficha deportiva (player_spec)"]
         end
 
         subgraph Services ["services/"]
@@ -56,7 +57,7 @@ flowchart TB
     subgraph TemplatePattern ["Patrón vm() en el template"]
         direction TB
         T1["<!-- El template SOLO accede a vm().prop -->"]
-        T2["<app-users-table\n  [data]=\"currentItems()\"\n  [pagination]=\"{ page: vm().activePage, ... }\"\n  (pageChange)=\"onPageChange($event)\"\n  (delete)=\"onDelete($event)\">"]
+        T2["<app-users-table\n  [data]=\"vm().items\"\n  [pagination]=\"vm().pagination\"\n  (pageChange)=\"onPageChange($event)\"\n  (actionClick)=\"onAction($event)\">"]
     end
 
     Feature --> TemplatePattern

@@ -9,6 +9,11 @@ use App\Features\Representatives\Application\Controllers\RepresentativeControlle
 require_once __DIR__ . '/../../../../Infrastructure/Auth/middleware.php';
 
 return function (Router $router, Container $container): void {
+    $router->addRoute('GET', '/representatives/my/players', middleware($container, function () use ($container) {
+        $controller = $container->make(RepresentativeController::class);
+        return $controller->myPlayers();
+    }, ['REP']));
+
     $router->addRoute('GET', '/representatives/{repUserId:\d+}/players', middleware($container, function (string $repUserId) use ($container) {
         $controller = $container->make(RepresentativeController::class);
         return $controller->listPlayers((int) $repUserId);

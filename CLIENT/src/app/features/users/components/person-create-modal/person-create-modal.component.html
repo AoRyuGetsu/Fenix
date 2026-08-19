@@ -2,85 +2,88 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title fw-bold">{{ 'usr_hdr_create_user' | message }}</h5>
+        <h5 class="modal-title fw-bold">{{ vm().t('usr_hdr_create_user') }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_person_type' | message }} <span class="text-danger">*</span></label>
-            <select #selType class="form-select" [value]="type()" (change)="type.set(selType.value)">
-              <option value="">{{ 'usr_plh_select_type' | message }}</option>
-              @for (pt of peopleTypes(); track pt.code) {
+            <label class="form-label">{{ vm().t('usr_lbl_person_type') }} <span class="text-danger">*</span></label>
+            <select #selType class="form-select" [value]="vm().type" (change)="type.set(selType.value)">
+              <option value="">{{ vm().t('usr_plh_select_type') }}</option>
+              @for (pt of vm().peopleTypes; track pt.code) {
                 <option [value]="pt.code">{{ pt.description }}</option>
               }
             </select>
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_document_number' | message }} <span class="text-danger">*</span></label>
-            <input #inputId type="text" class="form-control" [value]="documentNumber()" (input)="documentNumber.set(inputId.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_document_number') }} <span class="text-danger">*</span></label>
+            <input #inputId type="text" class="form-control" maxlength="10" inputmode="numeric" [class.is-invalid]="vm().documentInvalid" [value]="vm().documentNumber" (input)="onDocumentInput($event)" />
+            @if (vm().documentInvalid) {
+              <div class="text-danger small mt-1">{{ vm().t('usr_err_document_invalid') }}</div>
+            }
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_first_name' | message }} <span class="text-danger">*</span></label>
-            <input #inputFirstName type="text" class="form-control" [value]="firstName()" (input)="firstName.set(inputFirstName.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_first_name') }} <span class="text-danger">*</span></label>
+            <input #inputFirstName type="text" class="form-control" [value]="vm().firstName" (input)="firstName.set(inputFirstName.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_middle_name' | message }}</label>
-            <input #inputMiddleName type="text" class="form-control" [value]="middleName()" (input)="middleName.set(inputMiddleName.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_middle_name') }}</label>
+            <input #inputMiddleName type="text" class="form-control" [value]="vm().middleName" (input)="middleName.set(inputMiddleName.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_first_surname' | message }} <span class="text-danger">*</span></label>
-            <input #inputFirstSurname type="text" class="form-control" [value]="firstSurname()" (input)="firstSurname.set(inputFirstSurname.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_first_surname') }} <span class="text-danger">*</span></label>
+            <input #inputFirstSurname type="text" class="form-control" [value]="vm().firstSurname" (input)="firstSurname.set(inputFirstSurname.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_second_surname' | message }}</label>
-            <input #inputSecondSurname type="text" class="form-control" [value]="secondSurname()" (input)="secondSurname.set(inputSecondSurname.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_second_surname') }}</label>
+            <input #inputSecondSurname type="text" class="form-control" [value]="vm().secondSurname" (input)="secondSurname.set(inputSecondSurname.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_email' | message }} <span class="text-danger">*</span></label>
-            <input #inputEmail type="email" class="form-control" [value]="email()" (input)="email.set(inputEmail.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_email') }} <span class="text-danger">*</span></label>
+            <input #inputEmail type="email" class="form-control" [value]="vm().email" (input)="email.set(inputEmail.value)" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_phone' | message }}</label>
-            <input #inputPhone type="text" class="form-control" [value]="phone()" (input)="phone.set(inputPhone.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_phone') }}</label>
+            <input #inputPhone type="text" class="form-control" [value]="vm().phone" (input)="phone.set(inputPhone.value)" />
           </div>
           <div class="col-12">
-            <label class="form-label">{{ 'usr_lbl_address' | message }}</label>
-            <textarea #inputAddress class="form-control" rows="2" [value]="address()" (input)="address.set(inputAddress.value)"></textarea>
+            <label class="form-label">{{ vm().t('usr_lbl_address') }}</label>
+            <textarea #inputAddress class="form-control" rows="2" [value]="vm().address" (input)="address.set(inputAddress.value)"></textarea>
           </div>
           <div class="col-md-6">
-            <label class="form-label">{{ 'usr_lbl_password' | message }}</label>
-            <input #inputPassword type="password" class="form-control" [value]="password()" (input)="password.set(inputPassword.value)"               [placeholder]="'usr_plh_password_optional' | message" />
+            <label class="form-label">{{ vm().t('usr_lbl_password') }}</label>
+            <input #inputPassword type="password" class="form-control" [value]="vm().password" (input)="password.set(inputPassword.value)"               [placeholder]="vm().t('usr_plh_password_optional')" />
           </div>
 
-          @if (isJug()) {
+          @if (vm().isJug) {
             <div class="col-12">
-              <label class="form-label">{{ 'usr_lbl_team' | message }} <span class="text-danger">*</span></label>
+              <label class="form-label">{{ vm().t('usr_lbl_team') }} <span class="text-danger">*</span></label>
               <app-autocomplete
-                [items]="teams()"
+                [items]="vm().teams"
                 displayField="name"
-                [placeholder]="'usr_plh_search_team' | message"
-                [loading]="loadingTeams()"
+                [placeholder]="vm().t('usr_plh_search_team')"
+                [loading]="vm().loadingTeams"
                 [required]="true"
                 (selectionChange)="onTeamSelect($event)"
               />
             </div>
             <div class="col-12">
-              <label class="form-label">{{ 'usr_lbl_representative' | message }}</label>
+              <label class="form-label">{{ vm().t('usr_lbl_representative') }}</label>
               <app-autocomplete
-                [items]="representatives()"
+                [items]="vm().representatives"
                 displayField="display_name"
-                [placeholder]="'usr_plh_search_representative' | message"
-                [loading]="loadingReps()"
+                [placeholder]="vm().t('usr_plh_search_representative')"
+                [loading]="vm().loadingReps"
                 (selectionChange)="onRepresentativeSelect($event)"
               />
             </div>
-            @if (representativeId()) {
+            @if (vm().representativeId) {
               <div class="col-12">
-                <label class="form-label">{{ 'usr_lbl_parentesco' | message }} <span class="text-danger">*</span></label>
-                <select class="form-select" [value]="parentescoId() ?? ''" (change)="onParentescoSelect($event)">
-                  <option value="">{{ 'usr_plh_select_parentesco' | message }}</option>
-                  @for (p of parentescos(); track p.id) {
+                <label class="form-label">{{ vm().t('usr_lbl_parentesco') }} <span class="text-danger">*</span></label>
+                <select class="form-select" [value]="vm().parentescoId ?? ''" (change)="onParentescoSelect($event)">
+                  <option value="">{{ vm().t('usr_plh_select_parentesco') }}</option>
+                  @for (p of vm().parentescos; track p.id) {
                     <option [value]="p.id">{{ p.description }}</option>
                   }
                 </select>
@@ -90,12 +93,12 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">{{ 'cr_btn_cancel' | message }}</button>
-        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading() || !firstName() || !firstSurname() || !documentNumber() || !email() || !type() || (isJug() && !teamId()) || (representativeId() && !parentescoId())">
-          @if (loading()) {
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="vm().loading">{{ vm().t('cr_btn_cancel') }}</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="vm().loading || !vm().firstName || !vm().firstSurname || !vm().documentNumber || !vm().documentValid || !vm().email || !vm().type || (vm().isJug && !vm().teamId) || (vm().representativeId && !vm().parentescoId)">
+          @if (vm().loading) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          {{ 'cr_btn_save' | message }}
+          {{ vm().t('cr_btn_save') }}
         </button>
       </div>
     </div>

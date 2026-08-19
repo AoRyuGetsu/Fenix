@@ -1,3 +1,11 @@
+<ng-template #playerDetailTpl let-item>
+  <app-player-detail-cards [model]="item._playerModel" />
+</ng-template>
+
+<ng-template #personDetailTpl let-item>
+  <app-person-detail-cards [model]="item._personModel" />
+</ng-template>
+
 <app-gtable
   [columns]="columns()"
   [data]="processedItems()"

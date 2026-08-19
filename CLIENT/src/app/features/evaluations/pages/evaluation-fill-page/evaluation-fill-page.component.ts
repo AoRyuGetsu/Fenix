@@ -4,12 +4,11 @@ import { EvaluationsFacade } from '../../facades/evaluations.facade';
 import { QuestionCardComponent } from '../../components/question-card/question-card.component';
 import { PlayerInfoModalComponent } from '../../components/player-info-modal/player-info-modal.component';
 import { UserItem } from '../../services/evaluations-http.service';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
 
 @Component({
   selector: 'app-evaluation-fill-page',
   standalone: true,
-  imports: [QuestionCardComponent, PlayerInfoModalComponent, MessagePipe],
+  imports: [QuestionCardComponent, PlayerInfoModalComponent],
   templateUrl: './evaluation-fill-page.component.html',
 })
 export class EvaluationFillPageComponent implements OnInit, OnDestroy {

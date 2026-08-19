@@ -18,7 +18,8 @@ flowchart TB
     subgraph APLICACION["Capa de Aplicación"]
         SERVICES["Services
         Lógica de negocio
-        Orquestación de repositorios"]
+        Orquestación de repositorios
+        AuthContext inyectado (userId/roles)"]
         DTOS["DTOs
         Query DTOs · Response DTOs
         Validación via Symfony Validator"]

@@ -11,6 +11,7 @@ use App\Features\EvaluationStats\Domain\Interfaces\EvaluationStatsServiceInterfa
 use App\Features\Questionnaire\Domain\Interfaces\QuestionnaireRepositoryInterface;
 use App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface;
 use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
+use App\Infrastructure\Auth\AuthContext;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManager;
 use MathPHP\Statistics\Regression\Linear;
@@ -22,10 +23,13 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
         private UserRepositoryInterface $userRepository,
         private QuestionnaireRepositoryInterface $questionnaireRepository,
         private TeamRepositoryInterface $teamRepository,
+        private AuthContext $authContext,
     ) {}
 
     public function getStats(EvaluationStatsQuery $query): array
     {
+        $this->assertCanViewStats($query->targetUserId);
+
         $user = $this->userRepository->findById($query->targetUserId);
         if ($user === null) {
             throw new AppException('USER_NOT_FOUND');
@@ -57,73 +61,80 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
 
         $rawData = $this->fetchRawAnswerData($query);
 
-        if (empty($rawData)) {
-            throw new AppException('EVALUATION_STATS_NO_DATA');
-        }
-
         $selectionOptionMap = $this->buildSelectionOptionMap($rawData);
+        $sessionsByQuestionnaire = $this->groupBySession($rawData, $selectionOptionMap);
 
-        $grouped = $this->groupAndResolveValues($rawData, $selectionOptionMap);
-
-        $questionnaireTitles = $this->fetchQuestionnaireTitles(array_keys($grouped));
+        $questionnaireTitles = $this->fetchQuestionnaireTitles(array_keys($sessionsByQuestionnaire));
 
         $questionnaires = [];
-        foreach ($grouped as $qId => $periodGroups) {
+        foreach ($sessionsByQuestionnaire as $qId => $sessions) {
             $qTitle = $questionnaireTitles[$qId] ?? 'Cuestionario #' . $qId;
 
-            $allQuestIds = [];
-            foreach ($periodGroups as $questions) {
-                foreach ($questions as $questId => $data) {
-                    $allQuestIds[$questId] = $data;
+            $reference = $this->findEarliestDate($sessions);
+
+            $questionMeta = [];
+            foreach ($sessions as $session) {
+                foreach ($session['answers'] as $questId => $answer) {
+                    $questionMeta[$questId] = [
+                        'question_text' => $answer['question_text'],
+                        'question_type' => $answer['question_type'],
+                    ];
                 }
             }
 
             $perQuestion = [];
-            foreach ($allQuestIds as $questId => $questData) {
-                $averages = [];
+            foreach ($questionMeta as $questId => $meta) {
                 $points = [];
-                foreach ($periodMap as $pId => $pInfo) {
-                    if (isset($periodGroups[$pId][$questId])) {
-                        $vals = $periodGroups[$pId][$questId]['values'];
-                        $avg = count($vals) > 0 ? round(array_sum($vals) / count($vals), 2) : 0;
-                        $count = count($vals);
-                        $averages[] = [
-                            'period_id'   => $pId,
-                            'period_name' => $pInfo['name'],
-                            'average'     => $avg,
-                            'count'       => $count,
-                        ];
-                        $points[] = [$pInfo['index'], $avg];
+                $observations = [];
+                foreach ($sessions as $session) {
+                    if (!isset($session['answers'][$questId])) {
+                        continue;
                     }
+                    $x = $this->daysBetween($reference, $session['evaluated_at']);
+                    $points[] = [$x, $session['answers'][$questId]['value']];
+                    $observations[] = [
+                        'evaluated_at' => $session['evaluated_at']->format('Y-m-d H:i:s'),
+                        'x_days'       => $x,
+                        'value'        => $session['answers'][$questId]['value'],
+                    ];
                 }
 
+                $regression = $this->computeRegression($points);
+                $this->attachObservations($observations, $regression);
+
+                $averages = $this->periodAveragesFromSessions($sessions, $periodMap, $questId);
                 $perQuestion[] = [
-                    'question_id'   => $questId,
-                    'question_text' => $questData['question_text'],
-                    'question_type' => $questData['question_type'],
-                    'averages'      => $averages,
-                    'regression'    => $this->computeRegression($points),
+                    'question_id'         => $questId,
+                    'question_text'       => $meta['question_text'],
+                    'question_type'       => $meta['question_type'],
+                    'averages'            => $averages,
+                    'observations'        => $observations,
+                    'regression'          => $regression,
+                    'historial_regression' => $this->regressionFromAverages($averages, $periodMap),
                 ];
             }
 
-            $overallAverages = [];
             $overallPoints = [];
-            foreach ($periodMap as $pId => $pInfo) {
-                $allVals = [];
-                foreach ($periodGroups[$pId] ?? [] as $questData) {
-                    array_push($allVals, ...$questData['values']);
+            $overallObservations = [];
+            foreach ($sessions as $session) {
+                $values = array_column($session['answers'], 'value');
+                if ($values === []) {
+                    continue;
                 }
-                if ($allVals !== []) {
-                    $avg = round(array_sum($allVals) / count($allVals), 2);
-                    $overallAverages[] = [
-                        'period_id'   => $pId,
-                        'period_name' => $pInfo['name'],
-                        'average'     => $avg,
-                        'count'       => count($allVals),
-                    ];
-                    $overallPoints[] = [$pInfo['index'], $avg];
-                }
+                $avg = round(array_sum($values) / count($values), 2);
+                $x = $this->daysBetween($reference, $session['evaluated_at']);
+                $overallPoints[] = [$x, $avg];
+                $overallObservations[] = [
+                    'evaluated_at' => $session['evaluated_at']->format('Y-m-d H:i:s'),
+                    'x_days'       => $x,
+                    'value'        => $avg,
+                ];
             }
+
+            $overallRegression = $this->computeRegression($overallPoints);
+            $this->attachObservations($overallObservations, $overallRegression);
+
+            $overallAverages = $this->overallPeriodAveragesFromSessions($sessions, $periodMap);
 
             $questionnaires[] = [
                 'questionnaire' => [
@@ -132,8 +143,10 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
                 ],
                 'per_question' => $perQuestion,
                 'overall'      => [
-                    'averages'   => $overallAverages,
-                    'regression' => $this->computeRegression($overallPoints),
+                    'averages'            => $overallAverages,
+                    'observations'        => $overallObservations,
+                    'regression'          => $overallRegression,
+                    'historial_regression' => $this->regressionFromAverages($overallAverages, $periodMap),
                 ],
             ];
         }
@@ -150,6 +163,8 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
 
     public function getTeamStats(TeamStatsQuery $query): array
     {
+        $this->assertCanViewTeamStats($query->teamId);
+
         $team = $this->teamRepository->findById($query->teamId);
         if ($team === null) {
             throw new AppException('TEAM_NOT_FOUND');
@@ -164,6 +179,7 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
                 'id'    => $id,
                 'name'  => $p['name'],
                 'index' => $i + 1,
+                'days'  => $p['days'],
             ];
             $periodList[] = $periodMap[$id];
         }
@@ -173,15 +189,7 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
             $playerIds[] = $player->getId();
         }
 
-        if ($playerIds === []) {
-            throw new AppException('EVALUATION_STATS_NO_DATA');
-        }
-
         $rawData = $this->fetchTeamRawAnswerData($playerIds, $query);
-
-        if (empty($rawData)) {
-            throw new AppException('EVALUATION_STATS_NO_DATA');
-        }
 
         $selectionOptionMap = $this->buildSelectionOptionMap($rawData);
         $groupedByUser = $this->groupAndResolveValuesByUser($rawData, $selectionOptionMap);
@@ -225,7 +233,7 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
                             'average'     => $avg,
                             'count'       => count($allValsByPeriod[$pId]),
                         ];
-                        $overallPoints[] = [$pInfo['index'], $avg];
+                        $overallPoints[] = [$pInfo['days'], $avg];
 
                         if (!isset($teamPeriodTotals[$pId])) {
                             $teamPeriodTotals[$pId] = 0;
@@ -261,7 +269,7 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
                         'period_name' => $pInfo['name'],
                         'average'     => $teamAvg,
                     ];
-                    $teamPoints[] = [$pInfo['index'], $teamAvg];
+                    $teamPoints[] = [$pInfo['days'], $teamAvg];
                 }
             }
 
@@ -287,15 +295,78 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
         ];
     }
 
+    private function assertCanViewStats(int $targetUserId): void
+    {
+        $currentUserId = $this->authContext->getUserId();
+        $currentRoles = $this->authContext->getRoles() ?? [];
+
+        if (in_array('JUG', $currentRoles, true) && $targetUserId !== $currentUserId) {
+            throw new AppException('FORBIDDEN');
+        }
+
+        if (in_array('REP', $currentRoles, true)) {
+            $count = (int) $this->entityManager->createQueryBuilder()
+                ->select('COUNT(rp.player)')
+                ->from(\App\Features\Representatives\Domain\Entities\RepPlayer::class, 'rp')
+                ->where('IDENTITY(rp.rep) = :repId AND IDENTITY(rp.player) = :playerId')
+                ->setParameter('repId', $currentUserId)
+                ->setParameter('playerId', $targetUserId)
+                ->getQuery()
+                ->getSingleScalarResult();
+            if ($count === 0) {
+                throw new AppException('FORBIDDEN');
+            }
+        }
+
+        if (in_array('ENT', $currentRoles, true)) {
+            $playerIds = $this->teamRepository->findPlayerIdsByTrainerId($currentUserId);
+            if (!in_array($targetUserId, $playerIds, true)) {
+                throw new AppException('FORBIDDEN');
+            }
+        }
+    }
+
+    private function assertCanViewTeamStats(int $teamId): void
+    {
+        $currentRoles = $this->authContext->getRoles() ?? [];
+
+        if (in_array('ENT', $currentRoles, true)) {
+            $teams = $this->teamRepository->findByTrainerId($this->authContext->getUserId());
+            $teamIds = array_map(fn ($t) => $t->getId(), $teams);
+            if (!in_array($teamId, $teamIds, true)) {
+                throw new AppException('FORBIDDEN');
+            }
+        }
+    }
+
     private function fetchPeriods(): array
     {
         $conn = $this->entityManager->getConnection();
-        return $conn->executeQuery(
+        $periods = $conn->executeQuery(
             "SELECT id, name, start_date
              FROM periods
              WHERE deleted_at IS NULL
              ORDER BY start_date ASC"
         )->fetchAllAssociative();
+
+        if ($periods === []) {
+            return [];
+        }
+
+        $minStart = null;
+        foreach ($periods as $p) {
+            $start = new \DateTimeImmutable($p['start_date']);
+            if ($minStart === null || $start < $minStart) {
+                $minStart = $start;
+            }
+        }
+
+        foreach ($periods as &$p) {
+            $p['days'] = $this->daysBetween($minStart, new \DateTimeImmutable($p['start_date']));
+        }
+        unset($p);
+
+        return $periods;
     }
 
     private function fetchRawAnswerData(EvaluationStatsQuery $query): array
@@ -303,8 +374,8 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
         $conn = $this->entityManager->getConnection();
         $params = ['targetUserId' => $query->targetUserId];
 
-        $sql = "SELECT e.questionnaire_id, e.period_id, a.question_id,
-                       q.text AS question_text, q.type AS question_type, a.value
+        $sql = "SELECT e.id AS evaluation_id, e.created_at AS evaluated_at, e.questionnaire_id, e.period_id,
+                       a.question_id, q.text AS question_text, q.type AS question_type, a.value
                 FROM evaluations e
                 JOIN answers a ON a.evaluation_id = e.id
                 JOIN questions q ON q.id = a.question_id
@@ -360,40 +431,126 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
         return $optionMap;
     }
 
-    private function groupAndResolveValues(array $rawData, array $optionMap): array
+    private function groupBySession(array $rawData, array $optionMap): array
     {
         $grouped = [];
 
         foreach ($rawData as $r) {
-            $qId    = (int) $r['questionnaire_id'];
-            $pId    = (int) $r['period_id'];
+            $qId     = (int) $r['questionnaire_id'];
+            $evalId  = (int) $r['evaluation_id'];
             $questId = (int) $r['question_id'];
-            $type   = $r['question_type'];
-            $value  = $r['value'];
+            $type    = $r['question_type'];
+            $value   = $r['value'];
 
             $numericVal = $this->resolveNumericValue($type, $value, $optionMap[$questId] ?? []);
             if ($numericVal === null) {
                 continue;
             }
 
-            if (!isset($grouped[$qId])) {
-                $grouped[$qId] = [];
-            }
-            if (!isset($grouped[$qId][$pId])) {
-                $grouped[$qId][$pId] = [];
-            }
-            if (!isset($grouped[$qId][$pId][$questId])) {
-                $grouped[$qId][$pId][$questId] = [
-                    'values'        => [],
-                    'question_text' => $r['question_text'],
-                    'question_type' => $type,
+            if (!isset($grouped[$qId][$evalId])) {
+                $grouped[$qId][$evalId] = [
+                    'evaluated_at' => new \DateTimeImmutable($r['evaluated_at']),
+                    'period_id'    => (int) $r['period_id'],
+                    'answers'      => [],
                 ];
             }
 
-            $grouped[$qId][$pId][$questId]['values'][] = $numericVal;
+            $grouped[$qId][$evalId]['answers'][$questId] = [
+                'value'         => $numericVal,
+                'question_text' => $r['question_text'],
+                'question_type' => $type,
+            ];
         }
 
         return $grouped;
+    }
+
+    private function findEarliestDate(array $sessions): \DateTimeImmutable
+    {
+        $earliest = null;
+        foreach ($sessions as $session) {
+            if ($earliest === null || $session['evaluated_at'] < $earliest) {
+                $earliest = $session['evaluated_at'];
+            }
+        }
+        return $earliest;
+    }
+
+    private function daysBetween(\DateTimeImmutable $reference, \DateTimeImmutable $date): float
+    {
+        return round(($date->getTimestamp() - $reference->getTimestamp()) / 86400, 2);
+    }
+
+    private function attachObservations(array &$observations, ?array $regression): void
+    {
+        if ($regression === null) {
+            return;
+        }
+        foreach ($observations as &$obs) {
+            $obs['fitted']   = round($regression['slope'] * $obs['x_days'] + $regression['intercept'], 4);
+            $obs['residual'] = round($obs['value'] - $obs['fitted'], 4);
+        }
+        unset($obs);
+    }
+
+    private function periodAveragesFromSessions(array $sessions, array $periodMap, int $questId): array
+    {
+        $byPeriod = [];
+        foreach ($sessions as $session) {
+            if (!isset($session['answers'][$questId])) {
+                continue;
+            }
+            $byPeriod[$session['period_id']][] = $session['answers'][$questId]['value'];
+        }
+
+        $result = [];
+        foreach ($periodMap as $pId => $pInfo) {
+            if (isset($byPeriod[$pId]) && $byPeriod[$pId] !== []) {
+                $result[] = [
+                    'period_id'   => $pId,
+                    'period_name' => $pInfo['name'],
+                    'index'       => $pInfo['index'],
+                    'average'     => round(array_sum($byPeriod[$pId]) / count($byPeriod[$pId]), 2),
+                    'count'       => count($byPeriod[$pId]),
+                ];
+            }
+        }
+        return $result;
+    }
+
+    private function regressionFromAverages(array $averages, array $periodMap): ?array
+    {
+        $points = [];
+        foreach ($averages as $a) {
+            $points[] = [$periodMap[$a['period_id']]['index'], $a['average']];
+        }
+        return $this->computeRegression($points);
+    }
+
+    private function overallPeriodAveragesFromSessions(array $sessions, array $periodMap): array
+    {
+        $byPeriod = [];
+        foreach ($sessions as $session) {
+            $values = array_column($session['answers'], 'value');
+            if ($values === []) {
+                continue;
+            }
+            $byPeriod[$session['period_id']][] = array_sum($values) / count($values);
+        }
+
+        $result = [];
+        foreach ($periodMap as $pId => $pInfo) {
+            if (isset($byPeriod[$pId]) && $byPeriod[$pId] !== []) {
+                $result[] = [
+                    'period_id'   => $pId,
+                    'period_name' => $pInfo['name'],
+                    'index'       => $pInfo['index'],
+                    'average'     => round(array_sum($byPeriod[$pId]) / count($byPeriod[$pId]), 2),
+                    'count'       => count($byPeriod[$pId]),
+                ];
+            }
+        }
+        return $result;
     }
 
     private function resolveNumericValue(string $type, string $value, array $options): ?float
@@ -431,6 +588,7 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
         $slope = $params['m'];
         $intercept = $params['b'];
         $rSquared = $regression->coefficientOfDetermination();
+        $standardErrors = $regression->standardErrors();
 
         $trend = match (true) {
             $slope > 0.05  => 'upward',
@@ -439,10 +597,14 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
         };
 
         return [
-            'slope'     => round($slope, 4),
-            'intercept' => round($intercept, 4),
-            'r_squared' => round($rSquared, 4),
-            'trend'     => $trend,
+            'slope'               => round($slope, 4),
+            'intercept'           => round($intercept, 4),
+            'r_squared'           => round($rSquared, 4),
+            'trend'               => $trend,
+            'sse'                 => round($regression->sumOfSquaresResidual(), 4),
+            'std_error_slope'     => round($standardErrors['m'], 4),
+            'std_error_intercept' => round($standardErrors['b'], 4),
+            'n'                   => count($points),
         ];
     }
 

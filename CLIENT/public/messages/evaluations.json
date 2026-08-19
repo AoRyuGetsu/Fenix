@@ -39,5 +39,6 @@
   "eval_badge_evaluated":                   { "message": "Evaluado", "desc": "Badge estudiante evaluado" },
   "eval_badge_unevaluated":                 { "message": "No evaluado", "desc": "Badge estudiante no evaluado" },
   "eval_btn_answer":                        { "message": "Contestar", "desc": "Botón contestar evaluación" },
-  "eval_btn_show_profile_tip":              { "message": "Ver ficha", "desc": "Tooltip ver ficha jugador" }
+  "eval_btn_show_profile_tip":              { "message": "Ver ficha", "desc": "Tooltip ver ficha jugador" },
+  "eval_hdr_player_ficha":                  { "message": "Ficha de Jugador", "desc": "Título modal ficha jugador" }
 }

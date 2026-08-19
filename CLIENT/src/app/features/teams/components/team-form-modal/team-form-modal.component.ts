@@ -1,14 +1,16 @@
-import { Component, input, output, signal, computed, effect } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { TeamDetail, TeamPayload } from '../../services/teams-http.service';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
+import { MessageService, MessageResolver } from '../../../../core/services/message.service';
 
 @Component({
   selector: 'app-team-form-modal',
   standalone: true,
-  imports: [MessagePipe],
   templateUrl: './team-form-modal.component.html',
 })
 export class TeamFormModalComponent {
+  private msg = inject(MessageService);
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
   item = input<TeamDetail | null>(null);
   saving = input(false);
   trainers = input<{ id: number; display_name: string }[]>([]);
@@ -26,6 +28,22 @@ export class TeamFormModalComponent {
   playerIds = signal<number[]>([]);
 
   isEdit = computed(() => this.item() !== null);
+
+  vm = computed(() => ({
+    item: this.item(),
+    saving: this.saving(),
+    trainers: this.trainers(),
+    players: this.players(),
+    loadingTrainers: this.loadingTrainers(),
+    loadingPlayers: this.loadingPlayers(),
+    name: this.name(),
+    code: this.code(),
+    description: this.description(),
+    trainerUserId: this.trainerUserId(),
+    playerIds: this.playerIds(),
+    isEdit: this.isEdit(),
+    t: this.t,
+  }));
 
   constructor() {
     effect(() => {

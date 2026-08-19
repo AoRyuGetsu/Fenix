@@ -1,5 +1,6 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
+import { MessageService, MessageResolver } from '../../../core/services/message.service';
 import { QuestionnaireHttpService, QuestionnaireItem, SectionItem, QuestionItem } from '../services/questionnaire-http.service';
 import { RoleItem } from '../../../core/auth/services/auth-http.service';
 
@@ -23,6 +24,7 @@ export interface QuestionnaireState {
 @Injectable({ providedIn: 'root' })
 export class QuestionnaireFacade {
   private api = inject(QuestionnaireHttpService);
+  private msg = inject(MessageService);
 
   private state = signal<QuestionnaireState>({
     items: [],
@@ -41,7 +43,9 @@ export class QuestionnaireFacade {
     searchTerm: '',
   });
 
-  vm = this.state.asReadonly();
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
+  vm = computed(() => ({ ...this.state(), t: this.t }));
 
   load(page = 1): void {
     this.state.update(s => ({ ...s, loading: true, error: null }));
@@ -58,7 +62,7 @@ export class QuestionnaireFacade {
       error: err => this.state.update(s => ({
         ...s,
         loading: false,
-        error: getErrorMessage(err, 'Error al cargar cuestionarios'),
+        error: getErrorMessage(err, 'qnr_err_load', this.msg),
       })),
     });
   }
@@ -94,14 +98,14 @@ export class QuestionnaireFacade {
 
     this.api.createQuestionnaire(data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, loading: false, showCreateModal: false, success: 'Cuestionario creado exitosamente' }));
+        this.state.update(s => ({ ...s, loading: false, showCreateModal: false, success: this.msg.get('qnr_suc_created') }));
         this.load();
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
         loading: false,
-        error: getErrorMessage(err, 'Error al crear cuestionario'),
+        error: getErrorMessage(err, 'qnr_err_create', this.msg),
       })),
     });
   }
@@ -111,30 +115,30 @@ export class QuestionnaireFacade {
 
     this.api.updateQuestionnaire(id, data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, loading: false, showUpdateModal: false, selectedItem: null, success: 'Cuestionario actualizado exitosamente' }));
+        this.state.update(s => ({ ...s, loading: false, showUpdateModal: false, selectedItem: null, success: this.msg.get('qnr_suc_updated') }));
         this.load();
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
         loading: false,
-        error: getErrorMessage(err, 'Error al actualizar cuestionario'),
+        error: getErrorMessage(err, 'qnr_err_update', this.msg),
       })),
     });
   }
 
   deleteQuestionnaire(id: number): void {
-    if (!confirm('¿Está seguro de eliminar este cuestionario?')) return;
+    if (!confirm(this.msg.get('qnr_cnf_delete'))) return;
 
     this.api.deleteQuestionnaire(id).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, success: 'Cuestionario eliminado exitosamente' }));
+        this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_deleted') }));
         this.load();
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
-        error: getErrorMessage(err, 'Error al eliminar cuestionario'),
+        error: getErrorMessage(err, 'qnr_err_delete', this.msg),
       })),
     });
   }
@@ -161,13 +165,13 @@ export class QuestionnaireFacade {
   addSection(questionnaireId: number, data: { title: string; description?: string; section_order?: number }): void {
     this.api.createSection(questionnaireId, data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, success: 'Sección agregada exitosamente' }));
+        this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_section_added') }));
         this.loadDetailSections(questionnaireId);
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
-        error: getErrorMessage(err, 'Error al crear sección'),
+        error: getErrorMessage(err, 'qnr_err_create_section', this.msg),
       })),
     });
   }
@@ -175,29 +179,29 @@ export class QuestionnaireFacade {
   updateSection(id: number, questionnaireId: number, data: { title?: string; description?: string; section_order?: number }): void {
     this.api.updateSection(id, data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, success: 'Sección actualizada exitosamente' }));
+        this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_section_updated') }));
         this.loadDetailSections(questionnaireId);
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
-        error: getErrorMessage(err, 'Error al actualizar sección'),
+        error: getErrorMessage(err, 'qnr_err_update_section', this.msg),
       })),
     });
   }
 
   deleteSection(id: number, questionnaireId: number): void {
-    if (!confirm('¿Está seguro de eliminar esta sección?')) return;
+    if (!confirm(this.msg.get('qnr_cnf_delete_section'))) return;
 
     this.api.deleteSection(id).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, success: 'Sección eliminada exitosamente' }));
+        this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_section_deleted') }));
         this.loadDetailSections(questionnaireId);
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
-        error: getErrorMessage(err, 'Error al eliminar sección'),
+        error: getErrorMessage(err, 'qnr_err_delete_section', this.msg),
       })),
     });
   }
@@ -205,13 +209,13 @@ export class QuestionnaireFacade {
   addQuestion(sectionId: number, questionnaireId: number, data: { text: string; type: string; question_order?: number; options?: string[] }): void {
     this.api.createQuestion(sectionId, data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, success: 'Pregunta agregada exitosamente' }));
+        this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_question_added') }));
         this.loadDetailSections(questionnaireId);
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
-        error: getErrorMessage(err, 'Error al crear pregunta'),
+        error: getErrorMessage(err, 'qnr_err_create_question', this.msg),
       })),
     });
   }
@@ -219,29 +223,29 @@ export class QuestionnaireFacade {
   updateQuestion(id: number, questionnaireId: number, data: { text?: string; type?: string; question_order?: number; options?: string[] }): void {
     this.api.updateQuestion(id, data).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, success: 'Pregunta actualizada exitosamente' }));
+        this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_question_updated') }));
         this.loadDetailSections(questionnaireId);
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
-        error: getErrorMessage(err, 'Error al actualizar pregunta'),
+        error: getErrorMessage(err, 'qnr_err_update_question', this.msg),
       })),
     });
   }
 
   deleteQuestion(id: number, questionnaireId: number): void {
-    if (!confirm('¿Está seguro de eliminar esta pregunta?')) return;
+    if (!confirm(this.msg.get('qnr_cnf_delete_question'))) return;
 
     this.api.deleteQuestion(id).subscribe({
       next: () => {
-        this.state.update(s => ({ ...s, success: 'Pregunta eliminada exitosamente' }));
+        this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_question_deleted') }));
         this.loadDetailSections(questionnaireId);
         this.clearSuccessAfterDelay();
       },
       error: err => this.state.update(s => ({
         ...s,
-        error: getErrorMessage(err, 'Error al eliminar pregunta'),
+        error: getErrorMessage(err, 'qnr_err_delete_question', this.msg),
       })),
     });
   }

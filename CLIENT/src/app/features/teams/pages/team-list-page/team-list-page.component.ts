@@ -3,17 +3,18 @@ import { TeamsFacade } from '../../facades/teams.facade';
 import { TeamTableComponent } from '../../components/team-table/team-table.component';
 import { TeamFormModalComponent } from '../../components/team-form-modal/team-form-modal.component';
 import { GtPagination } from '../../../../shared/components/gtable/gtable.types';
-import { MessagePipe } from '../../../../shared/pipes/message.pipe';
+import { MessageService } from '../../../../core/services/message.service';
 
 @Component({
   selector: 'app-team-list-page',
   standalone: true,
-  imports: [TeamTableComponent, TeamFormModalComponent, MessagePipe],
+  imports: [TeamTableComponent, TeamFormModalComponent],
   templateUrl: './team-list-page.component.html',
 })
 export class TeamListPageComponent implements OnInit {
   facade = inject(TeamsFacade);
   vm = this.facade.vm;
+  private msg = inject(MessageService);
 
   ngOnInit(): void {
     this.facade.load();
@@ -38,7 +39,7 @@ export class TeamListPageComponent implements OnInit {
   }
 
   onDelete(id: number): void {
-    if (confirm('¿Está seguro de eliminar este equipo?')) {
+    if (confirm(this.msg.get('team_cnf_delete'))) {
       this.facade.delete(id);
     }
   }

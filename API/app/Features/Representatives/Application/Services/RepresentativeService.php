@@ -33,6 +33,11 @@ class RepresentativeService implements \App\Features\Representatives\Domain\Inte
         return [$players, $total];
     }
 
+    public function findPaginatedAssignments(RepPlayerQuery $query): array
+    {
+        return $this->repository->findPaginatedByRepUserId($query);
+    }
+
     /** @return int[] */
     public function getPlayerIds(int $repUserId): array
     {

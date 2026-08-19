@@ -1,0 +1,123 @@
+@if (vm().loading) {
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
+    </div>
+  </div>
+} @else if (vm().error) {
+  <div class="alert alert-danger">{{ vm().error }}</div>
+} @else if (vm().playerStats) {
+  <h5 class="text-gray-800 fw-semibold mb-3">{{ vm().playerName ?? '' }}</h5>
+
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <label class="form-label">{{ vm().t('es_lbl_select_questionnaire') }}</label>
+      <select class="form-select" (change)="onQuestionnaireChange($event)">
+        @for (q of vm().playerQuestionnaireOptions; track q.id) {
+          <option [value]="q.id" [selected]="q.id === vm().selectedQuestionnaireId">{{ q.title }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (vm().canToggleModes) {
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="btn-group" role="group" aria-label="Vista">
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-info]="vm().viewMode === 'analysis'"
+            [class.btn-outline-info]="vm().viewMode !== 'analysis'"
+            (click)="onSetViewMode('analysis')">
+            {{ vm().t('es_btn_analysis') }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-info]="vm().viewMode === 'historial'"
+            [class.btn-outline-info]="vm().viewMode !== 'historial'"
+            (click)="onSetViewMode('historial')">
+            {{ vm().t('es_btn_historial') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (vm().selectedQStats) {
+    @if (vm().viewMode === 'analysis') {
+      <div class="row mb-4">
+        <div class="col-12">
+          <app-player-regression-chart
+            [observations]="vm().overallObservations"
+            [regression]="vm().selectedQStats!.overall.regression">
+            <h6 class="m-0 fw-bold text-gray-800" cardTitle>{{ vm().t('es_lbl_overall') }}</h6>
+          </app-player-regression-chart>
+        </div>
+      </div>
+    } @else {
+      <div class="row mb-4">
+        <div class="col-12">
+          <app-player-historical-chart
+            [averages]="vm().overallAverages"
+            [regression]="vm().overallHistorialRegression">
+            <h6 class="m-0 fw-bold text-gray-800" cardTitle>{{ vm().t('es_lbl_overall') }}</h6>
+          </app-player-historical-chart>
+        </div>
+      </div>
+    }
+
+    <h5 class="text-gray-800 fw-semibold mb-3">{{ vm().t('es_lbl_per_question') }}</h5>
+    @if (vm().currentQuestionStats; as pq) {
+      <div class="row align-items-center mb-3">
+        <div class="col-4">
+          <button
+            type="button"
+            class="btn btn-info btn-sm"
+            (click)="onPrevQuestion()"
+            [disabled]="!vm().canGoPrev">
+            <i class="bi bi-chevron-left"></i> {{ vm().t('es_btn_previous') }}
+          </button>
+        </div>
+        <div class="col-4 text-center">
+          <span class="small text-muted">
+            {{ vm().t('es_lbl_question_x_of_y', { current: vm().questionIndex + 1, total: vm().questionCount }) }}
+          </span>
+        </div>
+        <div class="col-4 text-end">
+          <button
+            type="button"
+            class="btn btn-info btn-sm"
+            (click)="onNextQuestion()"
+            [disabled]="!vm().canGoNext">
+            {{ vm().t('es_btn_next') }} <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+      @if (vm().viewMode === 'analysis') {
+        <div class="row">
+          <div class="col-12">
+            <app-player-regression-chart
+              [observations]="pq.observations"
+              [regression]="pq.regression">
+              <h6 class="m-0 fw-bold text-gray-800" cardTitle>{{ pq.question_text }}</h6>
+            </app-player-regression-chart>
+          </div>
+        </div>
+      } @else {
+        <div class="row">
+          <div class="col-12">
+            <app-player-historical-chart
+              [averages]="pq.averages"
+              [regression]="pq.historial_regression">
+              <h6 class="m-0 fw-bold text-gray-800" cardTitle>{{ pq.question_text }}</h6>
+            </app-player-historical-chart>
+          </div>
+        </div>
+      }
+    }
+  }
+} @else {
+  <div class="alert alert-info">{{ vm().t('es_lbl_no_data') }}</div>
+}

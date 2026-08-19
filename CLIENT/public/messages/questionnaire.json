@@ -53,5 +53,12 @@
   "qnr_hdr_new_section":                    { "message": "Nueva Sección", "desc": "Modal header nueva sección" },
   "qnr_hdr_edit_section":                   { "message": "Editar Sección", "desc": "Modal header editar sección" },
   "qnr_btn_edit_section":                   { "message": "Editar", "desc": "Botón editar en detail" },
-  "qnr_btn_delete_section":                 { "message": "Eliminar", "desc": "Botón eliminar en detail" }
+  "qnr_btn_delete_section":                 { "message": "Eliminar", "desc": "Botón eliminar en detail" },
+  "qnr_lbl_responds":                       { "message": "Responde", "desc": "Columna rol que responde" },
+  "qnr_lbl_evaluates":                      { "message": "Evalúa a", "desc": "Columna rol evaluado" },
+  "qnr_lbl_questions":                      { "message": "Preguntas", "desc": "Columna cantidad preguntas" },
+  "qnr_lbl_created":                        { "message": "Creado", "desc": "Columna fecha creación" },
+  "qnr_hdr_add_question":                   { "message": "Agregar Pregunta", "desc": "Modal header agregar pregunta" },
+  "qnr_hdr_edit_question":                  { "message": "Editar Pregunta", "desc": "Modal header editar pregunta" },
+  "qnr_hdr_edit_questionnaire":             { "message": "Editar Cuestionario", "desc": "Modal header editar cuestionario" }
 }

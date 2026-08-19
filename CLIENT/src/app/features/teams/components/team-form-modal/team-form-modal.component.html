@@ -3,35 +3,35 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title fw-bold">
-          {{ (isEdit() ? 'team_btn_edit' : 'team_btn_new') | message }}
+          {{ vm().t(vm().isEdit ? 'team_btn_edit' : 'team_btn_new') }}
         </h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">{{ 'team_lbl_name' | message }} <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" [value]="name()" (input)="onNameChange($event)" />
+            <label class="form-label">{{ vm().t('team_lbl_name') }} <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [value]="vm().name" (input)="onNameChange($event)" />
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">{{ 'team_lbl_code' | message }} <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" [value]="code()" (input)="onCodeChange($event)" />
+            <label class="form-label">{{ vm().t('team_lbl_code') }} <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [value]="vm().code" (input)="onCodeChange($event)" />
           </div>
 
           <div class="col-12">
-            <label class="form-label">{{ 'team_lbl_description' | message }}</label>
-            <textarea class="form-control" rows="3" [value]="description()" (input)="onDescriptionChange($event)"></textarea>
+            <label class="form-label">{{ vm().t('team_lbl_description') }}</label>
+            <textarea class="form-control" rows="3" [value]="vm().description" (input)="onDescriptionChange($event)"></textarea>
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">{{ 'team_lbl_trainer' | message }} <span class="text-danger">*</span></label>
-            @if (loadingTrainers()) {
+            <label class="form-label">{{ vm().t('team_lbl_trainer') }} <span class="text-danger">*</span></label>
+            @if (vm().loadingTrainers) {
               <div class="spinner-border spinner-border-sm text-primary"></div>
             } @else {
-              <select class="form-select" [value]="trainerUserId() === null ? '' : trainerUserId()" (change)="onTrainerChange($event)">
-                <option value="" disabled>{{ 'team_plh_select_trainer' | message }}</option>
-                @for (t of trainers(); track t.id) {
+              <select class="form-select" [value]="vm().trainerUserId === null ? '' : vm().trainerUserId" (change)="onTrainerChange($event)">
+                <option value="" disabled>{{ vm().t('team_plh_select_trainer') }}</option>
+                @for (t of vm().trainers; track t.id) {
                   <option [value]="t.id">{{ t.display_name }}</option>
                 }
               </select>
@@ -39,25 +39,25 @@
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">{{ 'team_lbl_players' | message }}</label>
-            @if (loadingPlayers()) {
+            <label class="form-label">{{ vm().t('team_lbl_players') }}</label>
+            @if (vm().loadingPlayers) {
               <div class="spinner-border spinner-border-sm text-primary"></div>
             } @else {
               <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-                @for (p of players(); track p.id) {
+                @for (p of vm().players; track p.id) {
                   <div class="form-check">
                     <input
                       class="form-check-input"
                       type="checkbox"
                       [id]="'player_' + p.id"
-                      [checked]="playerIds().includes(p.id)"
+                      [checked]="vm().playerIds.includes(p.id)"
                       (change)="onPlayerToggle(p.id)"
                     />
                     <label class="form-check-label" [for]="'player_' + p.id">{{ p.display_name }}</label>
                   </div>
                 }
-                @if (players().length === 0) {
-                  <span class="text-muted small">{{ 'team_lbl_no_players_available' | message }}</span>
+                @if (vm().players.length === 0) {
+                  <span class="text-muted small">{{ vm().t('team_lbl_no_players_available') }}</span>
                 }
               </div>
             }
@@ -65,15 +65,15 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="saving()">
-          {{ 'cr_btn_cancel' | message }}
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="vm().saving">
+          {{ vm().t('cr_btn_cancel') }}
         </button>
         <button type="button" class="btn btn-primary" (click)="onSubmit()"
-          [disabled]="saving() || !name() || !code() || trainerUserId() === null">
-          @if (saving()) {
+          [disabled]="vm().saving || !vm().name || !vm().code || vm().trainerUserId === null">
+          @if (vm().saving) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          {{ (isEdit() ? 'cr_btn_update' : 'cr_btn_save') | message }}
+          {{ vm().t(vm().isEdit ? 'cr_btn_update' : 'cr_btn_save') }}
         </button>
       </div>
     </div>

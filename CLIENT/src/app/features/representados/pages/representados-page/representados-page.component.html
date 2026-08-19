@@ -1,0 +1,46 @@
+@let vm = facade.vm;
+@if (vm().error) {
+  <div class="alert alert-danger alert-dismissible fade show py-2" role="alert">
+    {{ vm().error }}
+    <button type="button" class="btn-close py-2" data-bs-dismiss="alert" (click)="facade.clearMessages()"></button>
+  </div>
+}
+
+<div class="row align-items-center mb-3">
+  <div class="col">
+    <h4 class="text-gray-800 fw-bold mb-1">{{ vm().t('rep_hdr_title') }}</h4>
+    <p class="text-gray-800 mb-0" style="font-size: 0.9rem;">{{ vm().t('rep_lbl_subtitle') }}</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow h-100">
+      <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 fw-bold text-gray-800">{{ vm().t('rep_hdr_list') }}</h6>
+      </div>
+      <div class="card-body d-flex flex-column">
+        <div class="flex-grow-1">
+          <app-player-list
+            [items]="listItems()"
+            [activeId]="vm().selectedId"
+            [loading]="vm().loading"
+            [pagination]="pagination()"
+            [searchPlaceholder]="'rep_plh_search'"
+            [searchValue]="vm().search"
+            (selectPlayer)="onSelect($event)"
+            (pageChange)="onChangePage($event)"
+            (searchChange)="onSearch($event)" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    @if (facade.selectedModel(); as model) {
+      <app-player-detail-cards [model]="model" />
+    } @else if (!vm().loading) {
+      <div class="alert alert-info">{{ vm().t('rep_lbl_select_player') }}</div>
+    }
+  </div>
+</div>

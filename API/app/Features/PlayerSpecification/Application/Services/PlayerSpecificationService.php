@@ -28,6 +28,11 @@ class PlayerSpecificationService implements PlayerSpecificationServiceInterface
         return $this->repository->findById($id);
     }
 
+    public function findByIds(array $userIds): array
+    {
+        return $this->repository->findByIds($userIds);
+    }
+
     public function findPaginated(PlayerSpecificationQuery $query): array
     {
         return $this->repository->findPaginated($query);

@@ -1,22 +1,32 @@
-import { Component, input, output, computed } from '@angular/core';
+import { Component, input, output, computed, inject, signal, TemplateRef, ViewChild } from '@angular/core';
 import { GTableComponent } from '../../../../shared/components/gtable/gtable.component';
 import { GtColumn, GtAction, GtDetailConfig } from '../../../../shared/components/gtable/gtable.types';
-import { PersonData, UserData, PlayerSpecData } from '../../services/users-http.service';
+import { PersonData, UserData, PlayerSpecData, PlayerRepData } from '../../services/users-http.service';
+import { PlayerDetailCardsComponent } from '../../../../shared/components/player-detail/player-detail-cards.component';
+import { buildPlayerDetail } from '../../../../shared/components/player-detail/player-detail.util';
+import { PlayerDetailModel } from '../../../../shared/components/player-detail/player-detail.types';
+import { PersonDetailCardsComponent } from '../../../../shared/components/person-detail/person-detail-cards.component';
+import { PersonDetailModel } from '../../../../shared/components/person-detail/person-detail.types';
+import { MessageService } from '../../../../core/services/message.service';
 
 type TableItem = PersonData | UserData;
 
 @Component({
   selector: 'app-users-table',
-  imports: [GTableComponent],
+  imports: [GTableComponent, PlayerDetailCardsComponent, PersonDetailCardsComponent],
   templateUrl: './users-table.component.html',
 })
 export class UsersTableComponent {
+  private msg = inject(MessageService);
+
   items = input<TableItem[]>([]);
   type = input<'person' | 'admin'>('person');
+  personType = input<string | null>(null);
   total = input(0);
   page = input(1);
   perPage = input(20);
   playerSpecs = input<Record<number, PlayerSpecData>>({});
+  playerReps = input<Record<number, PlayerRepData>>({});
 
   pageChange = output<number>();
   delete = output<number>();
@@ -24,27 +34,39 @@ export class UsersTableComponent {
   restore = output<number>();
   spec = output<number>();
 
+  @ViewChild('playerDetailTpl') set playerDetailTpl(v: TemplateRef<{ $implicit: any }>) {
+    this.playerDetailTplSignal.set(v);
+  }
+
+  private playerDetailTplSignal = signal<TemplateRef<{ $implicit: any }> | null>(null);
+
+  @ViewChild('personDetailTpl') set personDetailTpl(v: TemplateRef<{ $implicit: any }>) {
+    this.personDetailTplSignal.set(v);
+  }
+
+  private personDetailTplSignal = signal<TemplateRef<{ $implicit: any }> | null>(null);
+
   columns = computed<GtColumn<any>[]>(() => {
     if (this.type() === 'person') {
       return [
-        { key: '_displayName', label: 'Nombres' },
-        { key: '_displaySurnames', label: 'Apellidos' },
-        { key: 'document_number', label: 'Cédula' },
-        { key: 'email', label: 'Correo' },
-        { key: 'phone', label: 'Teléfono' },
+        { key: '_displayName', label: this.msg.get('usr_lbl_names') },
+        { key: '_displaySurnames', label: this.msg.get('usr_lbl_surnames') },
+        { key: 'document_number', label: this.msg.get('usr_lbl_document_number') },
+        { key: 'email', label: this.msg.get('usr_lbl_email_short') },
+        { key: 'phone', label: this.msg.get('usr_lbl_phone') },
       ];
     }
     return [
-      { key: 'email', label: 'Correo' },
-      { key: '_rolesDisplay', label: 'Roles' },
-      { key: 'active', label: 'Activo', format: 'boolean' },
+      { key: 'email', label: this.msg.get('usr_lbl_email_short') },
+      { key: '_rolesDisplay', label: this.msg.get('usr_lbl_roles') },
+      { key: 'active', label: this.msg.get('usr_lbl_active'), format: 'boolean' },
       {
         key: '_deletedStatus',
-        label: 'Estado',
+        label: this.msg.get('usr_lbl_status'),
         format: 'badge',
         badgeMap: {
-          active: { class: 'bg-success', label: 'Activo' },
-          deleted: { class: 'bg-danger', label: 'Eliminado' },
+          active: { class: 'bg-success', label: this.msg.get('usr_lbl_active') },
+          deleted: { class: 'bg-danger', label: this.msg.get('usr_lbl_deleted') },
         },
       },
     ];
@@ -52,58 +74,50 @@ export class UsersTableComponent {
 
   detailConfig = computed<GtDetailConfig | null>(() => {
     if (this.type() === 'person') {
+      if (this.personType() === 'JUG') {
+        const tpl = this.playerDetailTplSignal();
+        if (tpl) return { template: tpl };
+      } else {
+        const tpl = this.personDetailTplSignal();
+        if (tpl) return { template: tpl };
+      }
+
       return {
         fields: [
-          { label: 'Nombre completo', key: '_displayFullName' },
-          { label: 'Cédula', key: 'document_number' },
-          { label: 'Correo', key: 'email' },
-          { label: 'Teléfono', key: 'phone' },
-          { label: 'Dirección', key: 'address' },
-          { label: 'Tipo', key: 'type' },
-          { label: 'Usuario asociado', key: '_associatedUser' },
-          { label: 'Fecha de nacimiento', key: '_specBirthDate' },
-          { label: 'Estatura', key: '_specHeight' },
-          { label: 'Peso', key: '_specWeight' },
-          { label: 'Género', key: '_specGender' },
-          { label: 'Nacionalidad', key: '_specNationality' },
-          { label: 'Tipo de sangre', key: '_specBlood' },
-          { label: 'Posición', key: '_specPosition' },
-          { label: 'Dorsal', key: '_specJersey' },
-          { label: 'Pie dominante', key: '_specFoot' },
-          { label: 'Fecha de ingreso', key: '_specEntryDate' },
-          { label: 'Estado', key: '_specStatus' },
-          { label: 'Contacto emergencia', key: '_specEmerName' },
-          { label: 'Teléfono emergencia', key: '_specEmerPhone' },
-          { label: 'Parentesco emergencia', key: '_specEmerRel' },
-          { label: 'Condiciones médicas', key: '_specMedCond' },
-          { label: 'Alergias', key: '_specAllergies' },
-          { label: 'Creado', key: 'created_at', format: 'date' },
-          { label: 'Actualizado', key: 'updated_at', format: 'date' },
+          { label: this.msg.get('usr_lbl_full_name'), key: '_displayFullName' },
+          { label: this.msg.get('usr_lbl_document_number'), key: 'document_number' },
+          { label: this.msg.get('usr_lbl_email_short'), key: 'email' },
+          { label: this.msg.get('usr_lbl_phone'), key: 'phone' },
+          { label: this.msg.get('usr_lbl_address'), key: 'address' },
+          { label: this.msg.get('usr_lbl_type'), key: 'type' },
+          { label: this.msg.get('usr_lbl_associated_user'), key: '_associatedUser' },
+          { label: this.msg.get('usr_lbl_created'), key: 'created_at', format: 'date' },
+          { label: this.msg.get('usr_lbl_updated'), key: 'updated_at', format: 'date' },
         ],
       };
     }
     return {
       fields: [
-        { label: 'Correo', key: 'email' },
-        { label: 'Roles', key: '_rolesDisplay' },
-        { label: 'Activo', key: 'active', format: 'boolean' },
-        { label: 'Estado', key: '_deletedStatus', format: 'badge', badgeMap: { active: { class: 'bg-success', label: 'Activo' }, deleted: { class: 'bg-danger', label: 'Eliminado' } } },
-        { label: 'Creado', key: 'created_at', format: 'date' },
-        { label: 'Actualizado', key: 'updated_at', format: 'date' },
+        { label: this.msg.get('usr_lbl_email_short'), key: 'email' },
+        { label: this.msg.get('usr_lbl_roles'), key: '_rolesDisplay' },
+        { label: this.msg.get('usr_lbl_active'), key: 'active', format: 'boolean' },
+        { label: this.msg.get('usr_lbl_status'), key: '_deletedStatus', format: 'badge', badgeMap: { active: { class: 'bg-success', label: this.msg.get('usr_lbl_active') }, deleted: { class: 'bg-danger', label: this.msg.get('usr_lbl_deleted') } } },
+        { label: this.msg.get('usr_lbl_created'), key: 'created_at', format: 'date' },
+        { label: this.msg.get('usr_lbl_updated'), key: 'updated_at', format: 'date' },
       ],
     };
   });
 
   actions = computed<GtAction<any>[]>(() => {
     const base: GtAction<any>[] = [
-      { key: 'edit', icon: 'bi-pencil', label: 'Actualizar', btnClass: 'btn-outline-info' },
-      { key: 'delete', icon: 'bi-trash', label: 'Eliminar', btnClass: 'btn-outline-danger' },
+      { key: 'edit', icon: 'bi-pencil', label: this.msg.get('cr_btn_update'), btnClass: 'btn-outline-info' },
+      { key: 'delete', icon: 'bi-trash', label: this.msg.get('cr_btn_delete'), btnClass: 'btn-outline-danger' },
     ];
     if (this.type() === 'person') {
       base.unshift({
         key: 'spec',
         icon: 'bi-person-badge',
-        label: 'Ficha',
+        label: this.msg.get('usr_lbl_ficha'),
         btnClass: 'btn-outline-primary',
         visible: (item: any) => item.type === 'JUG',
       });
@@ -112,7 +126,7 @@ export class UsersTableComponent {
       base.push({
         key: 'restore',
         icon: 'bi-arrow-counterclockwise',
-        label: 'Restaurar',
+        label: this.msg.get('cr_btn_restore'),
         btnClass: 'btn-outline-warning',
         visible: (item: any) => !!item.deleted_at,
       });
@@ -123,32 +137,47 @@ export class UsersTableComponent {
   processedItems = computed<any[]>(() => {
     const t = this.type();
     const ps = this.playerSpecs();
+    const reps = this.playerReps();
     return this.items().map(item => {
       if (t === 'person') {
         const p = item as PersonData;
-        const spec = p.user_id ? ps[p.user_id] : null;
+        const userId = p.user_id;
+        const spec = userId ? ps[userId] : null;
+        const rep = userId ? reps[userId] : null;
+        const fullName = [p.first_name, p.middle_name, p.first_surname, p.second_surname].filter(Boolean).join(' ');
+        const associatedUser = p.user_id ? this.msg.get('usr_lbl_user_yes_id', { id: p.user_id }) : this.msg.get('usr_lbl_associated_user_no');
+        const playerModel: PlayerDetailModel = buildPlayerDetail(
+          p.user_id ?? p.id,
+          fullName,
+          p.email,
+          p,
+          spec ?? null,
+          {
+            representative: rep
+              ? { id: rep.id, display_name: rep.display_name, email: rep.email }
+              : null,
+            parentesco: rep?.parentesco?.description ?? null,
+          },
+        );
+        const personModel: PersonDetailModel = {
+          display_name: fullName,
+          document_number: p.document_number,
+          email: p.email,
+          phone: p.phone,
+          address: p.address,
+          type: p.type,
+          associated_user: associatedUser,
+          created_at: p.created_at,
+          updated_at: p.updated_at,
+        };
         return {
           ...p,
           _displayName: `${p.first_name} ${p.middle_name ?? ''}`.trim(),
           _displaySurnames: `${p.first_surname} ${p.second_surname ?? ''}`.trim(),
-          _displayFullName: [p.first_name, p.middle_name, p.first_surname, p.second_surname].filter(Boolean).join(' '),
-          _associatedUser: p.user_id ? `Sí (ID: ${p.user_id})` : 'No',
-          _specBirthDate: spec?.birth_date ?? null,
-          _specHeight: spec?.height_cm ? `${spec.height_cm} cm` : null,
-          _specWeight: spec?.weight_kg ? `${spec.weight_kg} kg` : null,
-          _specGender: spec?.gender ?? null,
-          _specNationality: spec?.nationality ?? null,
-          _specBlood: spec?.blood_type ?? null,
-          _specPosition: spec?.position ?? null,
-          _specJersey: spec?.jersey_number_1 ?? null,
-          _specFoot: spec?.dominant_foot ?? null,
-          _specEntryDate: spec?.entry_date ?? null,
-          _specStatus: spec?.status ?? null,
-          _specEmerName: spec?.emergency_contact_name ?? null,
-          _specEmerPhone: spec?.emergency_contact_phone ?? null,
-          _specEmerRel: spec?.emergency_contact_relationship ?? null,
-          _specMedCond: spec?.medical_conditions ?? null,
-          _specAllergies: spec?.allergies ?? null,
+          _displayFullName: fullName,
+          _playerModel: playerModel,
+          _personModel: personModel,
+          _associatedUser: associatedUser,
         };
       }
       const u = item as UserData;

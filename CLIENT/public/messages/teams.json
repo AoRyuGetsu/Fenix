@@ -11,5 +11,13 @@
   "team_lbl_players":                       { "message": "Jugadores", "desc": "Label select jugadores" },
   "team_lbl_no_players_available":          { "message": "No hay jugadores disponibles", "desc": "Sin jugadores" },
   "team_btn_edit":                          { "message": "Editar equipo", "desc": "Título editar equipo" },
-  "team_plh_select_trainer":                { "message": "Seleccionar entrenador", "desc": "Opción default select entrenador" }
+  "team_plh_select_trainer":                { "message": "Seleccionar entrenador", "desc": "Opción default select entrenador" },
+  "team_err_load":                          { "message": "Error al cargar equipos", "desc": "Error al listar equipos" },
+  "team_suc_deleted":                       { "message": "Equipo eliminado correctamente", "desc": "Éxito al eliminar equipo" },
+  "team_err_delete":                        { "message": "Error al eliminar equipo", "desc": "Error al eliminar equipo" },
+  "team_suc_created":                       { "message": "Equipo creado correctamente", "desc": "Éxito al crear equipo" },
+  "team_suc_updated":                       { "message": "Equipo actualizado correctamente", "desc": "Éxito al actualizar equipo" },
+  "team_err_save":                          { "message": "Error al guardar equipo", "desc": "Error al guardar equipo" },
+  "team_cnf_delete":                        { "message": "¿Está seguro de eliminar este equipo?", "desc": "Confirmación eliminar equipo" },
+  "team_lbl_updated":                       { "message": "Actualizado", "desc": "Campo fecha actualización" }
 }

@@ -1,12 +1,15 @@
 <div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h4 class="text-gray-800 fw-bold mb-1">{{ 'qnr_hdr_title' | message }}</h4>
-      <p class="text-gray-800 mb-0 text-sm">{{ 'qnr_lbl_subtitle' | message }}</p>
+  @let vm = facade.vm;
+  <div class="row align-items-center mb-3">
+    <div class="col">
+      <h4 class="text-gray-800 fw-bold mb-1">{{ vm().t('qnr_hdr_title') }}</h4>
+      <p class="text-gray-800 mb-0 text-sm">{{ vm().t('qnr_lbl_subtitle') }}</p>
     </div>
-    <button class="btn btn-primary" (click)="facade.openCreateModal()">
-      <i class="bi-plus-lg me-1"></i>{{ 'qnr_btn_new_questionnaire' | message }}
-    </button>
+    <div class="col-auto">
+      <button class="btn btn-primary" (click)="facade.openCreateModal()">
+        <i class="bi-plus-lg me-1"></i>{{ vm().t('qnr_btn_new_questionnaire') }}
+      </button>
+    </div>
   </div>
 
   @if (vm().success) {
@@ -23,20 +26,20 @@
   }
 
   <div class="alert alert-info py-2" role="alert">
-    <i class="bi-info-circle me-1"></i> {{ 'qnr_info_topic_guidelines' | message }}
+    <i class="bi-info-circle me-1"></i> {{ vm().t('qnr_info_topic_guidelines') }}
   </div>
 
   @if (vm().loading) {
     <div class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">{{ 'cr_lbl_loading' | message }}</span>
+        <span class="visually-hidden">{{ vm().t('cr_lbl_loading') }}</span>
       </div>
     </div>
   }
 
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 fw-bold text-gray-800">{{ 'qnr_hdr_list' | message }}</h6>
+      <h6 class="m-0 fw-bold text-gray-800">{{ vm().t('qnr_hdr_list') }}</h6>
     </div>
     <div class="card-body">
       <div class="row mb-3">
@@ -45,7 +48,7 @@
             #filterInput
             type="text"
             class="form-control"
-            [placeholder]="'qnr_plh_search_title' | message"
+            [placeholder]="vm().t('qnr_plh_search_title')"
             [value]="vm().searchTerm"
             (input)="onFilter(filterInput.value)"
           />
@@ -70,17 +73,17 @@
     }
     <div class="row mb-3">
       <div class="col-md-4 col-sm-6">
-        <small class="text-muted d-block">{{ 'qnr_lbl_responder_role' | message }}</small>
+        <small class="text-muted d-block">{{ vm().t('qnr_lbl_responder_role') }}</small>
         <span class="fw-medium">{{ item.responder_role }}</span>
       </div>
       <div class="col-md-4 col-sm-6">
-        <small class="text-muted d-block">{{ 'qnr_lbl_target_role' | message }}</small>
+        <small class="text-muted d-block">{{ vm().t('qnr_lbl_target_role') }}</small>
         <span class="fw-medium">{{ item.target_role }}</span>
       </div>
       <div class="col-md-4 col-sm-6">
-        <small class="text-muted d-block">{{ 'qnr_lbl_active' | message }}</small>
+        <small class="text-muted d-block">{{ vm().t('qnr_lbl_active') }}</small>
         <span class="badge" [class.bg-success]="item.active" [class.bg-secondary]="!item.active">
-          {{ item.active ? ('cr_lbl_yes' | message) : ('cr_lbl_no' | message) }}
+          {{ item.active ? (vm().t('cr_lbl_yes')) : (vm().t('cr_lbl_no')) }}
         </span>
       </div>
     </div>
@@ -92,9 +95,9 @@
       </div>
     } @else {
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h6 class="fw-bold mb-0">{{ 'qnr_hdr_sections' | message }}</h6>
+        <h6 class="fw-bold mb-0">{{ vm().t('qnr_hdr_sections') }}</h6>
         <button class="btn btn-sm btn-primary" (click)="onAddSection()">
-          <i class="bi-plus-lg me-1"></i>{{ 'qnr_btn_add_section' | message }}
+          <i class="bi-plus-lg me-1"></i>{{ vm().t('qnr_btn_add_section') }}
         </button>
       </div>
 
@@ -128,7 +131,7 @@
         </div>
       } @empty {
         @if (!vm().detailSectionsLoading) {
-          <p class="text-muted text-sm">{{ 'qnr_lbl_no_sections' | message }}</p>
+          <p class="text-muted text-sm">{{ vm().t('qnr_lbl_no_sections') }}</p>
         }
       }
     }
@@ -164,35 +167,35 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title fw-bold">{{ editingSection() ? ('qnr_hdr_edit_section' | message) : ('qnr_hdr_new_section' | message) }}</h5>
+            <h5 class="modal-title fw-bold">{{ editingSection() ? (vm().t('qnr_hdr_edit_section')) : (vm().t('qnr_hdr_new_section')) }}</h5>
             <button type="button" class="btn-close" (click)="showSectionModal.set(false)"></button>
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label class="form-label">{{ 'qnr_lbl_title' | message }} <span class="text-danger">*</span></label>
+              <label class="form-label">{{ vm().t('qnr_lbl_title') }} <span class="text-danger">*</span></label>
               <input
                 type="text"
                 class="form-control"
                 [value]="sectionTitle()"
                 (input)="sectionTitle.set($any($event.target).value)"
-                [placeholder]="'qnr_lbl_section_name' | message"
+                [placeholder]="vm().t('qnr_lbl_section_name')"
               />
             </div>
             <div class="mb-3">
-              <label class="form-label">{{ 'qnr_lbl_description' | message }}</label>
+              <label class="form-label">{{ vm().t('qnr_lbl_description') }}</label>
               <textarea
                 class="form-control"
                 [value]="sectionDescription()"
                 (input)="sectionDescription.set($any($event.target).value)"
                 rows="2"
-                [placeholder]="'qnr_plh_description_optional' | message"
+                [placeholder]="vm().t('qnr_plh_description_optional')"
               ></textarea>
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-danger" (click)="showSectionModal.set(false)">{{ 'cr_btn_cancel' | message }}</button>
+            <button class="btn btn-danger" (click)="showSectionModal.set(false)">{{ vm().t('cr_btn_cancel') }}</button>
             <button class="btn btn-primary" (click)="onSaveSection()" [disabled]="!sectionTitle().trim()">
-              {{ editingSection() ? ('cr_btn_update' | message) : ('cr_btn_create' | message) }}
+              {{ editingSection() ? (vm().t('cr_btn_update')) : (vm().t('cr_btn_create')) }}
             </button>
           </div>
         </div>

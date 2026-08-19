@@ -32,9 +32,38 @@ class TeamService implements \App\Features\Teams\Domain\Interfaces\TeamServiceIn
         return $this->repository->findById($id);
     }
 
+    public function findByIdIfViewable(int $id): ?Team
+    {
+        $team = $this->repository->findById($id);
+        if ($team === null) {
+            return null;
+        }
+
+        if ($this->authContext->hasRole('ENT')) {
+            $belongsToEnt = false;
+            foreach ($this->repository->findByTrainerId($this->authContext->getUserId()) as $myTeam) {
+                if ((int) $myTeam->getId() === $id) {
+                    $belongsToEnt = true;
+                    break;
+                }
+            }
+            if (!$belongsToEnt) {
+                throw new AppException('FORBIDDEN');
+            }
+        }
+
+        return $team;
+    }
+
     public function findByTrainerId(int $trainerUserId): array
     {
         return $this->repository->findByTrainerId($trainerUserId);
+    }
+
+    public function findMyTeams(?TeamQueryDto $query = null): array
+    {
+        $q = $query ?? new TeamQueryDto();
+        return $this->repository->findPaginatedByTrainerId($q, $this->authContext->getUserId());
     }
 
     public function create(array $data): Team

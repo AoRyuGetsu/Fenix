@@ -1,18 +1,18 @@
-@let state = vm();
+@let vm = facade.vm;
 
 <div class="container-fluid py-3">
-  <h4 class="mb-3">{{ 'eval_hdr_title' | message }}</h4>
+  <h4 class="mb-3">{{ vm().t('eval_hdr_title') }}</h4>
 
-  @if (state.success) {
+  @if (vm().success) {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ state.success }}
+      {{ vm().success }}
       <button type="button" class="btn-close" (click)="facade.clearMessages()"></button>
     </div>
   }
 
-  @if (state.error) {
+  @if (vm().error) {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      {{ state.error }}
+      {{ vm().error }}
       <button type="button" class="btn-close" (click)="facade.clearMessages()"></button>
     </div>
   }
@@ -23,7 +23,7 @@
         #filterInput
         type="text"
         class="form-control"
-        [placeholder]="'eval_plh_search_title' | message"
+        [placeholder]="vm().t('eval_plh_search_title')"
         [value]="vm().searchTerm"
         (input)="onFilter(filterInput.value)"
       />
@@ -31,8 +31,8 @@
   </div>
 
   <app-evaluations-table
-    [items]="state.items"
-    [loading]="state.loading"
+    [items]="vm().items"
+    [loading]="vm().loading"
     [pagination]="pagination()"
     (pageChange)="onChangePage($event)"
     (fill)="onFill($event)"

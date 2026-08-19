@@ -48,7 +48,7 @@ class UserRoleController implements ControllerInterface
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
         }
 
-        return new JsonResponse(['message' => 'Role assigned']);
+        return new JsonResponse(['message' => getError('ROLE_ASSIGNED')]);
     }
 
     #[OA\Delete(path: '/users/{id}/roles/{roleId}', tags: ['User Roles'], summary: 'Quitar rol de usuario')]

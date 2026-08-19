@@ -283,17 +283,17 @@ class EvaluationController implements ControllerInterface
 
         $targetRoleCode = $questionnaire->getTargetRole()->getCode();
 
-        $teamIds = null;
+        $targetPlayerIds = null;
         $responderRoles = $this->authContext->getRoles();
         if ($targetRoleCode === 'JUG' && in_array('ENT', $responderRoles, true)) {
             $playerIds = $this->teamRepository->findPlayerIdsByTrainerId($this->authContext->getUserId());
-            $teamIds = $playerIds !== [] ? $playerIds : null;
+            $targetPlayerIds = $playerIds !== [] ? $playerIds : null;
         }
 
         $usersResult = $this->userRepository->findPaginated(
             new \App\Features\User\Application\DTO\UserQuery(
                 role: $targetRoleCode,
-                teamIds: $teamIds,
+                playerIds: $targetPlayerIds,
                 page: $page,
                 perPage: $perPage,
             )

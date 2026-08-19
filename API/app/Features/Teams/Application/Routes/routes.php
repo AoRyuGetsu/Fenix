@@ -27,7 +27,7 @@ return function (Router $router, Container $container): void {
     $router->addRoute('GET', '/teams/{id:\d+}', middleware($container, function (string $id) use ($container) {
         $controller = $container->make(TeamController::class);
         return $controller->show((int) $id);
-    }, ['ADM']));
+    }, ['SUP', 'ADM', 'ENT']));
 
     $router->addRoute('PUT', '/teams/{id:\d+}', middleware($container, function (string $id) use ($container) {
         $controller = $container->make(TeamController::class);

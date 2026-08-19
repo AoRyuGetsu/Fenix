@@ -33,6 +33,23 @@ class PlayerSpecificationRepository implements PlayerSpecificationRepositoryInte
         return $this->findById($userId);
     }
 
+    public function findByIds(array $userIds): array
+    {
+        if ($userIds === []) {
+            return [];
+        }
+
+        return $this->entityManager
+            ->createQueryBuilder()
+            ->select('ps')
+            ->from(PlayerSpecification::class, 'ps')
+            ->where('ps.user IN (:userIds)')
+            ->andWhere('ps.deletedAt IS NULL')
+            ->setParameter('userIds', $userIds)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findPaginated(PlayerSpecificationQuery $query): array
     {
         $qb = $this->entityManager

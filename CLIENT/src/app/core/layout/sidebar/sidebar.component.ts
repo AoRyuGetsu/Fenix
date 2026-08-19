@@ -1,10 +1,10 @@
 import { Component, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MessagePipe } from '../../../shared/pipes/message.pipe';
 import { MenuFacade, MenuNode } from '../../menu/facades/menu.facade';
 import { AuthFacade } from '../../auth/facades/auth.facade';
 import { ConfigService } from '../../services/config.service';
 import { CatalogService } from '../../services/catalog.service';
+import { MessageService, MessageResolver } from '../../services/message.service';
 
 const ICON_MAP: Record<string, string> = {
   settings: 'bi-gear',
@@ -12,11 +12,12 @@ const ICON_MAP: Record<string, string> = {
   lock: 'bi-lock',
   people: 'bi-people',
   questionnaire: 'bi-question-circle',
+  'person-badge': 'bi-person-badge',
 };
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, MessagePipe],
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent {
@@ -24,18 +25,25 @@ export class SidebarComponent {
   private authFacade = inject(AuthFacade);
   private configService = inject(ConfigService);
   private catalogService = inject(CatalogService);
+  private msg = inject(MessageService);
 
-  menuTree = this.menuFacade.menuTree;
-  authVm = this.authFacade.vm;
-  logoUrl = this.configService.logoUrl;
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
 
   userRoleName = computed(() => {
-    const roles = this.authVm().roles;
+    const roles = this.authFacade.vm().roles;
     if (roles.length === 0) return '';
     const catalog = this.catalogService.getCatalog<{ code: string; name: string }>('roles');
     const match = catalog.find(r => r.code === roles[0]);
     return match?.name ?? roles[0];
   });
+
+  vm = computed(() => ({
+    logoUrl: this.configService.logoUrl,
+    menuTree: this.menuFacade.menuTree(),
+    user: this.authFacade.vm().user,
+    userRoleName: this.userRoleName(),
+    t: this.t,
+  }));
 
   protected logout(): void {
     this.authFacade.logout();

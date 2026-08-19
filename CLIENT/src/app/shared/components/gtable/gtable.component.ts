@@ -1,6 +1,7 @@
-import { Component, input, output, signal, computed } from '@angular/core';
+import { Component, input, output, signal, computed, inject } from '@angular/core';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { GtColumn, GtAction, GtDetailConfig, GtPagination } from './gtable.types';
+import { MessageService } from '../../../core/services/message.service';
 
 @Component({
   selector: 'app-gtable',
@@ -8,11 +9,13 @@ import { GtColumn, GtAction, GtDetailConfig, GtPagination } from './gtable.types
   templateUrl: './gtable.component.html',
 })
 export class GTableComponent<T extends { id: number }> {
+  protected msg = inject(MessageService);
+
   columns    = input<GtColumn<T>[]>([]);
   data       = input<T[]>([]);
   pagination = input<GtPagination>({ page: 1, perPage: 20, total: 0 });
   loading    = input(false);
-  emptyMsg   = input('No hay registros para mostrar');
+  emptyMsg   = input('');
 
   detail     = input<GtDetailConfig | null>(null);
   actions    = input<GtAction<T>[]>([]);

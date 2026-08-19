@@ -1,51 +1,51 @@
-@if (visible()) {
+@if (vm().visible) {
   <div class="modal d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title fw-bold">Editar Cuestionario</h5>
+          <h5 class="modal-title fw-bold">{{ vm().t('qnr_hdr_edit_questionnaire') }}</h5>
           <button type="button" class="btn-close" (click)="close.emit()"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Título</label>
-            <input #titleInput type="text" class="form-control" [value]="title()" (input)="title.set(titleInput.value)" />
+            <label class="form-label">{{ vm().t('qnr_lbl_title') }}</label>
+            <input #titleInput type="text" class="form-control" [value]="vm().title" (input)="title.set(titleInput.value)" />
           </div>
           <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <textarea #descInput class="form-control" rows="3" [value]="description()" (input)="description.set(descInput.value)"></textarea>
+            <label class="form-label">{{ vm().t('qnr_lbl_description') }}</label>
+            <textarea #descInput class="form-control" rows="3" [value]="vm().description" (input)="description.set(descInput.value)"></textarea>
           </div>
           <div class="mb-3">
-            <label class="form-label">Activo</label>
+            <label class="form-label">{{ vm().t('qnr_lbl_active') }}</label>
             <div class="form-check">
-              <input #chk type="checkbox" class="form-check-input" [checked]="active()" (change)="active.set(chk.checked)" />
-              <label class="form-check-label">Cuestionario activo</label>
+              <input #chk type="checkbox" class="form-check-input" [checked]="vm().active" (change)="active.set(chk.checked)" />
+              <label class="form-check-label">{{ vm().t('qnr_lbl_questionnaire_active') }}</label>
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Rol que responde</label>
-            <select #responderSel class="form-select" [value]="responderRoleId()" (change)="responderRoleId.set(+responderSel.value)">
-              <option value="0">Seleccione...</option>
-              @for (role of roles(); track role.id) {
-                <option [value]="role.id" [selected]="role.id === responderRoleId()">{{ role.name }}</option>
+            <label class="form-label">{{ vm().t('qnr_lbl_responder_role') }}</label>
+            <select #responderSel class="form-select" [value]="vm().responderRoleId" (change)="responderRoleId.set(+responderSel.value)">
+              <option value="0">{{ vm().t('qnr_plh_select_role') }}</option>
+              @for (role of vm().roles; track role.id) {
+                <option [value]="role.id" [selected]="role.id === vm().responderRoleId">{{ role.name }}</option>
               }
             </select>
           </div>
           <div class="mb-3">
-            <label class="form-label">Rol evaluado</label>
-            <select #targetSel class="form-select" [value]="targetRoleId()" (change)="targetRoleId.set(+targetSel.value)">
-              <option value="0">Seleccione...</option>
-              @for (role of roles(); track role.id) {
-                <option [value]="role.id" [selected]="role.id === targetRoleId()">{{ role.name }}</option>
+            <label class="form-label">{{ vm().t('qnr_lbl_target_role') }}</label>
+            <select #targetSel class="form-select" [value]="vm().targetRoleId" (change)="targetRoleId.set(+targetSel.value)">
+              <option value="0">{{ vm().t('qnr_plh_select_role') }}</option>
+              @for (role of vm().roles; track role.id) {
+                <option [value]="role.id" [selected]="role.id === vm().targetRoleId">{{ role.name }}</option>
               }
             </select>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-danger" (click)="close.emit()" [disabled]="loading()">Cancelar</button>
-          <button class="btn btn-primary" (click)="onSave()" [disabled]="loading()">
-            @if (loading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
-            Actualizar
+          <button class="btn btn-danger" (click)="close.emit()" [disabled]="vm().loading">{{ vm().t('cr_btn_cancel') }}</button>
+          <button class="btn btn-primary" (click)="onSave()" [disabled]="vm().loading">
+            @if (vm().loading) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            {{ vm().t('cr_btn_update') }}
           </button>
         </div>
       </div>

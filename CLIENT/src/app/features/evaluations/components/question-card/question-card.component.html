@@ -1,16 +1,14 @@
-@let q = question();
-
 <div class="card mb-3">
   <div class="card-body">
     <label class="form-label fw-semibold mb-2">
-      {{ q.question_order }}. {{ q.text }}
+      {{ vm().question.question_order }}. {{ vm().question.text }}
     </label>
 
-    @switch (q.type) {
+    @switch (vm().question.type) {
       @case ('textarea') {
         <textarea
           class="form-control"
-          [value]="value()"
+          [value]="vm().value"
           (input)="onTextarea($event)"
           rows="3"
         ></textarea>
@@ -18,29 +16,29 @@
       @case ('selection') {
         <select
           class="form-select"
-          [value]="value()"
+          [value]="vm().value"
           (change)="onSelect($event)"
         >
-          <option value="" disabled selected>{{ 'eval_plh_select_option' | message }}</option>
-          @for (opt of q.options; track trackByOptionId($index, opt)) {
+          <option value="" disabled selected>{{ vm().t('eval_plh_select_option') }}</option>
+          @for (opt of vm().question.options; track trackByOptionId($index, opt)) {
             <option [value]="opt.option_text">{{ opt.option_text }}</option>
           }
         </select>
       }
       @case ('radio') {
         <div class="d-flex flex-column gap-2">
-          @for (opt of q.options; track trackByOptionId($index, opt)) {
+          @for (opt of vm().question.options; track trackByOptionId($index, opt)) {
             <div class="form-check">
               <input
                 class="form-check-input"
                 type="radio"
-                [name]="'q_' + q.id"
-                [id]="'q_' + q.id + '_opt_' + opt.id"
+                [name]="'q_' + vm().question.id"
+                [id]="'q_' + vm().question.id + '_opt_' + opt.id"
                 [value]="opt.option_text"
-                [checked]="value() === opt.option_text"
+                [checked]="vm().value === opt.option_text"
                 (change)="onOptionSelect(opt.option_text)"
               />
-              <label class="form-check-label" [for]="'q_' + q.id + '_opt_' + opt.id">
+              <label class="form-check-label" [for]="'q_' + vm().question.id + '_opt_' + opt.id">
                 {{ opt.option_text }}
               </label>
             </div>
@@ -51,7 +49,7 @@
         <input
           type="text"
           class="form-control"
-          [value]="value()"
+          [value]="vm().value"
           (input)="onInput($event)"
         />
       }

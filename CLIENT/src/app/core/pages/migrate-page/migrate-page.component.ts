@@ -1,20 +1,29 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { ConfigService } from '../../services/config.service';
+import { MessageService, MessageResolver } from '../../services/message.service';
 
 @Component({
   selector: 'app-migrate-page',
-  imports: [],
   templateUrl: './migrate-page.component.html',
 })
 export class MigratePageComponent {
   private http = inject(HttpClient);
   private configService = inject(ConfigService);
+  private msg = inject(MessageService);
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
 
-  loading = signal(false);
-  output = signal<string | null>(null);
-  error = signal<string | null>(null);
+  private loading = signal(false);
+  private output = signal<string | null>(null);
+  private error = signal<string | null>(null);
+
+  vm = computed(() => ({
+    loading: this.loading(),
+    output: this.output(),
+    error: this.error(),
+    t: this.t,
+  }));
 
   run(): void {
     this.loading.set(true);
@@ -29,8 +38,8 @@ export class MigratePageComponent {
         },
         error: (err) => {
           this.error.set(err.status === 403
-            ? 'Token de migración inválido. Define MIGRATION_TOKEN en el .env'
-            : `Error al ejecutar migraciones (${err.status})`
+            ? this.t('cr_err_migration_token')
+            : this.t('cr_err_migration_failed', { status: err.status })
           );
           this.loading.set(false);
         },

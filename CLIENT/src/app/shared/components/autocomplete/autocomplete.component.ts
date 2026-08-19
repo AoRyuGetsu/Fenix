@@ -1,13 +1,16 @@
-import { Component, input, output, signal, computed, effect, ViewChild, ElementRef } from '@angular/core';
+import { Component, input, output, signal, computed, effect, ViewChild, ElementRef, inject } from '@angular/core';
+import { MessageService } from '../../../core/services/message.service';
 
 @Component({
   selector: 'app-autocomplete',
   templateUrl: './autocomplete.component.html',
 })
 export class AutocompleteComponent {
+  protected msg = inject(MessageService);
+
   items = input<any[]>([]);
   displayField = input<string>('display_name');
-  placeholder = input<string>('Buscar...');
+  placeholder = input<string>('');
   loading = input(false);
   required = input(false);
 

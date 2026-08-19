@@ -6,7 +6,7 @@
       class="form-control"
       [class.is-invalid]="isInvalid()"
       [readonly]="selectedItem() !== null"
-      [placeholder]="placeholder()"
+      [placeholder]="placeholder() || msg.get('cr_plh_search')"
       [value]="filterText()"
       (input)="onInput(inputRef.value)"
       (keydown)="onKeydown($event)"

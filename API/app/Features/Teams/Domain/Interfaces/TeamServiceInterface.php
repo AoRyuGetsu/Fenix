@@ -12,7 +12,9 @@ interface TeamServiceInterface
 {
     public function list(?TeamQueryDto $query = null): array;
     public function findById(int $id): ?Team;
+    public function findByIdIfViewable(int $id): ?Team;
     public function findByTrainerId(int $trainerUserId): array;
+    public function findMyTeams(?TeamQueryDto $query = null): array;
     public function create(array $data): Team;
     public function update(int $id, array $data): Team;
     public function addPlayer(int $teamId, User $player): Team;

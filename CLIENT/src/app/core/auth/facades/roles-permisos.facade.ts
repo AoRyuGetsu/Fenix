@@ -1,5 +1,6 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
+import { MessageService, MessageResolver } from '../../../core/services/message.service';
 import { RolesPermisosHttpService, PermissionItem, RoleWithPermissions } from '../services/roles-permisos-http.service';
 
 export interface RolesPermisosState {
@@ -12,6 +13,7 @@ export interface RolesPermisosState {
 @Injectable({ providedIn: 'root' })
 export class RolesPermisosFacade {
   private api = inject(RolesPermisosHttpService);
+  private msg = inject(MessageService);
 
   private state = signal<RolesPermisosState>({
     permissions: [],
@@ -20,7 +22,9 @@ export class RolesPermisosFacade {
     error: null,
   });
 
-  vm = this.state.asReadonly();
+  private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
+
+  vm = computed(() => ({ ...this.state(), t: this.t }));
 
   load(): void {
     this.state.update(s => ({ ...s, loading: true, error: null }));
@@ -39,7 +43,7 @@ export class RolesPermisosFacade {
         this.state.update(s => ({
           ...s,
           loading: false,
-          error: getErrorMessage(err, 'Error al cargar roles y permisos'),
+          error: getErrorMessage(err, 'rp_err_load', this.msg),
         }));
       },
     });

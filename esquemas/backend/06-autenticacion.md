@@ -56,7 +56,8 @@ sequenceDiagram
     AS->>AS: createToken(sub, email, roles, permissions, refreshTTL, 'refresh')
     Note over AS: Mismo builder + claim<br>purpose: 'refresh'
 
-    AS-->>A: { access_token, refresh_token, expires_in, user, roles, menus, catalogs }
+    AS-->>A: { access_token, refresh_token, expires_in,<br>user, roles, menus, catalogs }
+    Note over A: user solo en login (includeUser=true)<br>payload NO incluye permissions (van en claims del token)
 
     A-->>C: 200 JsonResponse
     Note over C: Cliente almacena tokens en localStorage
@@ -167,6 +168,29 @@ sequenceDiagram
     CT->>CT: Ejecuta lógica del controller
     CT-->>C: JsonResponse
 ```
+
+## 6.4 Obtener Usuario Autenticado (`/auth/me`)
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente (Angular)
+    participant M as Middleware
+    participant A as AuthController
+    participant AS as AuthService
+    participant RAC as RoleAccessControlService
+
+    C->>M: GET /auth/me (Authorization: Bearer)
+    M->>M: Valida JWT + crea AuthContext
+    M->>A: Controller::me() (vía middleware)
+    A->>AS: AuthService::getMe(authContext)
+    AS->>RAC: getRoles + getPermissions (userId)
+    RAC-->>AS: roles[], permissionNames[]
+    AS-->>A: { user, roles, permissions }
+    A-->>C: 200 JsonResponse
+```
+
+- `GET /auth/me` requiere token y solo devuelve datos del usuario autenticado (no regenera tokens).
+- Este endpoint es el único de infraestructura que expone `permissions` en el payload.
 
 ## Claims del Token JWT
 

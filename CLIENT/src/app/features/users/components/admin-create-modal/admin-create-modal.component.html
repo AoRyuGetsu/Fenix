@@ -2,28 +2,28 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title fw-bold">{{ 'usr_hdr_create_admin' | message }}</h5>
+        <h5 class="modal-title fw-bold">{{ vm().t('usr_hdr_create_admin') }}</h5>
         <button type="button" class="btn-close" (click)="onClose()"></button>
       </div>
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-12">
-            <label class="form-label">{{ 'usr_lbl_email' | message }} <span class="text-danger">*</span></label>
-            <input #emailInput type="email" class="form-control" [value]="email()" (input)="email.set(emailInput.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_email') }} <span class="text-danger">*</span></label>
+            <input #emailInput type="email" class="form-control" [value]="vm().email" (input)="email.set(emailInput.value)" />
           </div>
           <div class="col-12">
-            <label class="form-label">{{ 'usr_lbl_password' | message }} <span class="text-danger">*</span></label>
-            <input #passwordInput type="password" class="form-control" [value]="password()" (input)="password.set(passwordInput.value)" />
+            <label class="form-label">{{ vm().t('usr_lbl_password') }} <span class="text-danger">*</span></label>
+            <input #passwordInput type="password" class="form-control" [value]="vm().password" (input)="password.set(passwordInput.value)" />
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="loading()">{{ 'cr_btn_cancel' | message }}</button>
-        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading() || !email() || !password()">
-          @if (loading()) {
+        <button type="button" class="btn btn-danger" (click)="onClose()" [disabled]="vm().loading">{{ vm().t('cr_btn_cancel') }}</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="vm().loading || !vm().email || !vm().password">
+          @if (vm().loading) {
             <span class="spinner-border spinner-border-sm me-1"></span>
           }
-          {{ 'cr_btn_save' | message }}
+          {{ vm().t('cr_btn_save') }}
         </button>
       </div>
     </div>

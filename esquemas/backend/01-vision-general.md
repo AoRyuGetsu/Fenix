@@ -13,8 +13,11 @@ flowchart TB
     subgraph API["API / Backend (PHP 8.2+)"]
         KERNEL["Kernel (Framework propio)"]
         FEATURES["Features
-        User · People · Questionnaire
-        RolesPermisos · Evaluations"]
+        User · People · Periods
+        Questionnaire · RolesPermisos
+        Teams · Representatives
+        PlayerSpecification · Parentescos
+        EvaluationStats · Dashboard"]
         INFRA["Infrastructure
         Auth/JWT · Health · Config · Menu"]
         CORE["Core
