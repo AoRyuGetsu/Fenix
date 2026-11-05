@@ -9,6 +9,7 @@ use App\Features\EvaluationStats\Application\DTO\EvaluationStatsQuery;
 use App\Features\EvaluationStats\Application\DTO\TeamStatsQuery;
 use App\Features\EvaluationStats\Domain\Interfaces\EvaluationStatsServiceInterface;
 use App\Features\Questionnaire\Domain\Interfaces\QuestionnaireRepositoryInterface;
+use App\Features\PlayerSpecification\Domain\Interfaces\PlayerSpecificationRepositoryInterface;
 use App\Features\Teams\Domain\Interfaces\TeamRepositoryInterface;
 use App\Features\User\Domain\Interfaces\UserRepositoryInterface;
 use App\Infrastructure\Auth\AuthContext;
@@ -23,6 +24,7 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
         private UserRepositoryInterface $userRepository,
         private QuestionnaireRepositoryInterface $questionnaireRepository,
         private TeamRepositoryInterface $teamRepository,
+        private PlayerSpecificationRepositoryInterface $playerSpecificationRepository,
         private AuthContext $authContext,
     ) {}
 
@@ -86,13 +88,16 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
             foreach ($questionMeta as $questId => $meta) {
                 $points = [];
                 $observations = [];
+                $obsIndex = 0;
                 foreach ($sessions as $session) {
                     if (!isset($session['answers'][$questId])) {
                         continue;
                     }
+                    $obsIndex++;
                     $x = $this->daysBetween($reference, $session['evaluated_at']);
                     $points[] = [$x, $session['answers'][$questId]['value']];
                     $observations[] = [
+                        'index'        => $obsIndex,
                         'evaluated_at' => $session['evaluated_at']->format('Y-m-d H:i:s'),
                         'x_days'       => $x,
                         'value'        => $session['answers'][$questId]['value'],
@@ -116,15 +121,18 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
 
             $overallPoints = [];
             $overallObservations = [];
+            $overallObsIndex = 0;
             foreach ($sessions as $session) {
                 $values = array_column($session['answers'], 'value');
                 if ($values === []) {
                     continue;
                 }
+                $overallObsIndex++;
                 $avg = round(array_sum($values) / count($values), 2);
                 $x = $this->daysBetween($reference, $session['evaluated_at']);
                 $overallPoints[] = [$x, $avg];
                 $overallObservations[] = [
+                    'index'        => $overallObsIndex,
                     'evaluated_at' => $session['evaluated_at']->format('Y-m-d H:i:s'),
                     'x_days'       => $x,
                     'value'        => $avg,
@@ -135,6 +143,29 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
             $this->attachObservations($overallObservations, $overallRegression);
 
             $overallAverages = $this->overallPeriodAveragesFromSessions($sessions, $periodMap);
+
+            $lastObservation = null;
+            $lastObservationAt = null;
+            $lastObservationEvaluatorId = null;
+            foreach ($sessions as $session) {
+                $obs = trim((string) ($session['observaciones'] ?? ''));
+                if ($obs === '') {
+                    continue;
+                }
+                if ($lastObservationAt === null || $session['evaluated_at'] > $lastObservationAt) {
+                    $lastObservationAt = $session['evaluated_at'];
+                    $lastObservation = $obs;
+                    $lastObservationEvaluatorId = $session['responder_user_id'] ?? null;
+                }
+            }
+
+            $lastEvaluator = null;
+            if ($lastObservationEvaluatorId !== null) {
+                $evaluatorUser = $this->userRepository->findById($lastObservationEvaluatorId);
+                if ($evaluatorUser !== null) {
+                    $lastEvaluator = $this->getUserDisplayName($evaluatorUser);
+                }
+            }
 
             $questionnaires[] = [
                 'questionnaire' => [
@@ -148,13 +179,26 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
                     'regression'          => $overallRegression,
                     'historial_regression' => $this->regressionFromAverages($overallAverages, $periodMap),
                 ],
+                'last_observation'     => $lastObservation,
+                'last_observation_at'  => $lastObservationAt !== null ? $lastObservationAt->format('Y-m-d') : null,
+                'last_evaluator'       => $lastEvaluator,
             ];
         }
+
+        $playerSpec = $this->playerSpecificationRepository->findByUserId($user->getId());
+        $team = $this->teamRepository->findByPlayerId($user->getId());
 
         return [
             'target_user'   => [
                 'id'           => $user->getId(),
                 'display_name' => $this->getUserDisplayName($user),
+                'email'        => $user->getEmail(),
+                'birth_date'   => $playerSpec !== null && $playerSpec->getBirthDate() !== null
+                    ? $playerSpec->getBirthDate()->format('Y-m-d')
+                    : null,
+                'height_cm'    => $playerSpec !== null ? (float) $playerSpec->getHeightCm() : null,
+                'weight_kg'    => $playerSpec !== null ? (float) $playerSpec->getWeightKg() : null,
+                'team'         => $team !== null ? $team->getName() : null,
             ],
             'periods'        => $periodList,
             'questionnaires' => $questionnaires,
@@ -375,7 +419,7 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
         $params = ['targetUserId' => $query->targetUserId];
 
         $sql = "SELECT e.id AS evaluation_id, e.created_at AS evaluated_at, e.questionnaire_id, e.period_id,
-                       a.question_id, q.text AS question_text, q.type AS question_type, a.value
+                       e.observaciones, e.responder_user_id, a.question_id, q.text AS question_text, q.type AS question_type, a.value
                 FROM evaluations e
                 JOIN answers a ON a.evaluation_id = e.id
                 JOIN questions q ON q.id = a.question_id
@@ -451,6 +495,8 @@ class EvaluationStatsService implements EvaluationStatsServiceInterface
                 $grouped[$qId][$evalId] = [
                     'evaluated_at' => new \DateTimeImmutable($r['evaluated_at']),
                     'period_id'    => (int) $r['period_id'],
+                    'observaciones' => $r['observaciones'] ?? null,
+                    'responder_user_id' => isset($r['responder_user_id']) ? (int) $r['responder_user_id'] : null,
                     'answers'      => [],
                 ];
             }

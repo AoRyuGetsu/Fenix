@@ -15,11 +15,23 @@
 }
 
 <div class="list-group">
-  @for (question of vm().questions; track question.id) {
+  @for (question of vm().questions; track question.id; let i = $index) {
     <div class="list-group-item list-group-item-action">
       <div class="d-flex justify-content-between align-items-start">
         <div class="flex-grow-1">
-          <span class="badge bg-secondary me-2">{{ question.question_order }}</span>
+          <span class="badge bg-secondary me-1">{{ question.question_order }}</span>
+          <span class="me-2 align-middle">
+            @if (i > 0) {
+              <button type="button" class="qnr-move-btn" [title]="vm().t('qnr_btn_move_up')" (click)="move.emit({ id: question.id, direction: 'up' })">
+                <i class="bi-arrow-up fw-bold"></i>
+              </button>
+            }
+            @if (i < vm().questions.length - 1) {
+              <button type="button" class="qnr-move-btn" [title]="vm().t('qnr_btn_move_down')" (click)="move.emit({ id: question.id, direction: 'down' })">
+                <i class="bi-arrow-down fw-bold"></i>
+              </button>
+            }
+          </span>
           <strong>{{ question.text }}</strong>
           <span class="badge bg-info ms-2 text-xs">{{ question.type }}</span>
           @if (question.type === 'selection' && question.options?.length) {

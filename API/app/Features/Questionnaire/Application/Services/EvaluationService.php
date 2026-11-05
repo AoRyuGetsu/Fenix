@@ -27,7 +27,7 @@ class EvaluationService implements EvaluationServiceInterface
         private AuthContext $authContext,
     ) {}
 
-    public function create(int $questionnaireId, int $targetUserId, int $periodId, array $answers): Evaluation
+    public function create(int $questionnaireId, int $targetUserId, int $periodId, array $answers, ?string $observaciones = null): Evaluation
     {
         $questionnaire = $this->questionnaireRepository->findById($questionnaireId);
         if ($questionnaire === null) {
@@ -51,6 +51,7 @@ class EvaluationService implements EvaluationServiceInterface
         $evaluation->setResponderUser($responderUser);
         $evaluation->setTargetUser($targetUser);
         $evaluation->setPeriod($period);
+        $evaluation->setObservaciones($observaciones);
         $evaluation->setCreatedAt(new \DateTime());
         $evaluation->setUpdatedAt(new \DateTime());
 
@@ -75,13 +76,14 @@ class EvaluationService implements EvaluationServiceInterface
         return $evaluation;
     }
 
-    public function update(int $evaluationId, array $answers): Evaluation
+    public function update(int $evaluationId, array $answers, ?string $observaciones = null): Evaluation
     {
         $evaluation = $this->repository->findById($evaluationId);
         if ($evaluation === null) {
             throw new AppException('EVALUATION_NOT_FOUND');
         }
 
+        $evaluation->setObservaciones($observaciones);
         foreach ($evaluation->getAnswers() as $answer) {
             $this->repository->removeAnswer($answer);
         }

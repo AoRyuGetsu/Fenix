@@ -19,6 +19,7 @@
   "cr_btn_go_login":                        { "message": "Ir a Iniciar Sesión", "desc": "Link a login" },
   "cr_lbl_loading":                         { "message": "Cargando...", "desc": "Texto genérico de carga" },
   "cr_btn_logout":                          { "message": "Salir", "desc": "Cerrar sesión" },
+  "cr_cnf_logout":                          { "message": "¿Está seguro que desea abandonar la sesión?", "desc": "Confirmación al cerrar sesión" },
   "cr_hdr_welcome":                         { "message": "Bienvenido", "desc": "Título de bienvenida" },
   "cr_lbl_welcome_msg":                     { "message": "Has iniciado sesión correctamente.", "desc": "Mensaje de bienvenida" },
   "cr_hdr_admin_panel":                     { "message": "Panel de Administración", "desc": "Card de bienvenida" },

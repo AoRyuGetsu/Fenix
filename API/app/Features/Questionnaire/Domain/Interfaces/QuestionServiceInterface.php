@@ -13,6 +13,7 @@ interface QuestionServiceInterface
     public function update(int $id, array $data): Question;
     public function findById(int $id): ?Question;
     public function softDelete(int $id): void;
+    public function move(int $id, string $direction): void;
     public function listBySection(int $sectionId): array;
     public function findPaginated(QuestionQuery $query): array;
 }

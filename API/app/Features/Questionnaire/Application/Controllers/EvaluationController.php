@@ -91,6 +91,7 @@ class EvaluationController implements ControllerInterface
         new OA\Property(property: 'questionnaire_id', type: 'integer'),
         new OA\Property(property: 'target_user_id', type: 'integer'),
         new OA\Property(property: 'period_id', type: 'integer'),
+        new OA\Property(property: 'observaciones', type: 'string', nullable: true),
         new OA\Property(property: 'answers', type: 'array', items: new OA\Items(
             properties: [
                 new OA\Property(property: 'question_id', type: 'integer'),
@@ -126,6 +127,7 @@ class EvaluationController implements ControllerInterface
                 (int) $data['target_user_id'],
                 (int) $data['period_id'],
                 $data['answers'],
+                $this->parseObservaciones($data['observaciones'] ?? null),
             );
         } catch (\App\Core\AppException $e) {
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
@@ -144,6 +146,7 @@ class EvaluationController implements ControllerInterface
             ],
             type: 'object'
         )),
+        new OA\Property(property: 'observaciones', type: 'string', nullable: true),
     ]))]
     #[OA\Response(response: 200, description: 'Evaluación actualizada')]
     #[OA\Response(response: 404, description: 'No encontrado')]
@@ -160,7 +163,7 @@ class EvaluationController implements ControllerInterface
         }
 
         try {
-            $evaluation = $this->evaluationService->update($id, $data['answers']);
+            $evaluation = $this->evaluationService->update($id, $data['answers'], $this->parseObservaciones($data['observaciones'] ?? null));
         } catch (\App\Core\AppException $e) {
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
         }
@@ -318,6 +321,7 @@ class EvaluationController implements ControllerInterface
                 'evaluation_id' => $ev->getId(),
                 'user' => $this->serializeUserItem($ev->getTargetUser()),
                 'answers' => $this->serializeAnswers($ev),
+                'observaciones' => $ev->getObservaciones(),
             ];
         }
 
@@ -414,6 +418,7 @@ class EvaluationController implements ControllerInterface
             'target_user_id'    => $e->getTargetUser()->getId(),
             'target_email'      => $e->getTargetUser()->getEmail(),
             'answers_count'     => $e->getAnswers()->count(),
+            'observaciones'     => $e->getObservaciones(),
             'created_at'        => $e->getCreatedAt()->format('c'),
         ];
     }
@@ -431,8 +436,17 @@ class EvaluationController implements ControllerInterface
             'target_user_id'    => $e->getTargetUser()->getId(),
             'target_email'      => $this->getUserName($e->getTargetUser()),
             'answers'           => $this->serializeAnswers($e),
+            'observaciones'     => $e->getObservaciones(),
             'created_at'        => $e->getCreatedAt()->format('c'),
             'updated_at'        => $e->getUpdatedAt()->format('c'),
         ];
+    }
+
+    private function parseObservaciones(mixed $value): ?string
+    {
+        if ($value === null || trim((string) $value) === '') {
+            return null;
+        }
+        return trim((string) $value);
     }
 }

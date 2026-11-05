@@ -26,6 +26,7 @@ class SectionRepository implements SectionRepositoryInterface
             ->select('s')
             ->from(Section::class, 's')
             ->where('s.questionnaire = :questionnaireId')
+            ->andWhere('s.deletedAt IS NULL')
             ->setParameter('questionnaireId', $questionnaireId)
             ->orderBy('s.sectionOrder', 'ASC')
             ->getQuery()
@@ -40,6 +41,12 @@ class SectionRepository implements SectionRepositoryInterface
 
     public function softDelete(Section $section): void
     {
+        foreach ($section->getQuestions() as $question) {
+            foreach ($question->getOptions() as $option) {
+                $this->entityManager->remove($option);
+            }
+            $question->setDeletedAt(new \DateTime());
+        }
         $section->setDeletedAt(new \DateTime());
         $this->entityManager->flush();
     }
@@ -50,6 +57,7 @@ class SectionRepository implements SectionRepositoryInterface
             ->select('s')
             ->from(Section::class, 's')
             ->where('s.questionnaire = :questionnaireId')
+            ->andWhere('s.deletedAt IS NULL')
             ->setParameter('questionnaireId', $query->questionnaireId)
             ->orderBy('s.sectionOrder', 'ASC');
 
@@ -71,6 +79,7 @@ class SectionRepository implements SectionRepositoryInterface
             ->select('COALESCE(MAX(s.sectionOrder), 0)')
             ->from(Section::class, 's')
             ->where('s.questionnaire = :questionnaireId')
+            ->andWhere('s.deletedAt IS NULL')
             ->setParameter('questionnaireId', $questionnaireId)
             ->getQuery()
             ->getSingleScalarResult();

@@ -179,6 +179,7 @@ class QuestionnaireController implements ControllerInterface
                         'id'           => $o->getId(),
                         'option_text'  => $o->getOptionText(),
                         'option_order' => $o->getOptionOrder(),
+                        'label'        => $o->getLabel(),
                     ], $question->getOptions()->toArray());
                 }
                 $questions[] = $qData;

@@ -371,6 +371,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'id', type: 'integer'),
         new OA\Property(property: 'option_text', type: 'string'),
         new OA\Property(property: 'option_order', type: 'integer'),
+        new OA\Property(property: 'label', type: 'string', nullable: true),
     ]
 )]
 #[OA\Schema(
@@ -414,6 +415,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'target_user_id', type: 'integer'),
         new OA\Property(property: 'target_email', type: 'string'),
         new OA\Property(property: 'answers', type: 'array', items: new OA\Items(ref: '#/components/schemas/Answer')),
+        new OA\Property(property: 'observaciones', type: 'string', nullable: true),
         new OA\Property(property: 'created_at', type: 'string', format: 'date-time'),
         new OA\Property(property: 'updated_at', type: 'string', format: 'date-time'),
     ]
@@ -434,6 +436,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'questionnaire_id', type: 'integer'),
         new OA\Property(property: 'target_user_id', type: 'integer'),
         new OA\Property(property: 'period_id', type: 'integer'),
+        new OA\Property(property: 'observaciones', type: 'string', nullable: true),
         new OA\Property(property: 'answers', type: 'array', items: new OA\Items(
             properties: [
                 new OA\Property(property: 'question_id', type: 'integer'),
@@ -612,6 +615,11 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'target_user', properties: [
             new OA\Property(property: 'id', type: 'integer'),
             new OA\Property(property: 'display_name', type: 'string'),
+            new OA\Property(property: 'email', type: 'string', nullable: true),
+            new OA\Property(property: 'birth_date', type: 'string', format: 'date', nullable: true),
+            new OA\Property(property: 'height_cm', type: 'number', format: 'float', nullable: true),
+            new OA\Property(property: 'weight_kg', type: 'number', format: 'float', nullable: true),
+            new OA\Property(property: 'team', type: 'string', nullable: true),
         ], type: 'object'),
         new OA\Property(property: 'periods', type: 'array', items: new OA\Items(ref: '#/components/schemas/StatsPeriod')),
         new OA\Property(property: 'questionnaires', type: 'array', items: new OA\Items(ref: '#/components/schemas/QuestionnaireStats')),
@@ -634,6 +642,9 @@ use OpenApi\Attributes as OA;
         ], type: 'object'),
         new OA\Property(property: 'per_question', type: 'array', items: new OA\Items(ref: '#/components/schemas/PerQuestionStats')),
         new OA\Property(property: 'overall', ref: '#/components/schemas/OverallStats'),
+        new OA\Property(property: 'last_observation', type: 'string', nullable: true),
+        new OA\Property(property: 'last_observation_at', type: 'string', format: 'date', nullable: true),
+        new OA\Property(property: 'last_evaluator', type: 'string', nullable: true),
     ]
 )]
 #[OA\Schema(

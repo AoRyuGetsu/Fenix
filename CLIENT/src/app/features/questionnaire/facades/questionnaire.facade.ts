@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { getErrorMessage } from '../../../shared/utils/error-messages';
 import { MessageService, MessageResolver } from '../../../core/services/message.service';
-import { QuestionnaireHttpService, QuestionnaireItem, SectionItem, QuestionItem } from '../services/questionnaire-http.service';
+import { QuestionnaireHttpService, QuestionnaireItem, SectionItem, QuestionItem, QuestionOptionPayload } from '../services/questionnaire-http.service';
 import { RoleItem } from '../../../core/auth/services/auth-http.service';
 
 export interface QuestionnaireState {
@@ -149,6 +149,9 @@ export class QuestionnaireFacade {
       next: sections => this.state.update(s => ({
         ...s,
         detailSections: sections,
+        items: s.items.map(it => it.id === id
+          ? { ...it, sections, questions_count: sections.reduce((n, sec) => n + sec.questions.length, 0) }
+          : it),
         detailSectionsLoading: false,
       })),
       error: () => this.state.update(s => ({
@@ -206,7 +209,7 @@ export class QuestionnaireFacade {
     });
   }
 
-  addQuestion(sectionId: number, questionnaireId: number, data: { text: string; type: string; question_order?: number; options?: string[] }): void {
+  addQuestion(sectionId: number, questionnaireId: number, data: { text: string; type: string; question_order?: number; options?: QuestionOptionPayload[] }): void {
     this.api.createQuestion(sectionId, data).subscribe({
       next: () => {
         this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_question_added') }));
@@ -220,7 +223,7 @@ export class QuestionnaireFacade {
     });
   }
 
-  updateQuestion(id: number, questionnaireId: number, data: { text?: string; type?: string; question_order?: number; options?: string[] }): void {
+  updateQuestion(id: number, questionnaireId: number, data: { text?: string; type?: string; question_order?: number; options?: QuestionOptionPayload[] }): void {
     this.api.updateQuestion(id, data).subscribe({
       next: () => {
         this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_question_updated') }));
@@ -246,6 +249,20 @@ export class QuestionnaireFacade {
       error: err => this.state.update(s => ({
         ...s,
         error: getErrorMessage(err, 'qnr_err_delete_question', this.msg),
+      })),
+    });
+  }
+
+  moveQuestion(id: number, questionnaireId: number, direction: 'up' | 'down'): void {
+    this.api.moveQuestion(id, direction).subscribe({
+      next: () => {
+        this.state.update(s => ({ ...s, success: this.msg.get('qnr_suc_question_updated') }));
+        this.loadDetailSections(questionnaireId);
+        this.clearSuccessAfterDelay();
+      },
+      error: err => this.state.update(s => ({
+        ...s,
+        error: getErrorMessage(err, 'qnr_err_update_question', this.msg),
       })),
     });
   }

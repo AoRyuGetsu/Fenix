@@ -46,6 +46,7 @@ export class SidebarComponent {
   }));
 
   protected logout(): void {
+    if (!confirm(this.msg.get('cr_cnf_logout'))) return;
     this.authFacade.logout();
   }
 

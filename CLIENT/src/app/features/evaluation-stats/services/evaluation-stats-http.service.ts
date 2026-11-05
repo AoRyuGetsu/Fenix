@@ -16,6 +16,7 @@ export interface RegressionResult {
   n: number;
 }
 export interface Observation {
+  index: number;
   evaluated_at: string;
   x_days: number;
   value: number;
@@ -41,7 +42,15 @@ export interface PlayerSummaryResponse {
 }
 
 export interface PlayerStatsResponse {
-  target_user: { id: number; display_name: string };
+  target_user: {
+    id: number;
+    display_name: string;
+    email?: string | null;
+    birth_date?: string | null;
+    height_cm?: number | null;
+    weight_kg?: number | null;
+    team?: string | null;
+  };
   periods: StatsPeriod[];
   questionnaires: QuestionnairePlayerStats[];
 }
@@ -55,6 +64,9 @@ export interface QuestionnairePlayerStats {
     regression: RegressionResult | null;
     historial_regression: RegressionResult | null;
   };
+  last_observation?: string | null;
+  last_observation_at?: string | null;
+  last_evaluator?: string | null;
 }
 
 export interface QuestionStats {

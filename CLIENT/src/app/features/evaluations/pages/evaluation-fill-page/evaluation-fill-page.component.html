@@ -178,6 +178,17 @@
                   </div>
                 }
 
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">{{ vm().t('eval_lbl_observaciones') }}</label>
+                  <textarea
+                    class="form-control"
+                    rows="3"
+                    [value]="vm().observaciones"
+                    (input)="onObservacionesChange($event)"
+                    [placeholder]="vm().t('eval_plh_observaciones')"
+                  ></textarea>
+                </div>
+
                 <div class="d-flex justify-content-end">
                   <button
                     class="btn btn-success btn-lg px-4"

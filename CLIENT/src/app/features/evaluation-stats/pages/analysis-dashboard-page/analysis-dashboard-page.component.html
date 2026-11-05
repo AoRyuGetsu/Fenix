@@ -1,7 +1,14 @@
 @let vm = facade.dashboardVm;
 
 <div class="container-fluid py-3">
-  <h4 class="text-gray-800 fw-bold mb-4">{{ vm().t('es_lbl_player_analysis') }}</h4>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="text-gray-800 fw-bold mb-0">{{ vm().t('es_lbl_player_analysis') }}</h4>
+    @if (vm().canToggleModes) {
+      <button type="button" class="btn btn-primary" (click)="onDownloadReport()">
+        <i class="bi bi-file-earmark-pdf me-1"></i>{{ vm().t('es_btn_download_report') }}
+      </button>
+    }
+  </div>
 
   @if (vm().loading && vm().roster.length === 0) {
     <div class="text-center py-5">

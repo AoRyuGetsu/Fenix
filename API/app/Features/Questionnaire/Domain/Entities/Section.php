@@ -41,6 +41,7 @@ class Section
     private ?\DateTime $deletedAt = null;
 
     #[ORM\OneToMany(mappedBy: 'section', targetEntity: Question::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['questionOrder' => 'ASC'])]
     private Collection $questions;
 
     public function __construct()

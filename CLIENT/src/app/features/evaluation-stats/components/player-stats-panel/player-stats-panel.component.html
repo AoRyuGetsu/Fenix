@@ -68,55 +68,77 @@
       </div>
     }
 
-    <h5 class="text-gray-800 fw-semibold mb-3">{{ vm().t('es_lbl_per_question') }}</h5>
-    @if (vm().currentQuestionStats; as pq) {
-      <div class="row align-items-center mb-3">
-        <div class="col-4">
-          <button
-            type="button"
-            class="btn btn-info btn-sm"
-            (click)="onPrevQuestion()"
-            [disabled]="!vm().canGoPrev">
-            <i class="bi bi-chevron-left"></i> {{ vm().t('es_btn_previous') }}
-          </button>
-        </div>
-        <div class="col-4 text-center">
-          <span class="small text-muted">
-            {{ vm().t('es_lbl_question_x_of_y', { current: vm().questionIndex + 1, total: vm().questionCount }) }}
-          </span>
-        </div>
-        <div class="col-4 text-end">
-          <button
-            type="button"
-            class="btn btn-info btn-sm"
-            (click)="onNextQuestion()"
-            [disabled]="!vm().canGoNext">
-            {{ vm().t('es_btn_next') }} <i class="bi bi-chevron-right"></i>
-          </button>
-        </div>
-      </div>
-      @if (vm().viewMode === 'analysis') {
-        <div class="row">
-          <div class="col-12">
-            <app-player-regression-chart
-              [observations]="pq.observations"
-              [regression]="pq.regression">
-              <h6 class="m-0 fw-bold text-gray-800" cardTitle>{{ pq.question_text }}</h6>
-            </app-player-regression-chart>
+    @if (vm().canToggleModes) {
+      <h5 class="text-gray-800 fw-semibold mb-3">{{ vm().t('es_lbl_per_question') }}</h5>
+      @if (vm().currentQuestionStats; as pq) {
+        <div class="row align-items-center mb-3">
+          <div class="col-4">
+            <button
+              type="button"
+              class="btn btn-info btn-sm"
+              (click)="onPrevQuestion()"
+              [disabled]="!vm().canGoPrev">
+              <i class="bi bi-chevron-left"></i> {{ vm().t('es_btn_previous') }}
+            </button>
+          </div>
+          <div class="col-4 text-center">
+            <span class="small text-muted">
+              {{ vm().t('es_lbl_question_x_of_y', { current: vm().questionIndex + 1, total: vm().questionCount }) }}
+            </span>
+          </div>
+          <div class="col-4 text-end">
+            <button
+              type="button"
+              class="btn btn-info btn-sm"
+              (click)="onNextQuestion()"
+              [disabled]="!vm().canGoNext">
+              {{ vm().t('es_btn_next') }} <i class="bi bi-chevron-right"></i>
+            </button>
           </div>
         </div>
-      } @else {
-        <div class="row">
-          <div class="col-12">
-            <app-player-historical-chart
-              [averages]="pq.averages"
-              [regression]="pq.historial_regression">
-              <h6 class="m-0 fw-bold text-gray-800" cardTitle>{{ pq.question_text }}</h6>
-            </app-player-historical-chart>
+        @if (vm().viewMode === 'analysis') {
+          <div class="row">
+            <div class="col-12">
+              <app-player-regression-chart
+                [observations]="pq.observations"
+                [regression]="pq.regression">
+                <h6 class="m-0 fw-bold text-gray-800" cardTitle>{{ pq.question_text }}</h6>
+              </app-player-regression-chart>
+            </div>
           </div>
-        </div>
+        } @else {
+          <div class="row">
+            <div class="col-12">
+              <app-player-historical-chart
+                [averages]="pq.averages"
+                [regression]="pq.historial_regression">
+                <h6 class="m-0 fw-bold text-gray-800" cardTitle>{{ pq.question_text }}</h6>
+              </app-player-historical-chart>
+            </div>
+          </div>
+        }
       }
     }
+
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header py-3">
+            <h6 class="m-0 fw-bold text-gray-800">{{ vm().t('es_card_comments') }}</h6>
+          </div>
+          <div class="card-body">
+            @if (vm().lastObservation) {
+              <p class="card-text mb-1">{{ vm().lastObservation }}</p>
+              @if (vm().lastObservationMeta) {
+                <small class="text-muted">{{ vm().lastObservationMeta }}</small>
+              }
+            } @else {
+              <p class="card-text text-muted mb-0">{{ vm().t('es_card_no_comments') }}</p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
   }
 } @else {
   <div class="alert alert-info">{{ vm().t('es_lbl_no_data') }}</div>

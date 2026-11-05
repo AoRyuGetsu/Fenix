@@ -185,7 +185,7 @@ CREATE TABLE questions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     section_id BIGINT UNSIGNED NOT NULL,
     text TEXT NOT NULL,
-    type VARCHAR(20) NOT NULL COMMENT 'text|number|selection',
+    type VARCHAR(20) NOT NULL COMMENT 'number|selection',
     question_order INT NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
@@ -199,6 +199,8 @@ CREATE TABLE question_options (
     question_id BIGINT UNSIGNED NOT NULL,
     option_text VARCHAR(255) NOT NULL,
     option_order INT NOT NULL DEFAULT 0,
+    label VARCHAR(255) DEFAULT NULL,
+    deleted_at DATETIME DEFAULT NULL,
     CONSTRAINT fk_qo_question FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -227,6 +229,7 @@ CREATE TABLE evaluations (
     responder_user_id BIGINT UNSIGNED NOT NULL,
     target_user_id BIGINT UNSIGNED NOT NULL,
     period_id BIGINT UNSIGNED NOT NULL,
+    observaciones TEXT DEFAULT NULL,
     created_by BIGINT UNSIGNED DEFAULT NULL,
     updated_by BIGINT UNSIGNED DEFAULT NULL,
     deleted_by BIGINT UNSIGNED DEFAULT NULL,

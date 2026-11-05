@@ -6,6 +6,7 @@ import {
   EvaluationStatsHttpService,
   PlayerStatsResponse,
 } from '../services/evaluation-stats-http.service';
+import { ReportService } from '../services/report.service';
 import { PlayerListItem } from '../../../shared/components/player-list/player-list.types';
 import { GtPagination } from '../../../shared/components/gtable/gtable.types';
 
@@ -35,6 +36,7 @@ export class EvaluationStatsFacade {
   private api = inject(EvaluationStatsHttpService);
   private msg = inject(MessageService);
   private auth = inject(AuthFacade);
+  private report = inject(ReportService);
 
   private dashboardState = signal<DashboardState>({
     roster: [],
@@ -92,6 +94,9 @@ export class EvaluationStatsFacade {
   playerVm = computed(() => {
     const s = this.playerState();
     const count = this.questionCount();
+    const q = this.currentPlayerQStats();
+    const lastEvaluator = q?.last_evaluator ?? null;
+    const lastObservationAt = q?.last_observation_at ?? null;
     return {
       ...s,
       questionIndex: s.currentQuestionIndex,
@@ -103,6 +108,10 @@ export class EvaluationStatsFacade {
       currentQuestionAverages: this.currentQuestionAverages(),
       currentQuestionHistorialRegression: this.currentQuestionHistorialRegression(),
       canToggleModes: this.canToggleModes(),
+      lastObservation: q?.last_observation ?? null,
+      lastObservationAt,
+      lastEvaluator,
+      lastObservationMeta: [lastEvaluator, lastObservationAt].filter(Boolean).join(' | '),
       t: this.t,
     };
   });
@@ -273,5 +282,11 @@ export class EvaluationStatsFacade {
     if (idx > 0) {
       this.playerState.update(s => ({ ...s, currentQuestionIndex: s.currentQuestionIndex - 1 }));
     }
+  }
+
+  downloadReport(): void {
+    const stats = this.playerState().playerStats;
+    if (!stats) return;
+    void this.report.generatePdf(stats, this.selectedPlayerName());
   }
 }

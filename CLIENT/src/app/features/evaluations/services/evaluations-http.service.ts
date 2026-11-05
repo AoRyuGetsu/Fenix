@@ -54,6 +54,7 @@ export interface QuestionOptionItem {
   id: number;
   option_text: string;
   option_order: number;
+  label?: string;
 }
 
 export interface UserItem {
@@ -126,16 +127,18 @@ export interface CreateEvaluationRequest {
   questionnaire_id: number;
   target_user_id: number;
   period_id: number;
+  observaciones?: string | null;
   answers: { question_id: number; value: string }[];
 }
 
 export interface UpdateEvaluationRequest {
+  observaciones?: string | null;
   answers: { question_id: number; value: string }[];
 }
 
 export interface PeriodTargetsData {
   unevaluated: UserItem[];
-  evaluated: { evaluation_id: number; user: UserItem; answers: { id: number; question_id: number; value: string }[] }[];
+  evaluated: { evaluation_id: number; user: UserItem; answers: { id: number; question_id: number; value: string }[]; observaciones?: string | null }[];
 }
 
 export interface PeriodTargetsResponse {
@@ -153,6 +156,7 @@ export interface EvaluationResponse {
   responder_email: string;
   target_user_id: number;
   target_email: string;
+  observaciones?: string | null;
   answers: {
     id: number;
     question_id: number;

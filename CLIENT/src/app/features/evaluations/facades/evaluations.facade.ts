@@ -14,6 +14,7 @@ export interface EvaluatedStudent {
   evaluation_id: number;
   user: UserItem;
   answers: { id: number; question_id: number; value: string }[];
+  observaciones?: string | null;
 }
 
 export interface EvaluationFillState {
@@ -27,6 +28,7 @@ export interface EvaluationFillState {
   selectedUserId: number | null;
   editingEvaluationId: number | null;
   answers: Record<number, string>;
+  observaciones: string;
   saving: boolean;
   error: string | null;
   success: string | null;
@@ -83,6 +85,7 @@ export class EvaluationsFacade {
     selectedUserId: null,
     editingEvaluationId: null,
     answers: {},
+    observaciones: '',
     saving: false,
     error: null,
     success: null,
@@ -176,6 +179,7 @@ export class EvaluationsFacade {
       selectedUserId: null,
       editingEvaluationId: null,
       answers: {},
+      observaciones: '',
       saving: false,
       error: null,
       success: null,
@@ -225,6 +229,7 @@ export class EvaluationsFacade {
       selectedUserId: null,
       editingEvaluationId: null,
       answers: {},
+      observaciones: '',
       page,
     }));
 
@@ -257,6 +262,7 @@ export class EvaluationsFacade {
       selectedUserId: null,
       editingEvaluationId: null,
       answers: {},
+      observaciones: '',
       page: 1,
     }));
     this.loadPeriodTargets(questionnaireId, periodId, 1);
@@ -274,6 +280,7 @@ export class EvaluationsFacade {
         selectedUserId: userId,
         editingEvaluationId: evaluated.evaluation_id,
         answers,
+        observaciones: evaluated.observaciones ?? '',
       }));
     } else {
       this.fillState.update(s => ({
@@ -281,6 +288,7 @@ export class EvaluationsFacade {
         selectedUserId: userId,
         editingEvaluationId: null,
         answers: {},
+        observaciones: '',
       }));
     }
   }
@@ -290,6 +298,10 @@ export class EvaluationsFacade {
       ...s,
       answers: { ...s.answers, [questionId]: value },
     }));
+  }
+
+  setObservaciones(value: string): void {
+    this.fillState.update(s => ({ ...s, observaciones: value }));
   }
 
   save(): void {
@@ -318,9 +330,10 @@ export class EvaluationsFacade {
       question_id: Number(questionId),
       value,
     }));
+    const observaciones = state.observaciones?.trim() || null;
 
     if (state.editingEvaluationId !== null) {
-      this.api.updateEvaluation(state.editingEvaluationId, { answers }).subscribe({
+      this.api.updateEvaluation(state.editingEvaluationId, { answers, observaciones }).subscribe({
         next: () => {
           this.fillState.update(s => ({
             ...s,
@@ -341,6 +354,7 @@ export class EvaluationsFacade {
         target_user_id: state.selectedUserId,
         period_id: state.selectedPeriodId,
         answers,
+        observaciones,
       }).subscribe({
         next: () => {
           this.fillState.update(s => ({
@@ -409,6 +423,7 @@ export class EvaluationsFacade {
       selectedUserId: null,
       editingEvaluationId: null,
       answers: {},
+      observaciones: '',
       saving: false,
       error: null,
       success: null,

@@ -99,7 +99,7 @@ export class QuestionnairePageComponent implements OnInit {
     this.showQuestionModal.set(true);
   }
 
-  onSaveQuestion(data: { id?: number; text: string; type: string; question_order?: number; options?: string[] }): void {
+  onSaveQuestion(data: { id?: number; text: string; type: string; question_order?: number }): void {
     const qId = this.expandedId();
     const sectionId = this.activeSectionId();
     if (!qId || !sectionId) return;
@@ -109,14 +109,12 @@ export class QuestionnairePageComponent implements OnInit {
         text: data.text,
         type: data.type,
         question_order: data.question_order,
-        options: data.options,
       });
     } else {
       this.facade.addQuestion(sectionId, qId, {
         text: data.text,
         type: data.type,
         question_order: data.question_order,
-        options: data.options,
       });
     }
     this.showQuestionModal.set(false);

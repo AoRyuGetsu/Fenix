@@ -57,7 +57,7 @@ class QuestionController implements ControllerInterface
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\RequestBody(content: new OA\JsonContent(properties: [
         new OA\Property(property: 'text', type: 'string'),
-        new OA\Property(property: 'type', type: 'string', default: 'text'),
+        new OA\Property(property: 'type', type: 'string', default: 'selection'),
         new OA\Property(property: 'question_order', type: 'integer'),
         new OA\Property(property: 'options', type: 'array', items: new OA\Items(type: 'string'), description: 'Solo para type=selection'),
     ]))]
@@ -109,6 +109,29 @@ class QuestionController implements ControllerInterface
         return new JsonResponse($this->serialize($question));
     }
 
+    #[OA\Put(path: '/questions/{id}/move', tags: ['Questionnaire'], summary: 'Mover pregunta dentro de su sección (reordenar)')]
+    #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
+    #[OA\RequestBody(content: new OA\JsonContent(properties: [
+        new OA\Property(property: 'direction', type: 'string', enum: ['up', 'down']),
+    ]))]
+    #[OA\Response(response: 204, description: 'Movida')]
+    public function move(int $id): Response
+    {
+        $data = json_decode($this->request->getContent(), true);
+
+        if (!is_array($data) || !isset($data['direction']) || !in_array($data['direction'], ['up', 'down'], true)) {
+            return new JsonResponse(['error' => getError('INVALID_ORDER_DIRECTION'), 'code' => 'INVALID_ORDER_DIRECTION'], 422);
+        }
+
+        try {
+            $this->questionService->move($id, $data['direction']);
+        } catch (\App\Core\AppException $e) {
+            return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
+        }
+
+        return new JsonResponse(null, 204);
+    }
+
     #[OA\Delete(path: '/questions/{id}', tags: ['Questionnaire'], summary: 'Eliminar pregunta (soft delete)')]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 204, description: 'Eliminada')]
@@ -137,6 +160,7 @@ class QuestionController implements ControllerInterface
                 'id'           => $o->getId(),
                 'option_text'  => $o->getOptionText(),
                 'option_order' => $o->getOptionOrder(),
+                'label'        => $o->getLabel(),
             ], $q->getOptions()->toArray());
         }
 

@@ -25,6 +25,12 @@ class QuestionOption
     #[ORM\Column(name: 'option_order', type: 'integer', options: ['default' => 0])]
     private int $optionOrder = 0;
 
+    #[ORM\Column(name: 'label', type: 'string', length: 255, nullable: true)]
+    private ?string $label = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTime $deletedAt = null;
+
     public function getId(): int
     {
         return $this->id;
@@ -58,5 +64,25 @@ class QuestionOption
     public function setOptionOrder(int $optionOrder): void
     {
         $this->optionOrder = $optionOrder;
+    }
+
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
+    public function setLabel(?string $label): void
+    {
+        $this->label = $label;
+    }
+
+    public function getDeletedAt(): ?\DateTime
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTime $deletedAt): void
+    {
+        $this->deletedAt = $deletedAt;
     }
 }

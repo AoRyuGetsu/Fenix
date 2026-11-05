@@ -5,14 +5,6 @@
     </label>
 
     @switch (vm().question.type) {
-      @case ('textarea') {
-        <textarea
-          class="form-control"
-          [value]="vm().value"
-          (input)="onTextarea($event)"
-          rows="3"
-        ></textarea>
-      }
       @case ('selection') {
         <select
           class="form-select"
@@ -24,30 +16,21 @@
             <option [value]="opt.option_text">{{ opt.option_text }}</option>
           }
         </select>
+        @if (vm().scaleHint; as hint) {
+          <small class="text-muted d-block mt-1">{{ vm().t('eval_lbl_scale_hint', { scale: hint }) }}</small>
+        }
       }
-      @case ('radio') {
-        <div class="d-flex flex-column gap-2">
-          @for (opt of vm().question.options; track trackByOptionId($index, opt)) {
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                [name]="'q_' + vm().question.id"
-                [id]="'q_' + vm().question.id + '_opt_' + opt.id"
-                [value]="opt.option_text"
-                [checked]="vm().value === opt.option_text"
-                (change)="onOptionSelect(opt.option_text)"
-              />
-              <label class="form-check-label" [for]="'q_' + vm().question.id + '_opt_' + opt.id">
-                {{ opt.option_text }}
-              </label>
-            </div>
-          }
-        </div>
+      @case ('number') {
+        <input
+          type="number"
+          class="form-control"
+          [value]="vm().value"
+          (input)="onInput($event)"
+        />
       }
       @default {
         <input
-          type="text"
+          type="number"
           class="form-control"
           [value]="vm().value"
           (input)="onInput($event)"

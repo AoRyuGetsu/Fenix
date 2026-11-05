@@ -41,7 +41,13 @@ if ($entrenadorRole === null || $jugadorRole === null) {
     exit(1);
 }
 
-$options = ['1', '2', '3', '4', '5'];
+$options = [
+    ['value' => '1', 'label' => 'Malo'],
+    ['value' => '2', 'label' => 'Regular'],
+    ['value' => '3', 'label' => 'Bueno'],
+    ['value' => '4', 'label' => 'Muy bueno'],
+    ['value' => '5', 'label' => 'Excelente'],
+];
 
 // ── Crear cuestionario ──
 $questionnaire = $questionnaireService->create([

@@ -25,6 +25,7 @@ return [
     'PERMISSION_NOT_FOUND'       => 'Permiso no encontrado',
     'PERMISSION_ALREADY_EXISTS'  => 'El permiso ya existe',
     'INVALID_QUESTION_TYPE'      => 'Tipo de pregunta inválido',
+    'INVALID_ORDER_DIRECTION'    => 'Dirección de orden inválida',
     'INVALID_TYPE'               => 'Tipo inválido',
     'CONFLICT'                   => 'Conflicto',
     'VALIDATION_REQUIRED'        => 'El campo es requerido',

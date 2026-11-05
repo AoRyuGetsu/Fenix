@@ -39,4 +39,8 @@ export class AnalysisDashboardPageComponent implements OnInit {
   onSearch(term: string): void {
     this.facade.setRosterSearch(term);
   }
+
+  onDownloadReport(): void {
+    this.facade.downloadReport();
+  }
 }

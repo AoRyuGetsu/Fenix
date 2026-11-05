@@ -38,6 +38,9 @@ class Evaluation
     #[ORM\OneToMany(mappedBy: 'evaluation', targetEntity: Answer::class, cascade: ['persist'])]
     private Collection $answers;
 
+    #[ORM\Column(name: 'observaciones', type: 'text', nullable: true)]
+    private ?string $observaciones = null;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id', nullable: true)]
     private ?User $createdBy = null;
@@ -112,6 +115,16 @@ class Evaluation
     public function getAnswers(): Collection
     {
         return $this->answers;
+    }
+
+    public function getObservaciones(): ?string
+    {
+        return $this->observaciones;
+    }
+
+    public function setObservaciones(?string $observaciones): void
+    {
+        $this->observaciones = $observaciones;
     }
 
     public function addAnswer(Answer $answer): void

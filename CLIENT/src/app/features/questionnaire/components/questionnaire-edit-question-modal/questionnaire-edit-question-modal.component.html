@@ -13,22 +13,29 @@
           </div>
           <div class="mb-3">
             <label class="form-label">{{ vm().t('qnr_lbl_type') }}</label>
-            <select #typeSel class="form-select" [value]="vm().editType" (change)="editType.set(typeSel.value)">
-              <option value="text">{{ vm().t('qnr_lbl_type_text') }}</option>
+            <select #typeSel class="form-select" style="flex: 1 1 0%; min-width: 0;" [value]="vm().editType" (change)="editType.set(typeSel.value)">
               <option value="number">{{ vm().t('qnr_lbl_type_numeric') }}</option>
               <option value="selection">{{ vm().t('qnr_lbl_type_selection') }}</option>
             </select>
           </div>
-          @if (vm().editType === 'selection') {
-            <div class="mb-3">
-              <label class="form-label">{{ vm().t('qnr_lbl_options_per_line') }}</label>
-              <textarea #optsInput class="form-control" rows="3" [value]="vm().editOptions" (input)="editOptions.set(optsInput.value)"></textarea>
+          @if (vm().editType === 'selection' && vm().selectionPreview.length > 0) {
+            <div class="mb-3 border rounded p-2">
+              <p class="text-muted text-sm mb-2">{{ vm().t('qnr_info_default_selection_options') }}</p>
+              <ul class="list-unstyled mb-0">
+                @for (row of vm().selectionPreview; track row.value) {
+                  <li class="d-flex align-items-center gap-2 mb-1">
+                    <span class="text-muted fw-medium" style="min-width: 30px; text-align: right;">{{ row.value }}</span>
+                    <span>{{ row.label }}</span>
+                  </li>
+                }
+              </ul>
             </div>
           }
-          <div class="mb-3">
-            <label class="form-label">{{ vm().t('qnr_lbl_order') }}</label>
-            <input #orderInput type="number" class="form-control" style="width: 100px" [value]="vm().editOrder" (input)="editOrder.set(+orderInput.value)" />
-          </div>
+          @if (vm().editType === 'selection' && !vm().isCreating) {
+            <div class="alert alert-info py-2" role="alert">
+              <i class="bi-info-circle me-1"></i> {{ vm().t('qnr_info_edit_selection_options') }}
+            </div>
+          }
         </div>
         <div class="modal-footer">
           <button class="btn btn-danger" (click)="close.emit()" [disabled]="vm().loading">{{ vm().t('cr_btn_cancel') }}</button>

@@ -11,16 +11,22 @@ export class QuestionnaireEditQuestionModalComponent {
   private msg = inject(MessageService);
   private readonly t: MessageResolver = (key, params) => this.msg.get(key, params);
 
+  private readonly defaultSelectionOptions = [
+    { value: '1', labelKey: 'qnr_lbl_default_option_malo' },
+    { value: '2', labelKey: 'qnr_lbl_default_option_regular' },
+    { value: '3', labelKey: 'qnr_lbl_default_option_bueno' },
+    { value: '4', labelKey: 'qnr_lbl_default_option_muy_bueno' },
+    { value: '5', labelKey: 'qnr_lbl_default_option_excelente' },
+  ];
+
   visible = input(false);
   loading = input(false);
   question = input<QuestionItem | null>(null);
   close = output<void>();
-  save = output<{ id?: number; text: string; type: string; question_order?: number; options?: string[] }>();
+  save = output<{ id?: number; text: string; type: string }>();
 
   editText = signal('');
-  editType = signal('text');
-  editOptions = signal('');
-  editOrder = signal(0);
+  editType = signal('selection');
 
   vm = computed(() => ({
     visible: this.visible(),
@@ -28,8 +34,10 @@ export class QuestionnaireEditQuestionModalComponent {
     question: this.question(),
     editText: this.editText(),
     editType: this.editType(),
-    editOptions: this.editOptions(),
-    editOrder: this.editOrder(),
+    isCreating: this.question() === null,
+    selectionPreview: this.question() === null && this.editType() === 'selection'
+      ? this.defaultSelectionOptions.map(o => ({ value: o.value, label: this.t(o.labelKey) }))
+      : [],
     t: this.t,
   }));
 
@@ -40,27 +48,19 @@ export class QuestionnaireEditQuestionModalComponent {
         if (q) {
           this.editText.set(q.text);
           this.editType.set(q.type);
-          this.editOrder.set(q.question_order);
-          this.editOptions.set(q.options?.map(o => o.option_text).join('\n') ?? '');
         } else {
           this.editText.set('');
-          this.editType.set('text');
-          this.editOptions.set('');
-          this.editOrder.set(0);
+          this.editType.set('selection');
         }
       }
     });
   }
 
   onSave(): void {
-    const data: { id?: number; text: string; type: string; question_order?: number; options?: string[] } = {
+    const data: { id?: number; text: string; type: string } = {
       text: this.editText(),
       type: this.editType(),
-      question_order: this.editOrder(),
     };
-    if (this.editType() === 'selection' && this.editOptions()) {
-      data.options = this.editOptions().split('\n').map(s => s.trim()).filter(s => s);
-    }
     const q = this.question();
     if (q) data.id = q.id;
     this.save.emit(data);

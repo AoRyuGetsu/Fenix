@@ -74,6 +74,11 @@ return function (Router $router, Container $container): void {
         return $controller->update((int) $id);
     }, ['ADM']));
 
+    $router->addRoute('PUT', '/questions/{id:\d+}/move', middleware($container, function (string $id) use ($container) {
+        $controller = $container->make(QuestionController::class);
+        return $controller->move((int) $id);
+    }, ['ADM']));
+
     $router->addRoute('DELETE', '/questions/{id:\d+}', middleware($container, function (string $id) use ($container) {
         $controller = $container->make(QuestionController::class);
         return $controller->delete((int) $id);

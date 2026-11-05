@@ -55,6 +55,10 @@ export class EvaluationFillPageComponent implements OnInit, OnDestroy {
     this.facade.setAnswer(questionId, value);
   }
 
+  onObservacionesChange(event: Event): void {
+    this.facade.setObservaciones((event.target as HTMLTextAreaElement).value);
+  }
+
   onSave(): void {
     this.facade.save();
   }

@@ -15,9 +15,16 @@ export class QuestionCardComponent {
   value = input<string>('');
   valueChange = output<string>();
 
+  private scaleHint = computed(() => {
+    const options = this.question().options;
+    if (!options || options.length === 0) return null;
+    return options.map(opt => `${opt.option_text}=${opt.label || opt.option_text}`).join(', ');
+  });
+
   vm = computed(() => ({
     question: this.question(),
     value: this.value(),
+    scaleHint: this.scaleHint(),
     t: this.t,
   }));
 
@@ -25,16 +32,8 @@ export class QuestionCardComponent {
     this.valueChange.emit((event.target as HTMLInputElement).value);
   }
 
-  onTextarea(event: Event): void {
-    this.valueChange.emit((event.target as HTMLTextAreaElement).value);
-  }
-
   onSelect(event: Event): void {
     this.valueChange.emit((event.target as HTMLSelectElement).value);
-  }
-
-  onOptionSelect(optionText: string): void {
-    this.valueChange.emit(optionText);
   }
 
   trackByOptionId(_index: number, option: { id: number }): number {

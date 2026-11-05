@@ -125,7 +125,7 @@ class Question
 
     public function getOptions(): Collection
     {
-        return $this->options;
+        return $this->options->filter(fn (QuestionOption $option) => $option->getDeletedAt() === null);
     }
 
     public function addOption(QuestionOption $option): void

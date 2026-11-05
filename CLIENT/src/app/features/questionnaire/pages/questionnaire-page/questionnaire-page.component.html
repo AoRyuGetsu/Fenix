@@ -125,7 +125,8 @@
               [loading]="false"
               (add)="onAddQuestion(section.id)"
               (edit)="onEditQuestion($event)"
-              (delete)="facade.deleteQuestion($event, item.id)">
+              (delete)="facade.deleteQuestion($event, item.id)"
+              (move)="facade.moveQuestion($event.id, item.id, $event.direction)">
             </app-question-manager>
           </div>
         </div>
