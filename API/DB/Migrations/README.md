@@ -68,8 +68,8 @@ El directorio `DB/test/` contiene migraciones que crean datos de prueba (usuario
 
 | Script | Descripción |
 |--------|-------------|
-| `001_seed_test_users.php` | Crea usuarios de prueba para cada rol excepto administrador: supervisor, entrenador, 5 jugadores, 2 representantes. Con persona y rol asignado. Además crea equipos y asigna representantes a 3 jugadores con parentesco (PADRE_MADRE, TUTOR_LEGAL, FAMILIAR) en `rep_players`. |
-| `002_seed_basketball_evaluations.php` | Genera 25 evaluaciones (5 jugadores × 5 periodos trimestrales) para el cuestionario "Evaluación Técnica de Jugador". Respuestas coherentes con perfil de cada jugador y progresión temporal. |
+| `001_seed_test_users.php` | Crea usuarios de prueba para cada rol excepto administrador: supervisor, entrenador, **27 jugadores**, 2 representantes. Con persona y rol asignado. Además crea equipos y asigna representantes a 3 jugadores con parentesco (PADRE_MADRE, TUTOR_LEGAL, FAMILIAR) en `rep_players`. |
+| `002_seed_basketball_evaluations.php` | Genera evaluaciones para los 27 jugadores (una por periodo trimestral, hasta 162 evaluaciones y 3078 respuestas) para el cuestionario "Evaluación Técnica de Jugador". Respuestas coherentes con el perfil de cada jugador: tendencias crecientes, decrecientes y de meseta, con variabilidad propia y rachas de inconsistencia. |
 
 ### Credenciales de usuarios de test
 
@@ -82,6 +82,12 @@ El directorio `DB/test/` contiene migraciones que crean datos de prueba (usuario
 | `jugador3@mail.com` | `pass1234` | jugador (Luis Fernández) |
 | `jugador4@mail.com` | `pass1234` | jugador (Diego Ramírez) |
 | `jugadora5@mail.com` | `pass1234` | jugador (Ana Torres) |
+| `jugador6@mail.com` | `pass1234` | jugador (Mateo Hernández) |
+| `jugador7@mail.com` | `pass1234` | jugador (Santiago Gómez) |
+| `jugador8@mail.com` | `pass1234` | jugador (Emiliano Castro) |
+| `jugadora9@mail.com` | `pass1234` | jugador (Valentina Morales) |
+| `jugador10@mail.com` | `pass1234` | jugador (Iker Vega) |
+| `jugador11@mail.com` … `jugador27@mail.com` | `pass1234` | jugadores (17 adicionales, `JUG-011` … `JUG-027`) |
 | `representante@mail.com` | `pass1234` | representante (asignado a jugador@ y jugadora5@) |
 | `representante2@mail.com` | `pass1234` | representante (asignado a jugador2@) |
 

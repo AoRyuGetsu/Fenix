@@ -67,38 +67,182 @@ $jugadores = $conn->executeQuery(
      WHERE r.code = 'JUG' AND u.deleted_at IS NULL"
 )->fetchAllAssociative();
 
-if (count($jugadores) !== 5) {
-    echo "⚠ Se encontraron " . count($jugadores) . " jugadores (esperados 5).\n";
+if ($jugadores !== false && count($jugadores) === 0) {
+    echo "✗ No se encontraron jugadores con rol 'JUG'.\n";
+    exit(1);
 }
+echo "• Se evaluarán " . count($jugadores) . " jugadores.\n";
 
 // ── Perfiles de jugadores (coherencia) ──
-// Cada perfil define base inicial y mejora por periodo para cada grupo de preguntas
+// Cada perfil define base inicial, mejora (puede ser negativa) y variabilidad
+// por periodo para cada grupo de preguntas.
 // Grupos: ofensivo (0-4), defensivo (5-9), físico (10-13), mental (14-18)
+// - mejora > 0  → tendencia creciente (progresión)
+// - mejora < 0  → tendencia decreciente (regresión/inconsistencia)
+// - mejora ≈ 0  → meseta (jugador estable con poco margen de mejora)
+// - variabilidad (desviación estándar) más alta → respuestas más dispersas
 $perfiles = [
     'jugador@mail.com' => [
-        'nombre'  => 'Juan García',
-        'bases'   => [3.5, 3.8, 3.2, 3.6],  // ofensivo, defensivo, físico, mental
-        'mejora'  => [0.3, 0.2, 0.3, 0.2],  // mejora por periodo
+        'nombre'       => 'Juan García',
+        'bases'        => [3.5, 3.8, 3.2, 3.6],  // ofensivo, defensivo, físico, mental
+        'mejora'       => [0.3, 0.2, 0.3, 0.2],  // mejora por periodo (creciente moderada)
+        'variabilidad' => [0.5, 0.6, 0.5, 0.6],
     ],
     'jugador2@mail.com' => [
-        'nombre'  => 'Pedro Martínez',
-        'bases'   => [2.8, 3.0, 3.5, 2.5],
-        'mejora'  => [0.5, 0.3, 0.4, 0.4],
+        'nombre'       => 'Pedro Martínez',
+        'bases'        => [2.8, 3.0, 3.5, 2.5],
+        'mejora'       => [0.5, 0.3, 0.4, 0.4],
+        'variabilidad' => [0.7, 0.6, 0.6, 0.8],
     ],
     'jugador3@mail.com' => [
-        'nombre'  => 'Luis Fernández',
-        'bases'   => [4.5, 4.2, 4.0, 4.3],
-        'mejora'  => [0.1, 0.2, 0.3, 0.1],
+        'nombre'       => 'Luis Fernández',
+        'bases'        => [4.5, 4.2, 4.0, 4.3],
+        'mejora'       => [0.1, 0.2, 0.3, 0.1],
+        'variabilidad' => [0.4, 0.4, 0.5, 0.5],
     ],
     'jugador4@mail.com' => [
-        'nombre'  => 'Diego Ramírez',
-        'bases'   => [2.5, 2.2, 3.0, 2.0],
-        'mejora'  => [0.2, 0.3, 0.2, 0.3],
+        'nombre'       => 'Diego Ramírez',
+        'bases'        => [2.5, 2.2, 3.0, 2.0],
+        'mejora'       => [0.2, 0.3, 0.2, 0.3],
+        'variabilidad' => [0.7, 0.7, 0.6, 0.8],
     ],
     'jugadora5@mail.com' => [
-        'nombre'  => 'Ana Torres',
-        'bases'   => [3.0, 3.5, 3.8, 3.2],
-        'mejora'  => [0.5, 0.3, 0.3, 0.5],
+        'nombre'       => 'Ana Torres',
+        'bases'        => [3.0, 3.5, 3.8, 3.2],
+        'mejora'       => [0.5, 0.3, 0.3, 0.5],
+        'variabilidad' => [0.6, 0.7, 0.8, 0.7],
+    ],
+    'jugador6@mail.com' => [
+        'nombre'       => 'Mateo Hernández',
+        'bases'        => [3.2, 3.4, 3.1, 3.0],
+        'mejora'       => [0.6, 0.5, 0.5, 0.6],  // alta proyección: progresión pronunciada
+        'variabilidad' => [0.6, 0.5, 0.7, 0.6],
+    ],
+    'jugador7@mail.com' => [
+        'nombre'       => 'Santiago Gómez',
+        'bases'        => [4.0, 3.8, 4.2, 4.4],
+        'mejora'       => [-0.3, -0.2, -0.3, -0.4], // tendencia decreciente (baja de rendimiento)
+        'variabilidad' => [0.9, 0.8, 0.9, 0.8],     // muy inconstante: respuestas muy dispersas
+    ],
+    'jugador8@mail.com' => [
+        'nombre'       => 'Emiliano Castro',
+        'bases'        => [3.6, 3.0, 2.8, 3.4],
+        'mejora'       => [0.1, 0.4, 0.3, 0.2],
+        'variabilidad' => [0.5, 0.6, 0.6, 0.5],
+    ],
+    'jugadora9@mail.com' => [
+        'nombre'       => 'Valentina Morales',
+        'bases'        => [2.9, 3.1, 2.5, 2.7],
+        'mejora'       => [0.2, 0.2, 0.3, 0.3],
+        'variabilidad' => [0.8, 0.7, 0.8, 0.9],     // irregular: rachas de muy bueno y muy malo
+    ],
+    'jugador10@mail.com' => [
+        'nombre'       => 'Iker Vega',
+        'bases'        => [4.7, 4.4, 4.5, 4.2],
+        'mejora'       => [0.0, 0.1, 0.0, 0.1],     // meseta: élite ya consolidado, poco margen
+        'variabilidad' => [0.3, 0.3, 0.4, 0.4],
+    ],
+    'jugador11@mail.com' => [
+        'nombre'       => 'Alejandro Robles',
+        'bases'        => [3.1, 3.3, 3.4, 3.0],
+        'mejora'       => [0.4, 0.3, 0.3, 0.4],
+        'variabilidad' => [0.5, 0.6, 0.6, 0.5],
+    ],
+    'jugador12@mail.com' => [
+        'nombre'       => 'Fernanda Castillo',
+        'bases'        => [3.8, 3.6, 3.2, 4.0],
+        'mejora'       => [0.2, 0.3, 0.4, 0.2],
+        'variabilidad' => [0.6, 0.5, 0.5, 0.6],
+    ],
+    'jugador13@mail.com' => [
+        'nombre'       => 'Samuel Ortega',
+        'bases'        => [2.4, 2.8, 3.0, 2.6],
+        'mejora'       => [0.6, 0.4, 0.5, 0.5],     // proyección: sube desde base baja
+        'variabilidad' => [0.7, 0.7, 0.6, 0.7],
+    ],
+    'jugador14@mail.com' => [
+        'nombre'       => 'Camila Mendoza',
+        'bases'        => [4.3, 4.5, 4.0, 4.1],
+        'mejora'       => [0.1, 0.0, 0.2, 0.1],     // meseta alta y estable
+        'variabilidad' => [0.4, 0.3, 0.5, 0.4],
+    ],
+    'jugador15@mail.com' => [
+        'nombre'       => 'Nicolás Aguilar',
+        'bases'        => [2.9, 3.1, 2.6, 2.8],
+        'mejora'       => [-0.1, 0.0, -0.2, -0.1],   // declinante irregular
+        'variabilidad' => [0.8, 0.8, 0.7, 0.8],
+    ],
+    'jugador16@mail.com' => [
+        'nombre'       => 'Mariana Serrano',
+        'bases'        => [3.4, 3.0, 3.6, 3.8],
+        'mejora'       => [0.3, 0.4, 0.2, 0.3],
+        'variabilidad' => [0.6, 0.7, 0.6, 0.5],
+    ],
+    'jugador17@mail.com' => [
+        'nombre'       => 'Leonardo Fuentes',
+        'bases'        => [3.9, 4.1, 3.8, 3.5],
+        'mejora'       => [-0.2, -0.1, -0.2, -0.3],  // decadencia marcada
+        'variabilidad' => [0.7, 0.6, 0.7, 0.6],
+    ],
+    'jugador18@mail.com' => [
+        'nombre'       => 'Daniela Rojas',
+        'bases'        => [2.7, 2.9, 2.5, 3.0],
+        'mejora'       => [0.5, 0.5, 0.6, 0.4],
+        'variabilidad' => [0.7, 0.6, 0.8, 0.7],
+    ],
+    'jugador19@mail.com' => [
+        'nombre'       => 'Gabriel Salinas',
+        'bases'        => [4.0, 3.7, 4.2, 3.9],
+        'mejora'       => [0.1, 0.3, 0.1, 0.2],
+        'variabilidad' => [0.5, 0.6, 0.5, 0.5],
+    ],
+    'jugador20@mail.com' => [
+        'nombre'       => 'Isabella Cordero',
+        'bases'        => [3.3, 3.5, 2.9, 3.1],
+        'mejora'       => [0.2, 0.1, 0.4, 0.3],
+        'variabilidad' => [0.6, 0.5, 0.7, 0.6],
+    ],
+    'jugador21@mail.com' => [
+        'nombre'       => 'Andrés Peña',
+        'bases'        => [2.2, 2.5, 2.8, 2.3],
+        'mejora'       => [0.4, 0.3, 0.3, 0.4],
+        'variabilidad' => [0.9, 0.8, 0.8, 0.9],     // muy irregular, nivel bajo
+    ],
+    'jugador22@mail.com' => [
+        'nombre'       => 'Sofía Lozano',
+        'bases'        => [4.5, 4.3, 4.6, 4.4],
+        'mejora'       => [-0.2, -0.2, -0.1, -0.2],  // élite con leve decaimiento
+        'variabilidad' => [0.5, 0.6, 0.4, 0.5],
+    ],
+    'jugador23@mail.com' => [
+        'nombre'       => 'Sebastián Delgado',
+        'bases'        => [3.0, 3.2, 3.1, 2.9],
+        'mejora'       => [0.5, 0.4, 0.4, 0.5],
+        'variabilidad' => [0.6, 0.7, 0.6, 0.6],
+    ],
+    'jugador24@mail.com' => [
+        'nombre'       => 'Renata Quiñones',
+        'bases'        => [3.6, 3.8, 3.3, 3.5],
+        'mejora'       => [0.0, 0.1, 0.2, 0.0],     // meseta media
+        'variabilidad' => [0.5, 0.6, 0.5, 0.5],
+    ],
+    'jugador25@mail.com' => [
+        'nombre'       => 'Emilio Navarro',
+        'bases'        => [2.6, 3.0, 2.4, 2.7],
+        'mejora'       => [0.3, 0.2, 0.4, 0.3],
+        'variabilidad' => [0.8, 0.7, 0.8, 0.9],
+    ],
+    'jugador26@mail.com' => [
+        'nombre'       => 'Bárbara Cáceres',
+        'bases'        => [4.2, 4.0, 3.9, 4.3],
+        'mejora'       => [0.1, 0.2, 0.3, 0.1],
+        'variabilidad' => [0.4, 0.5, 0.4, 0.4],
+    ],
+    'jugador27@mail.com' => [
+        'nombre'       => 'Facundo Romero',
+        'bases'        => [3.5, 3.3, 3.7, 3.4],
+        'mejora'       => [-0.1, 0.0, 0.1, -0.2],   // fluctuante, sin tendencia clara
+        'variabilidad' => [0.7, 0.6, 0.7, 0.8],
     ],
 ];
 
@@ -114,12 +258,10 @@ if (empty($periodRows)) {
 
 $periodos = [];
 foreach ($periodRows as $row) {
-    $startDate = new \DateTime($row['start_date'] ?? '2025-01-01');
-    $midPoint = (clone $startDate)->modify('+45 days');
     $periodos[] = [
         'id'    => (int) $row['id'],
         'label' => $row['name'],
-        'date'  => $midPoint->format('Y-m-d H:i:s'),
+        'start' => new \DateTime($row['start_date'] ?? '2025-01-01'),
     ];
 }
 
@@ -163,7 +305,14 @@ foreach ($jugadores as $jugador) {
     echo "--- {$perfil['nombre']} ({$email}) ---\n";
 
     foreach ($periodos as $pi => $periodo) {
-        $fecha = $periodo['date'];
+        // Semilla determinista por jugador+periodo: mismas respuestas en cada ejecución,
+        // pero variadas entre jugadores y periodos.
+        mt_srand(crc32($email . '|' . $periodo['label']));
+
+        // Fecha de la evaluación dentro del periodo (días 15..80 desde el inicio) para
+        // esparcir los test en el tiempo.
+        $offsetDias = mt_rand(15, 80);
+        $fecha = (clone $periodo['start'])->modify("+{$offsetDias} days")->format('Y-m-d H:i:s');
 
         // ── Verificar si la evaluación ya existe ──
         $existingEval = $conn->executeQuery(
@@ -177,21 +326,31 @@ foreach ($jugadores as $jugador) {
             continue;
         }
 
-        // Calcular base para este periodo (progresión lineal)
+        // Calcular base para este periodo (progresión lineal, puede ser negativa)
         $progreso = $pi / (count($periodos) - 1);  // 0 a 1
         $basesPeriodo = [];
         foreach ($perfil['bases'] as $gi => $base) {
             $basesPeriodo[$gi] = $base + $perfil['mejora'][$gi] * $progreso;
         }
 
-        // Generar 19 respuestas coherentes
+        // Generar 19 respuestas coherentes y variadas
         $scores = [];
         foreach ($grupos as $gNombre => $indices) {
             $gi = array_search($gNombre, array_keys($grupos)); // índice del grupo (0-3)
             $base = $basesPeriodo[$gi];
+            $stdDev = $perfil['variabilidad'][$gi] ?? 0.6;
 
             foreach ($indices as $qi) {
-                $score = normalRand($base, 0.6);
+                $score = normalRand($base, $stdDev);
+
+                // Rachas (inconsistencia): ~8% de probabilidad de ±1 punto extra
+                $racha = mt_rand(1, 100);
+                if ($racha <= 8) {
+                    $score += 1;
+                } elseif ($racha >= 96) {
+                    $score -= 1;
+                }
+
                 $scores[$qi] = clampScore($score);
             }
         }
