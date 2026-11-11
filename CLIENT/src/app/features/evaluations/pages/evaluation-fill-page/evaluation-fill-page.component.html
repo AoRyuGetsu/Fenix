@@ -45,9 +45,9 @@
         <div class="card-header fw-semibold">{{ vm().t('eval_hdr_period_selector') }}</div>
         <div class="card-body">
           <select class="form-select" [value]="vm().selectedPeriodId ?? ''" (change)="onPeriodChange($event)">
-            <option value="" disabled>{{ vm().t('eval_plh_select_period') }}</option>
+            <option value="" disabled [selected]="vm().selectedPeriodId === null">{{ vm().t('eval_plh_select_period') }}</option>
             @for (p of vm().periods; track p.id) {
-              <option [value]="p.id">{{ p.name }}</option>
+              <option [value]="p.id" [selected]="p.id === vm().selectedPeriodId">{{ p.name }}</option>
             }
           </select>
         </div>

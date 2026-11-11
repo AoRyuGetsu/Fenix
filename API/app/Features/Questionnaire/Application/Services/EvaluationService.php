@@ -76,11 +76,20 @@ class EvaluationService implements EvaluationServiceInterface
         return $evaluation;
     }
 
-    public function update(int $evaluationId, array $answers, ?string $observaciones = null): Evaluation
+    public function update(int $evaluationId, int $periodId, array $answers, ?string $observaciones = null): Evaluation
     {
         $evaluation = $this->repository->findById($evaluationId);
         if ($evaluation === null) {
             throw new AppException('EVALUATION_NOT_FOUND');
+        }
+
+        $period = $this->periodRepository->findById($periodId);
+        if ($period === null) {
+            throw new AppException('PERIOD_NOT_FOUND');
+        }
+
+        if ($evaluation->getPeriod()->getId() !== $periodId) {
+            throw new AppException('EVALUATION_PERIOD_MISMATCH');
         }
 
         $evaluation->setObservaciones($observaciones);

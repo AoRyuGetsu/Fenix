@@ -139,6 +139,7 @@ class EvaluationController implements ControllerInterface
     #[OA\Put(path: '/evaluations/{id}', tags: ['Evaluation'], summary: 'Actualizar respuestas de una evaluación')]
     #[OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\RequestBody(content: new OA\JsonContent(properties: [
+        new OA\Property(property: 'period_id', type: 'integer'),
         new OA\Property(property: 'answers', type: 'array', items: new OA\Items(
             properties: [
                 new OA\Property(property: 'question_id', type: 'integer'),
@@ -158,12 +159,16 @@ class EvaluationController implements ControllerInterface
             return new JsonResponse(['error' => getError('VALIDATION_JSON_INVALID'), 'code' => 'VALIDATION_JSON_INVALID'], 400);
         }
 
+        if (!isset($data['period_id'])) {
+            return new JsonResponse(['error' => getError('VALIDATION_REQUIRED'), 'code' => 'VALIDATION_REQUIRED'], 422);
+        }
+
         if (!isset($data['answers']) || !is_array($data['answers']) || $data['answers'] === []) {
             return new JsonResponse(['error' => getError('VALIDATION_ARRAY_REQUIRED'), 'code' => 'VALIDATION_ARRAY_REQUIRED'], 422);
         }
 
         try {
-            $evaluation = $this->evaluationService->update($id, $data['answers'], $this->parseObservaciones($data['observaciones'] ?? null));
+            $evaluation = $this->evaluationService->update($id, (int) $data['period_id'], $data['answers'], $this->parseObservaciones($data['observaciones'] ?? null));
         } catch (\App\Core\AppException $e) {
             return new JsonResponse(['error' => $e->getMessage(), 'code' => $e->getErrorCode()], $e->getCode());
         }

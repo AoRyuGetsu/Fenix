@@ -11,9 +11,9 @@
           [value]="vm().value"
           (change)="onSelect($event)"
         >
-          <option value="" disabled selected>{{ vm().t('eval_plh_select_option') }}</option>
+          <option value="" disabled [selected]="!vm().value">{{ vm().t('eval_plh_select_option') }}</option>
           @for (opt of vm().question.options; track trackByOptionId($index, opt)) {
-            <option [value]="opt.option_text">{{ opt.option_text }}</option>
+            <option [value]="opt.option_text" [selected]="opt.option_text === vm().value">{{ opt.option_text }}</option>
           }
         </select>
         @if (vm().scaleHint; as hint) {

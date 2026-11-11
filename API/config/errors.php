@@ -17,6 +17,7 @@ return [
     'SECTION_NOT_FOUND'          => 'Sección no encontrada',
     'QUESTION_NOT_FOUND'         => 'Pregunta no encontrada',
     'EVALUATION_NOT_FOUND'       => 'Evaluación no encontrada',
+    'EVALUATION_PERIOD_MISMATCH' => 'El periodo seleccionado no coincide con la evaluación',
     'PERIOD_NOT_FOUND'           => 'Periodo no encontrado',
     'PERIOD_OVERLAP'             => 'Ya existe un periodo con ese nombre',
     'PERIOD_DATES_INVALID'       => 'La fecha de inicio no puede ser posterior a la fecha de fin',

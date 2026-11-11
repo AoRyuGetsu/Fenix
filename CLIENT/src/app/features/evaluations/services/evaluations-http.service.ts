@@ -132,6 +132,7 @@ export interface CreateEvaluationRequest {
 }
 
 export interface UpdateEvaluationRequest {
+  period_id: number;
   observaciones?: string | null;
   answers: { question_id: number; value: string }[];
 }

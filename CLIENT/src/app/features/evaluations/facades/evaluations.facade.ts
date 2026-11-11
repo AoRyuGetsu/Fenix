@@ -21,6 +21,7 @@ export interface EvaluationFillState {
   questionnaire: QuestionnaireDetail | null;
   periods: PeriodItem[];
   selectedPeriodId: number | null;
+  loadedPeriodId: number | null;
   unevaluated: UserItem[];
   evaluated: EvaluatedStudent[];
   usersLoading: boolean;
@@ -78,6 +79,7 @@ export class EvaluationsFacade {
     questionnaire: null,
     periods: [],
     selectedPeriodId: null,
+    loadedPeriodId: null,
     unevaluated: [],
     evaluated: [],
     usersLoading: false,
@@ -161,9 +163,11 @@ export class EvaluationsFacade {
   }
 
   private findCurrentPeriod(periods: PeriodItem[]): number | null {
+    if (periods.length === 0) return null;
     const today = new Date().toISOString().slice(0, 10);
     const match = periods.find(p => today >= p.start_date && today <= p.end_date);
-    return match ? match.id : (periods.length > 0 ? periods[periods.length - 1].id : null);
+    if (match) return match.id;
+    return [...periods].sort((a, b) => a.start_date.localeCompare(b.start_date))[0].id;
   }
 
   loadFillData(questionnaireId: number, page = 1): void {
@@ -172,6 +176,7 @@ export class EvaluationsFacade {
       questionnaire: null,
       periods: [],
       selectedPeriodId: null,
+      loadedPeriodId: null,
       unevaluated: [],
       evaluated: [],
       usersLoading: true,
@@ -226,6 +231,7 @@ export class EvaluationsFacade {
     this.fillState.update(s => ({
       ...s,
       usersLoading: true,
+      loadedPeriodId: null,
       selectedUserId: null,
       editingEvaluationId: null,
       answers: {},
@@ -241,6 +247,7 @@ export class EvaluationsFacade {
         total: res.total,
         page: res.page,
         perPage: res.perPage,
+        loadedPeriodId: periodId,
         usersLoading: false,
       })),
       error: err => this.fillState.update(s => ({
@@ -317,6 +324,11 @@ export class EvaluationsFacade {
       return;
     }
 
+    if (state.usersLoading || state.loadedPeriodId !== state.selectedPeriodId) {
+      this.fillState.update(s => ({ ...s, error: this.msg.get('eval_err_period_not_loaded') }));
+      return;
+    }
+
     const allQuestions = state.questionnaire?.sections.flatMap(s => s.questions) ?? [];
     const unanswered = allQuestions.filter(q => !state.answers[q.id]?.trim());
     if (unanswered && unanswered.length > 0) {
@@ -333,13 +345,25 @@ export class EvaluationsFacade {
     const observaciones = state.observaciones?.trim() || null;
 
     if (state.editingEvaluationId !== null) {
-      this.api.updateEvaluation(state.editingEvaluationId, { answers, observaciones }).subscribe({
-        next: () => {
+      this.api.updateEvaluation(state.editingEvaluationId, {
+        period_id: state.selectedPeriodId,
+        answers,
+        observaciones,
+      }).subscribe({
+        next: res => {
           this.fillState.update(s => ({
             ...s,
             saving: false,
             success: this.msg.get('eval_suc_evaluation_updated'),
             error: null,
+            editingEvaluationId: res.id,
+            evaluated: s.evaluated.map(e => e.evaluation_id === res.id
+              ? {
+                  ...e,
+                  answers: res.answers.map(a => ({ id: a.id, question_id: a.question_id, value: a.value })),
+                  observaciones: res.observaciones ?? null,
+                }
+              : e),
           }));
         },
         error: err => this.fillState.update(s => ({
@@ -356,13 +380,26 @@ export class EvaluationsFacade {
         answers,
         observaciones,
       }).subscribe({
-        next: () => {
-          this.fillState.update(s => ({
-            ...s,
-            saving: false,
-            success: this.msg.get('eval_suc_evaluation_saved'),
-            error: null,
-          }));
+        next: res => {
+          this.fillState.update(s => {
+            const user = s.unevaluated.find(u => u.id === s.selectedUserId);
+            return {
+              ...s,
+              saving: false,
+              success: this.msg.get('eval_suc_evaluation_saved'),
+              error: null,
+              editingEvaluationId: res.id,
+              unevaluated: user ? s.unevaluated.filter(u => u.id !== s.selectedUserId) : s.unevaluated,
+              evaluated: user
+                ? [...s.evaluated, {
+                    evaluation_id: res.id,
+                    user,
+                    answers: res.answers.map(a => ({ id: a.id, question_id: a.question_id, value: a.value })),
+                    observaciones: res.observaciones ?? null,
+                  }]
+                : s.evaluated,
+            };
+          });
         },
         error: err => this.fillState.update(s => ({
           ...s,
@@ -416,6 +453,7 @@ export class EvaluationsFacade {
       questionnaire: null,
       periods: [],
       selectedPeriodId: null,
+      loadedPeriodId: null,
       unevaluated: [],
       evaluated: [],
       usersLoading: false,

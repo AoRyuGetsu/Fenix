@@ -27,6 +27,7 @@
   "eval_err_load_students":                 { "message": "Error al cargar estudiantes", "desc": "Error cargar estudiantes" },
   "eval_err_select_period":                 { "message": "Debe seleccionar un periodo", "desc": "Validación antes de guardar" },
   "eval_err_select_user":                   { "message": "Debe seleccionar un usuario evaluado", "desc": "Validación antes de guardar" },
+  "eval_err_period_not_loaded":             { "message": "El periodo seleccionado aún no está cargado. Espere e intente de nuevo.", "desc": "Validación antes de guardar" },
   "eval_err_answer_all":                    { "message": "Debe responder todas las preguntas", "desc": "Validación preguntas incompletas" },
   "eval_suc_evaluation_updated":            { "message": "Evaluación actualizada exitosamente", "desc": "Éxito al actualizar" },
   "eval_suc_evaluation_saved":              { "message": "Evaluación guardada exitosamente", "desc": "Éxito al crear" },

@@ -10,7 +10,7 @@ use App\Features\Questionnaire\Domain\Entities\Evaluation;
 interface EvaluationServiceInterface
 {
     public function create(int $questionnaireId, int $targetUserId, int $periodId, array $answers): Evaluation;
-    public function update(int $evaluationId, array $answers): Evaluation;
+    public function update(int $evaluationId, int $periodId, array $answers, ?string $observaciones = null): Evaluation;
     public function findById(int $id): ?Evaluation;
     public function list(?EvaluationQuery $query = null): array;
     public function softDelete(int $id): void;
